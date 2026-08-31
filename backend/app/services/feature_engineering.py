@@ -1,5 +1,5 @@
 """
-FinSight Feature Engineering Pipeline
+FinSight Feature Engineering Pipeline (Backend Service Copy)
 Improvised high-dimensional financial feature vector extractor for Indian banking transactions.
 Optimized for FY 2025-26 Indian Income Tax Regime (Section 115BAC).
 """
@@ -91,7 +91,6 @@ def detect_category(narration: str, txn_type: str) -> str:
             return "GENERAL_DEBIT"
 
 
-
 class FinancialFeatureExtractor:
     """
     Extracts a 16-dimensional standardized financial behavioral feature vector
@@ -131,15 +130,12 @@ class FinancialFeatureExtractor:
         monthly_burn_rate = float(total_debit / (total_credit + self.eps))
 
         # 2. Income Dynamics & Regularity
-        # Salary detection by category or regex narration
         salary_mask = credits["category"].astype(str).str.upper().str.contains("SALARY") | credits["narration"].apply(lambda s: bool(SALARY_PATTERNS.search(s)))
         salary_credits = credits[salary_mask]
         total_salary = float(salary_credits["amount"].sum())
         salary_inflow_ratio = float(total_salary / (total_credit + self.eps))
 
-        # Monthly Credit CV & Regularity
         monthly_credits = credits.groupby("month")["amount"].sum()
-        # Reindex to 12 months if possible
         if len(monthly_credits) > 1:
             credit_mean = float(monthly_credits.mean())
             credit_std = float(monthly_credits.std(ddof=0))
@@ -147,32 +143,26 @@ class FinancialFeatureExtractor:
         else:
             monthly_credit_cv = 0.0
 
-        # Salary regularity: distinct months with salary
         salary_months = salary_credits["month"].nunique()
         salary_regularity_score = float(min(salary_months / 12.0, 1.0))
 
-        # Outsized Bonus / Lump-sum ratio (credits > 2x monthly mean)
         mean_monthly_credit = (total_credit / 12.0) if total_credit > 0 else 1.0
         bonus_credits = credits[credits["amount"] >= (2.0 * mean_monthly_credit)]["amount"].sum()
         bonus_lump_sum_ratio = float(bonus_credits / (total_credit + self.eps))
 
         # 3. Outflow Allocation & Tax-Shield Proxies
-        # Investment (SIP, Mutual Funds, Stocks)
         inv_mask = debits["category"].astype(str).str.upper().isin(["INVESTMENT", "SIP", "MUTUAL_FUND", "STOCKS"]) | debits["narration"].apply(lambda s: bool(INVESTMENT_PATTERNS.search(s)))
         total_inv = float(debits[inv_mask]["amount"].sum())
         investment_ratio = float(total_inv / (total_credit + self.eps))
 
-        # Fixed Obligations (Rent, EMI, Utilities)
         fixed_mask = debits["category"].astype(str).str.upper().isin(["RENT", "EMI", "UTILITIES", "HOUSING"]) | debits["narration"].apply(lambda s: bool(FIXED_OBLIGATION_PATTERNS.search(s)))
         total_fixed = float(debits[fixed_mask]["amount"].sum())
         fixed_obligation_ratio = float(total_fixed / (total_debit + self.eps))
 
-        # Discretionary (Dining, Shopping, Travel)
         disc_mask = debits["category"].astype(str).str.upper().isin(["FOOD", "DINING", "SHOPPING", "TRAVEL", "ENTERTAINMENT"]) | debits["narration"].apply(lambda s: bool(DISCRETIONARY_PATTERNS.search(s)))
         total_disc = float(debits[disc_mask]["amount"].sum())
         discretionary_ratio = float(total_disc / (total_debit + self.eps))
 
-        # Tax-Shield Outflows (PPF, NPS 14%, Health Insurance)
         tax_shield_mask = debits["category"].astype(str).str.upper().isin(["NPS", "PPF", "INSURANCE", "TAX_SAVING"]) | debits["narration"].apply(lambda s: bool(TAX_SHIELD_PATTERNS.search(s)))
         total_tax_shield = float(debits[tax_shield_mask]["amount"].sum())
         tax_shield_ratio = float(total_tax_shield / (total_credit + self.eps))
@@ -187,7 +177,6 @@ class FinancialFeatureExtractor:
         avg_ticket_size = float(df["amount"].mean()) if len(df) > 0 else 0.0
         log_avg_ticket_size = float(np.log1p(avg_ticket_size))
 
-        # Capital Gains Inflows / Liquidations
         cap_gains_mask = credits["category"].astype(str).str.upper().isin(["REDEMPTION", "DIVIDEND", "CAPITAL_GAINS"]) | credits["narration"].apply(lambda s: bool(CAPITAL_GAINS_PATTERNS.search(s)))
         total_cap_gains = float(credits[cap_gains_mask]["amount"].sum())
         capital_gains_flux = float(total_cap_gains / (total_credit + self.eps))
@@ -210,31 +199,3 @@ class FinancialFeatureExtractor:
             "log_avg_ticket_size": round(log_avg_ticket_size, 4),
             "capital_gains_flux": round(capital_gains_flux, 4)
         }
-
-    def extract_vector(self, df: pd.DataFrame) -> np.ndarray:
-        """Returns ordered feature array corresponding to FEATURE_NAMES."""
-        features_dict = self.extract_from_dataframe(df)
-        return np.array([features_dict[feat] for feat in FEATURE_NAMES], dtype=np.float32)
-
-
-class FinSightDataPreprocessor(BaseEstimator, TransformerMixin):
-    """
-    Robust pipeline transformer applying Yeo-Johnson power transform
-    to skewed financial ratios followed by standard scaling.
-    """
-
-    def __init__(self):
-        self.scaler = StandardScaler()
-        self.feature_names = FEATURE_NAMES
-
-    def fit(self, X, y=None):
-        X_mat = np.asarray(X, dtype=np.float64)
-        self.scaler.fit(X_mat)
-        return self
-
-    def transform(self, X):
-        X_mat = np.asarray(X, dtype=np.float64)
-        return self.scaler.transform(X_mat)
-
-    def fit_transform(self, X, y=None):
-        return self.fit(X, y).transform(X)
