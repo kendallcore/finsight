@@ -6,6 +6,9 @@
 [![React 19](https://img.shields.io/badge/React-19.0-61dafb.svg)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-6.0-646CFF.svg)](https://vitejs.dev)
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-1.4+-F7931E.svg)](https://scikit-learn.org)
+[![Hugging Face Models](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models-orange)](https://huggingface.co/sanjeevafk/finsight-indian-tax-models)
+[![Hugging Face Datasets](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Datasets-yellow)](https://huggingface.co/datasets/sanjeevafk/indian-banking-tax-profiles-2025)
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/sanjeevafk/finsight)
 
 FinSight is a production-grade machine learning system that automates bank statement diagnostic analysis, extracts 16-dimensional financial behavioral vectors, predicts annual gross income via regression, classifies statutory tax slabs under the Indian New Tax Regime (Section 115BAC - FY 2025-26), and discovers spending personas through unsupervised geometric clustering.
 
