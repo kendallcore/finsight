@@ -58,3 +58,12 @@ data/kaggle_bank_customer_segmentation/
 data/kaggle_upi_2024/
 data/raw/
 
+# Local Planning, College PBL, and Internal Presentation Docs
+plans/
+docs/original/
+docs/19AI410*
+docs/VIVA_AND_DEMO_GUIDE.md
+docs/ROADMAP.md
+docs/PRESENTATION_SLIDES.html
+
+
