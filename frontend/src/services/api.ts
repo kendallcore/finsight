@@ -15,9 +15,13 @@ export const api = {
     return res.json();
   },
 
-  async uploadStatement(file: File): Promise<UploadStatementResponse> {
+  async uploadStatement(file: File, entityType: string = 'salaried_individual', pdfPassword?: string): Promise<UploadStatementResponse> {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('entity_type', entityType);
+    if (pdfPassword) {
+      formData.append('pdf_password', pdfPassword);
+    }
     const res = await fetch(`${API_BASE}/upload-statement`, {
       method: 'POST',
       body: formData,
@@ -28,6 +32,7 @@ export const api = {
     }
     return res.json();
   },
+
 
   async predictFeatures(features: ExtractedFeatures): Promise<UploadStatementResponse> {
     const res = await fetch(`${API_BASE}/predict-features`, {

@@ -102,10 +102,68 @@ def test_upload_statement_csv():
 2025-02-05,25000,DEBIT,UPI - RENT TO LANDLORD,UPI,RENT
 """
     files = {"file": ("test_statement.csv", io.BytesIO(csv_content.encode("utf-8")), "text/csv")}
-    response = client.post("/api/upload-statement", files=files)
+    response = client.post("/api/upload-statement", files=files, data={"entity_type": "salaried_individual"})
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
     assert data["statement_summary"]["total_transactions"] == 6
     assert data["predictions"]["estimated_annual_income"] > 0
     assert data["predictions"]["tax_breakdown"]["gross_income"] > 0
+    assert data["predictions"]["tax_breakdown"]["standard_deduction"] == 75000.0
+
+
+def test_upload_statement_pdf_real():
+    import os
+    pdf_path = "/home/sanjeev/Downloads/Acct Statement_1553_31082026_16.39.39.pdf"
+    if not os.path.exists(pdf_path):
+        pytest.skip("Test statement PDF not present in environment.")
+    
+    with open(pdf_path, "rb") as f:
+        files = {"file": ("bank_statement.pdf", f, "application/pdf")}
+        response = client.post(
+            "/api/upload-statement",
+            files=files,
+            data={"entity_type": "presumptive_business_44ad", "pdf_password": "254214884"}
+        )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert data["statement_summary"]["total_transactions"] >= 1800
+    assert data["statement_summary"]["digital_receipts_ratio"] > 0.80
+    assert data["predictions"]["tax_breakdown"]["entity_type"] == "presumptive_business_44ad"
+    assert data["predictions"]["tax_breakdown"]["deemed_profit_rate_percent"] == 6.0
+    # For ~51.92L turnover, 6% profit = ~3.11L -> tax is ₹0 under Section 87A rebate
+    assert data["predictions"]["tax_breakdown"]["net_tax_payable"] == 0.0
+
+
+def test_business_pnl_tax_with_depreciation():
+    payload = {
+        "entity_type": "regular_business_pnl",
+        "opex_amount": 3500000.0,
+        "capex_amount": 800000.0, # 15% depreciation = 120,000
+        "log_annual_credit": 15.6,
+        "log_annual_debit": 15.5,
+        "net_savings_ratio": 0.10,
+        "monthly_burn_rate": 0.90,
+        "salary_inflow_ratio": 0.0,
+        "monthly_credit_cv": 0.50,
+        "salary_regularity_score": 0.5,
+        "bonus_lump_sum_ratio": 0.0,
+        "investment_ratio": 0.0,
+        "fixed_obligation_ratio": 0.25,
+        "discretionary_ratio": 0.05,
+        "tax_shield_ratio": 0.0,
+        "upi_velocity_index": 0.90,
+        "micro_spend_density": 0.02,
+        "log_avg_ticket_size": 8.5,
+        "capital_gains_flux": 0.0
+    }
+    response = client.post("/api/predict-features", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    tb = data["predictions"]["tax_breakdown"]
+    assert tb["entity_type"] == "regular_business_pnl"
+    assert tb["deductible_opex"] == 3500000.0
+    assert tb["capex_investment"] == 800000.0
+    assert tb["depreciation_allowance"] == 120000.0
+    assert tb["taxable_income"] == round(tb["gross_income"] - 3500000.0 - 120000.0, 2)

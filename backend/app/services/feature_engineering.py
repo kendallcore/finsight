@@ -21,6 +21,11 @@ DISCRETIONARY_PATTERNS = re.compile(r"(?i)(swiggy|zomato|blinkit|zepto|instamart
 CAPITAL_GAINS_PATTERNS = re.compile(r"(?i)(dividend|redemption|mf\s*red|zerodha\s*cr|groww\s*cr|payout)")
 
 
+# Regular expressions for Business Deductions (OPEX & Section 32 CAPEX)
+OPEX_PATTERNS = re.compile(r"(?i)(rent\b|landlord|nobroker|electricity|bescom|tneb|mgl|staff|wages|trainer|salary\s*paid|vendor|supplier|wholesale|materials|maintenance|repair|courier|marketing|adwords|meta\s*ads|software|saas|subscription|aws|gcp|cleaning|stationery|office\s*exp)")
+CAPEX_PATTERNS = re.compile(r"(?i)(machinery|equipment|treadmill|gym\s*equip|weights|dumbbells|hardware|computer|laptop|macbook|dell|server|furniture|interior|renovation|air\s*conditioner|cctv|sound\s*system|pos\s*machine)")
+
+
 FEATURE_NAMES = [
     "log_annual_credit",
     "log_annual_debit",
@@ -71,8 +76,16 @@ def detect_category(narration: str, txn_type: str) -> str:
         else:
             return "GENERAL_CREDIT"
     else:
-        if any(w in s for w in ["RENT", "LANDLORD", "NOBROKER"]):
+        if bool(CAPEX_PATTERNS.search(s)):
+            return "CAPEX_EQUIPMENT"
+        elif any(w in s for w in ["RENT", "LANDLORD", "NOBROKER"]):
             return "RENT"
+        elif any(w in s for w in ["ELECTRICITY", "BESCOM", "TNEB", "AIRTEL", "JIO", "GAS", "BBPS", "BILL"]):
+            return "UTILITIES"
+        elif any(w in s for w in ["STAFF", "WAGES", "TRAINER", "SALARY PAID"]):
+            return "STAFF_SALARY"
+        elif any(w in s for w in ["VENDOR", "SUPPLIER", "WHOLESALE", "MATERIALS", "MAINTENANCE"]):
+            return "VENDOR_PAYOUT"
         elif any(w in s for w in ["EMI", "LOAN", "HOUSING", "AUTO"]):
             return "EMI"
         elif any(w in s for w in ["SWIGGY", "ZOMATO", "BLINKIT", "ZEPTO", "RESTAURANT", "CAFE", "FOOD"]):
@@ -81,12 +94,12 @@ def detect_category(narration: str, txn_type: str) -> str:
             return "SHOPPING"
         elif any(w in s for w in ["UBER", "OLA", "FASTAG", "PETROL", "FUEL", "IRCTC", "MAKEMYTRIP"]):
             return "TRAVEL"
-        elif any(w in s for w in ["ELECTRICITY", "BESCOM", "AIRTEL", "JIO", "GAS", "BBPS", "BILL"]):
-            return "UTILITIES"
         elif any(w in s for w in ["ZERODHA", "GROWW", "MUTUAL FUND", "SIP", "STOCKS", "MF"]):
             return "INVESTMENT"
         elif any(w in s for w in ["NPS", "PPF", "INSURANCE", "LIC", "MAX LIFE", "HDFC ERGO"]):
             return "TAX_SHIELD"
+        elif bool(OPEX_PATTERNS.search(s)):
+            return "OPERATIONAL_EXPENSE"
         else:
             return "GENERAL_DEBIT"
 
@@ -199,3 +212,45 @@ class FinancialFeatureExtractor:
             "log_avg_ticket_size": round(log_avg_ticket_size, 4),
             "capital_gains_flux": round(capital_gains_flux, 4)
         }
+
+    def extract_business_breakdown(self, df: pd.DataFrame) -> Dict[str, float]:
+        """
+        Extracts business-specific financial aggregates:
+        Deductible OPEX, Capital Expenditures (CAPEX), and Digital Receipts Ratio.
+        """
+        if df.empty:
+            return {"detected_opex": 0.0, "detected_capex": 0.0, "digital_receipts_ratio": 1.0}
+
+        df = df.copy()
+        df["amount"] = pd.to_numeric(df["amount"], errors="coerce").fillna(0.0).abs()
+        df["type"] = df["type"].astype(str).str.upper()
+        df["payment_mode"] = df["payment_mode"].astype(str).str.upper()
+        df["narration"] = df["narration"].astype(str)
+
+        credits = df[df["type"] == "CREDIT"]
+        debits = df[df["type"] == "DEBIT"]
+
+        total_credits = float(credits["amount"].sum())
+        total_debits = float(debits["amount"].sum())
+
+        # 1. Digital Receipts Ratio (UPI, NEFT, IMPS, ACH, Card vs Cash)
+        digital_credit_mask = credits["payment_mode"].isin(["UPI", "NEFT", "IMPS", "ACH", "POS", "NETBANKING", "CARD"])
+        digital_credits = float(credits[digital_credit_mask]["amount"].sum())
+        digital_ratio = (digital_credits / total_credits) if total_credits > 0 else 1.0
+
+        # 2. Detected CAPEX (Equipment, Machinery, Computers, Gym Hardware)
+        capex_mask = debits["narration"].apply(lambda s: bool(CAPEX_PATTERNS.search(s))) | debits["category"].astype(str).str.upper().isin(["CAPEX_EQUIPMENT"])
+        total_capex = float(debits[capex_mask]["amount"].sum())
+
+        # 3. Detected OPEX (Rent, Utilities, Staff/Trainers, Vendors, Supplier Payouts, Business Debits)
+        # Exclude capital asset purchases and personal investment transfers
+        inv_mask = debits["category"].astype(str).str.upper().isin(["INVESTMENT", "SIP", "MUTUAL_FUND", "STOCKS"])
+        pure_opex_mask = (~capex_mask) & (~inv_mask)
+        total_opex = float(debits[pure_opex_mask]["amount"].sum())
+
+        return {
+            "detected_opex": round(total_opex, 2),
+            "detected_capex": round(total_capex, 2),
+            "digital_receipts_ratio": round(digital_ratio, 4)
+        }
+

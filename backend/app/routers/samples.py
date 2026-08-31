@@ -40,8 +40,17 @@ async def analyze_sample_profile(profile_id: str):
     if not csv_bytes:
         raise HTTPException(status_code=404, detail=f"Sample profile '{profile_id}' not found.")
 
-    summary, features = statement_parser.parse_and_extract(csv_bytes)
-    predictions = ml_service.predict(features.model_dump())
+    summary, features, business_metrics = statement_parser.parse_and_extract(
+        file_bytes=csv_bytes,
+        filename=f"{profile_id}.csv"
+    )
+    predictions = ml_service.predict(
+        features_dict=features.model_dump(),
+        entity_type="salaried_individual",
+        opex=business_metrics.get("detected_opex", 0.0),
+        capex=business_metrics.get("detected_capex", 0.0),
+        digital_ratio=business_metrics.get("digital_receipts_ratio", 1.0)
+    )
 
     return UploadStatementResponse(
         status="success",
@@ -49,3 +58,4 @@ async def analyze_sample_profile(profile_id: str):
         extracted_features=features,
         predictions=predictions
     )
+

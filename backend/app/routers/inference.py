@@ -1,9 +1,5 @@
-"""
-Inference Endpoints Router
-Handles CSV statement uploads and manual what-if feature predictions.
-"""
-
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, status
+from typing import Optional
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 
 from app.schemas import (
@@ -21,28 +17,42 @@ router = APIRouter(prefix="/api", tags=["Inference"])
 @router.post("/upload-statement", response_model=UploadStatementResponse)
 async def upload_statement(
     file: UploadFile = File(...),
+    entity_type: str = Form("salaried_individual"),
+    pdf_password: Optional[str] = Form(None),
     db: Session = Depends(get_db)
 ):
     """
-    Ingests an arbitrary Indian banking CSV statement, extracts the 16D financial
-    behavioral feature vector, and computes multi-model predictions.
+    Ingests an arbitrary Indian banking CSV, TXT, or PDF statement,
+    extracts the 16D financial behavioral vector, and computes multi-model predictions
+    tailored to the selected entity type (Salaried, 44AD Small Business, 44ADA Professional, Business P&L).
     """
-    if not file.filename.endswith((".csv", ".txt")):
+    valid_exts = (".csv", ".txt", ".pdf")
+    if not any(file.filename.lower().endswith(ext) for ext in valid_exts):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Unsupported file format. Please upload a standard CSV banking statement."
+            detail="Unsupported file format. Please upload a standard CSV, TXT, or PDF banking statement."
         )
 
     try:
-        csv_bytes = await file.read()
-        if len(csv_bytes) == 0:
+        file_bytes = await file.read()
+        if len(file_bytes) == 0:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Uploaded file is empty.")
 
-        # 1. Parse and extract features
-        summary, features = statement_parser.parse_and_extract(csv_bytes)
+        # 1. Parse and extract features + business breakdown
+        summary, features, business_metrics = statement_parser.parse_and_extract(
+            file_bytes=file_bytes,
+            filename=file.filename,
+            password=pdf_password
+        )
 
-        # 2. Execute inference
-        predictions = ml_service.predict(features.model_dump())
+        # 2. Execute inference tailored to entity type
+        predictions = ml_service.predict(
+            features_dict=features.model_dump(),
+            entity_type=entity_type,
+            opex=business_metrics.get("detected_opex", 0.0),
+            capex=business_metrics.get("detected_capex", 0.0),
+            digital_ratio=business_metrics.get("digital_receipts_ratio", 1.0)
+        )
 
         # 3. Log to SQLite
         record = StatementUploadRecord(
@@ -80,7 +90,16 @@ async def predict_features(input_data: ManualFeatureInput):
     """
     try:
         feat_dict = input_data.model_dump()
-        predictions = ml_service.predict(feat_dict)
+        entity_type = feat_dict.pop("entity_type", "salaried_individual")
+        opex_amount = feat_dict.pop("opex_amount", 0.0)
+        capex_amount = feat_dict.pop("capex_amount", 0.0)
+
+        predictions = ml_service.predict(
+            features_dict=feat_dict,
+            entity_type=entity_type,
+            opex=opex_amount,
+            capex=capex_amount
+        )
         features = ExtractedFeatures(**feat_dict)
 
         return PredictFeaturesResponse(
@@ -93,3 +112,4 @@ async def predict_features(input_data: ManualFeatureInput):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Inference error: {str(e)}"
         )
+

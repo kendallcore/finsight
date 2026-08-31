@@ -79,12 +79,55 @@ class MLService:
         except Exception as e:
             print(f"Warning: Error loading models: {e}. Ensure train_models.py was executed.")
 
-    def calculate_statutory_tax(self, gross_income: float, is_salaried: bool = True) -> TaxBreakdownSummary:
-        """Computes FY 2025-26 New Tax Regime (Section 115BAC) statutory tax liability."""
-        std_deduction = 75000.0 if is_salaried else 0.0
-        taxable_income = max(0.0, gross_income - std_deduction)
+    def calculate_statutory_tax(
+        self,
+        gross_income: float,
+        is_salaried: bool = True,
+        entity_type: str = "salaried_individual",
+        opex: float = 0.0,
+        capex: float = 0.0,
+        digital_ratio: float = 1.0
+    ) -> TaxBreakdownSummary:
+        """
+        Computes statutory tax liability under Indian Income Tax Act (FY 2025-26 - Section 115BAC).
+        Supports Salaried Individuals, Presumptive Taxation (Sec 44AD/44ADA), and Business P&L with OPEX & Depreciation.
+        """
+        std_deduction = 0.0
+        deductible_opex = 0.0
+        capex_investment = 0.0
+        depreciation_allowance = 0.0
+        deemed_profit_rate = None
+        regime_notes = ""
 
-        # Compute tax per slab
+        if entity_type == "presumptive_business_44ad":
+            # Section 44AD: 6% for digital receipts, 8% for cash on turnover up to ₹3 Crore
+            deemed_rate = 6.0 if digital_ratio >= 0.95 else round((6.0 * digital_ratio) + (8.0 * (1.0 - digital_ratio)), 2)
+            deemed_profit_rate = deemed_rate
+            taxable_income = max(0.0, round(gross_income * (deemed_rate / 100.0), 2))
+            regime_notes = f"Section 44AD Presumptive Taxation ({deemed_rate}% deemed profit on ₹{gross_income:,.2f} turnover). OPEX and depreciation are fully factored into the presumptive rate."
+
+        elif entity_type == "presumptive_professional_44ada":
+            # Section 44ADA: 50% deemed profit on gross receipts up to ₹75 Lakhs
+            deemed_profit_rate = 50.0
+            taxable_income = max(0.0, round(gross_income * 0.50, 2))
+            regime_notes = f"Section 44ADA Presumptive Taxation (50.0% deemed profit on ₹{gross_income:,.2f} professional receipts)."
+
+        elif entity_type == "regular_business_pnl":
+            # Regular Commercial Business P&L: Gross Revenue - Deductible OPEX - Sec 32 Depreciation (15% WDV)
+            deductible_opex = round(min(max(0.0, opex), gross_income), 2)
+            capex_investment = round(max(0.0, capex), 2)
+            depreciation_allowance = round(capex_investment * 0.15, 2)
+            taxable_income = max(0.0, round(gross_income - deductible_opex - depreciation_allowance, 2))
+            regime_notes = f"Commercial Business P&L: Gross revenue ₹{gross_income:,.2f} minus allowable OPEX ₹{deductible_opex:,.2f} and Section 32 Depreciation (15% WDV) ₹{depreciation_allowance:,.2f}."
+
+        else:
+            # Salaried Individual (Default)
+            entity_type = "salaried_individual"
+            std_deduction = 75000.0 if is_salaried else 0.0
+            taxable_income = max(0.0, round(gross_income - std_deduction, 2))
+            regime_notes = "Section 115BAC Salaried Individual (Standard deduction ₹75,000 + Section 87A rebate)."
+
+        # Compute progressive statutory tax per slab on taxable_income
         base_tax = 0.0
         remaining = taxable_income
 
@@ -116,22 +159,35 @@ class MLService:
         effective_rate = (net_tax / gross_income * 100.0) if gross_income > 0 else 0.0
 
         return TaxBreakdownSummary(
+            entity_type=entity_type,
             gross_income=round(gross_income, 2),
             standard_deduction=round(std_deduction, 2),
+            deductible_opex=round(deductible_opex, 2),
+            capex_investment=round(capex_investment, 2),
+            depreciation_allowance=round(depreciation_allowance, 2),
+            deemed_profit_rate_percent=deemed_profit_rate,
             taxable_income=round(taxable_income, 2),
             base_tax_liability=round(base_tax, 2),
             section_87a_rebate=round(rebate_87a, 2),
             net_tax_payable=round(net_tax, 2),
-            effective_tax_rate_percent=round(effective_rate, 2)
+            effective_tax_rate_percent=round(effective_rate, 2),
+            regime_notes=regime_notes
         )
 
-    def predict(self, features_dict: Dict[str, float]) -> PredictionOutput:
+    def predict(
+        self,
+        features_dict: Dict[str, float],
+        entity_type: str = "salaried_individual",
+        opex: float = 0.0,
+        capex: float = 0.0,
+        digital_ratio: float = 1.0
+    ) -> PredictionOutput:
         """Executes full inference pipeline for a 16-feature input."""
         # Convert dictionary to ordered feature vector
         vector = np.array([[float(features_dict.get(feat, 0.0)) for feat in FEATURE_ORDER]], dtype=np.float64)
         scaled_vector = self.scaler.transform(vector)
 
-        # 1. Income Regression
+        # 1. Income / Turnover Regression
         pred_income = float(self.regressor.predict(scaled_vector)[0])
         pred_income = max(100000.0, round(pred_income, 2))
         
@@ -176,7 +232,15 @@ class MLService:
         )
 
         # 5. Statutory Tax Calculation
-        tax_breakdown = self.calculate_statutory_tax(pred_income, is_salaried=True)
+        is_salaried = (entity_type == "salaried_individual")
+        tax_breakdown = self.calculate_statutory_tax(
+            gross_income=pred_income,
+            is_salaried=is_salaried,
+            entity_type=entity_type,
+            opex=opex,
+            capex=capex,
+            digital_ratio=digital_ratio
+        )
 
         return PredictionOutput(
             estimated_annual_income=pred_income,
@@ -185,5 +249,6 @@ class MLService:
             tax_breakdown=tax_breakdown,
             assigned_cluster=assigned_cluster
         )
+
 
 ml_service = MLService()

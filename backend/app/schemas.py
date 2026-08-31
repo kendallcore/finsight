@@ -12,6 +12,9 @@ class StatementSummary(BaseModel):
     date_range: Dict[str, str]
     total_credits: float
     total_debits: float
+    detected_opex: float = 0.0
+    detected_capex: float = 0.0
+    digital_receipts_ratio: float = 1.0
 
 
 class ExtractedFeatures(BaseModel):
@@ -49,13 +52,19 @@ class AssignedCluster(BaseModel):
 
 
 class TaxBreakdownSummary(BaseModel):
+    entity_type: str = "salaried_individual"
     gross_income: float
-    standard_deduction: float
+    standard_deduction: float = 0.0
+    deductible_opex: float = 0.0
+    capex_investment: float = 0.0
+    depreciation_allowance: float = 0.0
+    deemed_profit_rate_percent: Optional[float] = None
     taxable_income: float
     base_tax_liability: float
     section_87a_rebate: float
     net_tax_payable: float
     effective_tax_rate_percent: float
+    regime_notes: Optional[str] = None
 
 
 class PredictionOutput(BaseModel):
@@ -74,6 +83,9 @@ class UploadStatementResponse(BaseModel):
 
 
 class ManualFeatureInput(BaseModel):
+    entity_type: str = Field("salaried_individual", description="Tax entity type: salaried_individual, presumptive_business_44ad, presumptive_professional_44ada, regular_business_pnl")
+    opex_amount: float = Field(0.0, ge=0.0, description="Deductible OPEX for business P&L")
+    capex_amount: float = Field(0.0, ge=0.0, description="Capex for depreciation under Sec 32")
     log_annual_credit: float = Field(..., description="Log of annual credit inflows")
     log_annual_debit: float = Field(..., description="Log of annual debit outflows")
     net_savings_ratio: float = Field(0.30, ge=-1.0, le=1.0)

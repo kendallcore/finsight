@@ -6,6 +6,9 @@ export interface StatementSummary {
   };
   total_credits: number;
   total_debits: number;
+  detected_opex?: number;
+  detected_capex?: number;
+  digital_receipts_ratio?: number;
 }
 
 export interface ExtractedFeatures {
@@ -43,14 +46,21 @@ export interface AssignedCluster {
 }
 
 export interface TaxBreakdownSummary {
+  entity_type?: string;
   gross_income: number;
   standard_deduction: number;
+  deductible_opex?: number;
+  capex_investment?: number;
+  depreciation_allowance?: number;
+  deemed_profit_rate_percent?: number;
   taxable_income: number;
   base_tax_liability: number;
   section_87a_rebate: number;
   net_tax_payable: number;
   effective_tax_rate_percent: number;
+  regime_notes?: string;
 }
+
 
 export interface PredictionOutput {
   estimated_annual_income: number;
