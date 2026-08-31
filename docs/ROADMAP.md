@@ -20,6 +20,13 @@ Week 1: Data & Models       Week 2: FastAPI Backend     Week 3: Next.js Frontend
 
 ## 🗓️ Week-by-Week Breakdown
 
+| Phase | Focus Area | Status | Deliverable |
+| :--- | :--- | :---: | :--- |
+| **Phase 1** | **ML Core & 16D Feature Engineering** | ✅ **Completed** | 10,000 fused profiles, 16D feature pipeline, $R^2=0.998$ Random Forest regressor, 98.35% GBC classifier, $k=4$ K-Means, and 3D PCA projector |
+| **Phase 2** | **FastAPI REST Backend** | ✅ **Completed** | Async CSV statement parser, multi-model inference, Section 115BAC statutory tax calculator, and Pytest suite |
+| **Phase 3** | **Vite React 19 Frontend SPA** | ✅ **Completed** | Minimalist high-density UI, drag-and-drop CSV diagnostic, what-if sliders, 3D Plotly WebGL scatter, and evaluation leaderboards |
+| **Phase 4** | **Viva Defense & 1-Click Launch** | ✅ **Completed** | 1-Click launcher script (`./run.sh`), examiner Q&A guide, 5 calibrated demonstration presets |
+
 ### Week 1: Data Engineering & Core ML Pipeline
 - [ ] Implement `scripts/generate_dataset.py` with 5,000 realistic Indian transaction records.
 - [ ] Implement `scripts/feature_extractor.py` to aggregate raw transactions into feature vectors.

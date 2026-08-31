@@ -91,12 +91,31 @@ FinSight is calibrated against the official **Indian Income Tax New Tax Regime**
 
 | Layer | Technologies Used | Purpose |
 | :--- | :--- | :--- |
-| **Frontend UI** | Next.js 15 (App Router), React 19, Tailwind CSS, Lucide Icons | Responsive UI, Drag-and-drop CSV upload, interactive cards |
-| **Visualizations** | Plotly.js, Recharts | Interactive 2D/3D PCA scatter plots, confusion matrices, spend donuts |
-| **Backend API** | FastAPI (Python 3.11+), Pydantic v2, Uvicorn | High-performance REST API, async statement parsing & inference |
-| **ML Engine** | scikit-learn, NumPy, pandas, joblib | Preprocessing, model training, cross-validation, serialized pipelines |
-| **Database** | SQLite (SQLAlchemy / aiosqlite) | Lightweight persistence for historical uploads and cached benchmarks |
-| **Data Generation** | Python NumPy / Faker | Realistic synthetic Indian banking transaction generator |
+| **Frontend UI** | Vite 6, React 19, TypeScript, Tailwind CSS, Lucide Icons | Minimalist high-density UI, drag-and-drop CSV upload, what-if sliders |
+| **Visualizations** | Plotly.js (WebGL 3D Scatter), Recharts (Donuts & Bars) | Interactive 3D PCA cluster exploration, confusion matrix, spend allocations |
+| **Backend API** | FastAPI (Python 3.12), Pydantic v2, Uvicorn, SQLAlchemy | High-performance REST API, async statement parsing & real-time inference |
+| **ML Engine** | scikit-learn, NumPy, pandas, joblib | 16D feature extraction, GBR regression ($R^2=0.998$), Random Forest / GBC (98.35% acc) |
+| **Database** | SQLite (SQLAlchemy ORM) | Lightweight local persistence for historical uploads and cached benchmarks |
+| **Data Fusion** | Agami Statements (51k txns), Kaggle UPI, Tech Salaries | 10,000 unified profiles grounded in real Indian banking behavior |
+
+---
+
+## ⚡ Quickstart (1-Click Launch)
+
+Run the full-stack application (FastAPI backend + Vite SPA) with a single command:
+
+```bash
+# 1. Clone & enter repository
+git clone https://github.com/sanjeevafk/finsight.git
+cd finsight
+
+# 2. Run automated launcher (installs dependencies, trains models, and launches server)
+./run.sh
+```
+
+- **Interactive Web Dashboard**: [http://localhost:8000](http://localhost:8000)
+- **Interactive Swagger REST API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **API Health Check**: [http://localhost:8000/api/health](http://localhost:8000/api/health)
 
 ---
 
@@ -104,24 +123,38 @@ FinSight is calibrated against the official **Indian Income Tax New Tax Regime**
 
 ```
 finsight/
+├── run.sh                              # 1-Click full-stack launch script
 ├── docs/                               # Detailed Project Documentation
 │   ├── original/                       # Original college PBL requirements (PDF & DOCX)
-│   │   ├── PBL.pdf
-│   │   └── Intro_ML_Project_Proposal_Financial_Intelligence.docx
 │   ├── ARCHITECTURE.md                 # System architecture & component design
-│   ├── ML_SPECIFICATION.md             # Mathematical models, loss functions & metrics
-│   ├── INDIAN_TAX_SYSTEM.md            # Tax slabs, deductions, and banking patterns
-│   ├── SYNTHETIC_DATA_SCHEMA.md        # Transaction generator schema & distributions
+│   ├── ML_SPECIFICATION.md             # 16D features, mathematical loss functions & metrics
+│   ├── INDIAN_TAX_SYSTEM.md            # FY 2025-26 7-slab Section 115BAC specifications
+│   ├── SYNTHETIC_DATA_SCHEMA.md        # Transaction generator schema & multi-source fusion
 │   ├── ROADMAP.md                      # 4-week execution roadmap & milestones
 │   ├── VIVA_AND_DEMO_GUIDE.md          # Viva defense script, FAQs & examiner answers
 │   └── API_CONTRACT.md                 # OpenAPI REST endpoints & request/response schemas
-├── plans/
-│   └── PBL_PROPOSAL.md                 # Official College PBL Proposal transcribed
-├── data/                               # Dataset directory (synthetic CSVs & generators)
+├── data/                               # Dataset directory (real & fused profiles)
+│   ├── user_profiles.csv               # 10,000 master profiles (16D feature matrix)
+│   ├── real_user_profiles_agami.csv    # 200 real Indian accounts feature vectors
+│   └── synthetic_transactions.csv      # Sample transaction streams
 ├── models/                             # Serialized scikit-learn models (.joblib)
-├── scripts/                            # Dataset generation and benchmark scripts
-├── backend/                            # FastAPI Python Backend
-└── frontend/                           # Next.js 15 Web Application
+│   ├── income_regressor.joblib         # Random Forest Regressor (R² = 0.9977)
+│   ├── tax_classifier.joblib           # Gradient Boosting Classifier (Acc = 98.35%)
+│   ├── kmeans_personas.joblib          # K-Means Persona Clustering (k=4)
+│   ├── pca_projector.joblib            # 3D PCA Latent Space Projector
+│   └── evaluation_metrics.json         # Benchmark leaderboards & confusion matrix
+├── scripts/                            # Data generation, extraction & training scripts
+│   ├── feature_engineering.py          # 16D high-dimensional feature extractor
+│   ├── build_comprehensive_dataset.py  # Multi-source real data fusion engine
+│   ├── train_models.py                 # Multi-algorithm training & evaluation
+│   └── test_pipeline.py                # End-to-end inference verification
+├── backend/                            # FastAPI Python REST Application
+│   ├── app/                            # Config, routers, schemas, services, database
+│   ├── requirements.txt                # Python dependencies
+│   └── tests/                          # Pytest integration test suite
+└── frontend/                           # Vite + React 19 TypeScript Web Application
+    ├── src/                            # Navbar, DiagnosticView, Simulator, EvaluationHub, PCA
+    └── dist/                           # Production static build
 ```
 
 ---
