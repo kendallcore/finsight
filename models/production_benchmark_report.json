@@ -1,0 +1,219 @@
+{
+  "benchmark_timestamp": "2026-08-31T07:15:44Z",
+  "real_holdout_evaluation": {
+    "dataset_name": "Agami Real Indian Banking Statements (200 Accounts)",
+    "sample_size": 200,
+    "total_transactions_evaluated": 51945,
+    "real_r2_score": 0.9657,
+    "real_rmse_inr": 22416121.36,
+    "real_mae_inr": 2947818.1,
+    "real_mape_percent": 2.51,
+    "real_classification_accuracy": 1.0,
+    "model_internal_consistency_rate": 1.0
+  },
+  "latency_and_throughput": {
+    "iterations_evaluated": 1000,
+    "latency_mean_ms": 40.594,
+    "latency_p50_ms": 41.252,
+    "latency_p90_ms": 55.138,
+    "latency_p95_ms": 58.89,
+    "latency_p99_ms": 68.201,
+    "latency_max_ms": 113.707,
+    "throughput_qps": 1549.2,
+    "concurrency_workers": 8
+  },
+  "feature_drift_ks_tests": [
+    {
+      "feature": "log_annual_credit",
+      "ks_statistic": 0.9428,
+      "p_value": 4.47e-236,
+      "training_mean": 13.3686,
+      "real_mean": 17.5328,
+      "drift_status": "Distribution Divergence"
+    },
+    {
+      "feature": "log_annual_debit",
+      "ks_statistic": 0.9517,
+      "p_value": 1.63e-248,
+      "training_mean": 13.0161,
+      "real_mean": 17.5411,
+      "drift_status": "Distribution Divergence"
+    },
+    {
+      "feature": "net_savings_ratio",
+      "ks_statistic": 0.7351,
+      "p_value": 1.67e-108,
+      "training_mean": 0.2743,
+      "real_mean": -0.0133,
+      "drift_status": "Distribution Divergence"
+    },
+    {
+      "feature": "monthly_burn_rate",
+      "ks_statistic": 0.7351,
+      "p_value": 1.67e-108,
+      "training_mean": 0.7257,
+      "real_mean": 1.0133,
+      "drift_status": "Distribution Divergence"
+    },
+    {
+      "feature": "salary_inflow_ratio",
+      "ks_statistic": 0.8611,
+      "p_value": 2.85e-166,
+      "training_mean": 0.851,
+      "real_mean": 0.4742,
+      "drift_status": "Distribution Divergence"
+    },
+    {
+      "feature": "monthly_credit_cv",
+      "ks_statistic": 0.791,
+      "p_value": 1.17e-130,
+      "training_mean": 0.1423,
+      "real_mean": 0.8972,
+      "drift_status": "Distribution Divergence"
+    },
+    {
+      "feature": "salary_regularity_score",
+      "ks_statistic": 0.8027,
+      "p_value": 7.15e-136,
+      "training_mean": 0.9455,
+      "real_mean": 0.5296,
+      "drift_status": "Distribution Divergence"
+    },
+    {
+      "feature": "bonus_lump_sum_ratio",
+      "ks_statistic": 0.7067,
+      "p_value": 1.16e-98,
+      "training_mean": 0.0792,
+      "real_mean": 0.0333,
+      "drift_status": "Distribution Divergence"
+    },
+    {
+      "feature": "investment_ratio",
+      "ks_statistic": 0.9797,
+      "p_value": 1.74e-306,
+      "training_mean": 0.1719,
+      "real_mean": 0.0,
+      "drift_status": "Distribution Divergence"
+    },
+    {
+      "feature": "fixed_obligation_ratio",
+      "ks_statistic": 0.98,
+      "p_value": 2.2e-307,
+      "training_mean": 0.3326,
+      "real_mean": 0.0092,
+      "drift_status": "Distribution Divergence"
+    },
+    {
+      "feature": "discretionary_ratio",
+      "ks_statistic": 0.98,
+      "p_value": 2.2e-307,
+      "training_mean": 0.3009,
+      "real_mean": 0.0005,
+      "drift_status": "Distribution Divergence"
+    },
+    {
+      "feature": "tax_shield_ratio",
+      "ks_statistic": 0.9572,
+      "p_value": 3.3e-257,
+      "training_mean": 0.0687,
+      "real_mean": 0.0001,
+      "drift_status": "Distribution Divergence"
+    },
+    {
+      "feature": "upi_velocity_index",
+      "ks_statistic": 0.98,
+      "p_value": 2.2e-307,
+      "training_mean": 0.7282,
+      "real_mean": 0.1183,
+      "drift_status": "Distribution Divergence"
+    },
+    {
+      "feature": "micro_spend_density",
+      "ks_statistic": 0.98,
+      "p_value": 2.2e-307,
+      "training_mean": 0.118,
+      "real_mean": 0.0,
+      "drift_status": "Distribution Divergence"
+    },
+    {
+      "feature": "log_avg_ticket_size",
+      "ks_statistic": 0.9599,
+      "p_value": 8.04e-262,
+      "training_mean": 7.6375,
+      "real_mean": 12.7262,
+      "drift_status": "Distribution Divergence"
+    },
+    {
+      "feature": "capital_gains_flux",
+      "ks_statistic": 0.5393,
+      "p_value": 8.49e-54,
+      "training_mean": 0.0295,
+      "real_mean": 0.0014,
+      "drift_status": "Distribution Divergence"
+    }
+  ],
+  "slice_fairness": {
+    "income_slices": [
+      {
+        "slice_name": "Low Income (\u2264 \u20b98L)",
+        "count": 1,
+        "mape_percent": 176.01
+      },
+      {
+        "slice_name": "Mid Income (\u20b98L - \u20b916L)",
+        "count": 2,
+        "mape_percent": 1.29
+      },
+      {
+        "slice_name": "High Income (\u20b916L - \u20b924L)",
+        "count": 2,
+        "mape_percent": 0.94
+      },
+      {
+        "slice_name": "Super-High Income (> \u20b924L)",
+        "count": 195,
+        "mape_percent": 1.65
+      }
+    ],
+    "institution_slices": [
+      {
+        "bank_name": "Velocity Banking Corporation",
+        "account_count": 12,
+        "mape_percent": 1.33
+      },
+      {
+        "bank_name": "Prosperity Bank Limited",
+        "account_count": 11,
+        "mape_percent": 0.92
+      },
+      {
+        "bank_name": "HERITAGE BANK LIMITED",
+        "account_count": 10,
+        "mape_percent": 1.11
+      },
+      {
+        "bank_name": "PARAMOUNT BANKING CORPORATION",
+        "account_count": 9,
+        "mape_percent": 2.89
+      }
+    ]
+  },
+  "adversarial_robustness": {
+    "baseline_prediction_inr": 344219200.04,
+    "scenario_missing_salary_tags": {
+      "prediction_inr": 347577640.33,
+      "deviation_percent": 0.98,
+      "status": "Robust"
+    },
+    "scenario_extreme_micro_spend_spike": {
+      "prediction_inr": 346558453.01,
+      "deviation_percent": 0.68,
+      "status": "Robust"
+    },
+    "scenario_outlier_ticket_spike": {
+      "prediction_inr": 485584396.89,
+      "deviation_percent": 41.07,
+      "status": "Volatile"
+    }
+  }
+}
