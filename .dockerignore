@@ -1,0 +1,14 @@
+.git
+.gitignore
+.venv/
+__pycache__/
+*.py[cod]
+*.sqlite
+*.sqlite3
+*.log
+frontend/node_modules/
+frontend/dist/
+data/huggingface_agami/
+data/kaggle_bank_customer_segmentation/
+data/kaggle_upi_2024/
+data/raw/

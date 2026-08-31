@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  finsight:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: finsight-app
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    environment:
+      - PROJECT_NAME=FinSight Smart Financial Intelligence System
+      - TAX_REGIME_YEAR=FY 2025-26
+    volumes:
+      - ./data:/app/data:ro
+      - ./models:/app/models:ro
