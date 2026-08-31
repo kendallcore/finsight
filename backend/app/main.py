@@ -63,12 +63,21 @@ async def health_check():
     }
 
 
-@app.get("/", include_in_schema=False)
-async def root():
-    return JSONResponse(
-        content={
-            "message": "Welcome to FinSight Financial Intelligence & Tax Estimation API",
-            "docs": "/docs",
-            "health": "/api/health"
-        }
-    )
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
+
+# Mount Static Files from compiled Vite frontend if available
+FRONTEND_DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+if FRONTEND_DIST.exists():
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIST), html=True), name="frontend")
+else:
+    @app.get("/", include_in_schema=False)
+    async def root():
+        return JSONResponse(
+            content={
+                "message": "Welcome to FinSight Financial Intelligence & Tax Estimation API",
+                "docs": "/docs",
+                "health": "/api/health"
+            }
+        )
+
