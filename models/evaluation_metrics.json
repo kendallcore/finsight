@@ -1,0 +1,4736 @@
+{
+  "status": "success",
+  "tax_regime_year": "FY 2025-26",
+  "feature_count": 16,
+  "features": [
+    "log_annual_credit",
+    "log_annual_debit",
+    "net_savings_ratio",
+    "monthly_burn_rate",
+    "salary_inflow_ratio",
+    "monthly_credit_cv",
+    "salary_regularity_score",
+    "bonus_lump_sum_ratio",
+    "investment_ratio",
+    "fixed_obligation_ratio",
+    "discretionary_ratio",
+    "tax_shield_ratio",
+    "upi_velocity_index",
+    "micro_spend_density",
+    "log_avg_ticket_size",
+    "capital_gains_flux"
+  ],
+  "regression_comparison": [
+    {
+      "model_name": "Ridge Regression",
+      "r2_score": 0.5116,
+      "rmse": 9923544.33,
+      "mae": 5053303.93,
+      "mape_percent": 972.29
+    },
+    {
+      "model_name": "Random Forest Regressor",
+      "r2_score": 0.9977,
+      "rmse": 687189.14,
+      "mae": 60082.37,
+      "mape_percent": 1.3
+    },
+    {
+      "model_name": "Gradient Boosting Regressor",
+      "r2_score": 0.9969,
+      "rmse": 794511.54,
+      "mae": 63201.0,
+      "mape_percent": 1.44
+    }
+  ],
+  "classification_comparison": [
+    {
+      "model_name": "Logistic Regression",
+      "accuracy": 0.9545,
+      "macro_f1": 0.861,
+      "weighted_f1": 0.9525
+    },
+    {
+      "model_name": "Random Forest Classifier",
+      "accuracy": 0.9805,
+      "macro_f1": 0.9499,
+      "weighted_f1": 0.9807
+    },
+    {
+      "model_name": "Support Vector Classifier (RBF)",
+      "accuracy": 0.956,
+      "macro_f1": 0.8944,
+      "weighted_f1": 0.9563
+    },
+    {
+      "model_name": "Gradient Boosting Classifier",
+      "accuracy": 0.9835,
+      "macro_f1": 0.9556,
+      "weighted_f1": 0.9836
+    }
+  ],
+  "best_models": {
+    "regression": "Random Forest Regressor",
+    "classification": "Gradient Boosting Classifier"
+  },
+  "confusion_matrix": [
+    [
+      826,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      2,
+      540,
+      3,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      282,
+      7,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      5,
+      113,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      68,
+      6,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      1,
+      40,
+      2
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      3,
+      98
+    ]
+  ],
+  "confusion_matrix_labels": [
+    "Class 0 (0%)",
+    "Class 1 (5%)",
+    "Class 2 (10%)",
+    "Class 3 (15%)",
+    "Class 4 (20%)",
+    "Class 5 (25%)",
+    "Class 6 (30%)"
+  ],
+  "feature_importance": [
+    {
+      "feature": "log_annual_credit",
+      "importance": 0.4953
+    },
+    {
+      "feature": "log_annual_debit",
+      "importance": 0.2274
+    },
+    {
+      "feature": "log_avg_ticket_size",
+      "importance": 0.1606
+    },
+    {
+      "feature": "monthly_burn_rate",
+      "importance": 0.0199
+    },
+    {
+      "feature": "net_savings_ratio",
+      "importance": 0.0194
+    },
+    {
+      "feature": "investment_ratio",
+      "importance": 0.0119
+    },
+    {
+      "feature": "upi_velocity_index",
+      "importance": 0.0119
+    },
+    {
+      "feature": "micro_spend_density",
+      "importance": 0.0114
+    },
+    {
+      "feature": "discretionary_ratio",
+      "importance": 0.0099
+    },
+    {
+      "feature": "fixed_obligation_ratio",
+      "importance": 0.0096
+    },
+    {
+      "feature": "tax_shield_ratio",
+      "importance": 0.0055
+    },
+    {
+      "feature": "monthly_credit_cv",
+      "importance": 0.0045
+    },
+    {
+      "feature": "salary_inflow_ratio",
+      "importance": 0.0042
+    },
+    {
+      "feature": "capital_gains_flux",
+      "importance": 0.0041
+    },
+    {
+      "feature": "bonus_lump_sum_ratio",
+      "importance": 0.0035
+    },
+    {
+      "feature": "salary_regularity_score",
+      "importance": 0.0009
+    }
+  ],
+  "clustering": {
+    "n_clusters": 4,
+    "silhouette_score": 0.3285,
+    "personas": {
+      "0": "High-Growth Wealth Builder",
+      "1": "Balanced Corporate Professional",
+      "2": "Discretionary Lifestyle Spender",
+      "3": "Entry-Level / Student Saver"
+    }
+  },
+  "pca_variance": {
+    "explained_variance_ratio": [
+      0.4406,
+      0.2497,
+      0.102
+    ],
+    "total_explained_variance": 0.7922
+  },
+  "pca_sample_points": [
+    {
+      "user_id": 6988,
+      "pca_x": 1.0572,
+      "pca_y": 0.1099,
+      "pca_z": 1.0173,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 600000.0
+    },
+    {
+      "user_id": 4055,
+      "pca_x": -2.527,
+      "pca_y": -0.5149,
+      "pca_z": 1.1688,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 720000.0
+    },
+    {
+      "user_id": 2719,
+      "pca_x": 2.7354,
+      "pca_y": 1.7274,
+      "pca_z": 0.32,
+      "cluster_id": 0,
+      "tax_slab_class": 3,
+      "annual_income": 1400000.0
+    },
+    {
+      "user_id": 3804,
+      "pca_x": 0.5455,
+      "pca_y": -0.2084,
+      "pca_z": 1.3582,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 700000.0
+    },
+    {
+      "user_id": 2516,
+      "pca_x": -4.1554,
+      "pca_y": 1.075,
+      "pca_z": -2.6278,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 780000.0
+    },
+    {
+      "user_id": 6306,
+      "pca_x": -3.257,
+      "pca_y": -1.9355,
+      "pca_z": -0.1503,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 300000.0
+    },
+    {
+      "user_id": 1507,
+      "pca_x": 0.6638,
+      "pca_y": -0.2257,
+      "pca_z": 0.6545,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 700000.0
+    },
+    {
+      "user_id": 5230,
+      "pca_x": -2.4439,
+      "pca_y": -0.5018,
+      "pca_z": 1.8714,
+      "cluster_id": 1,
+      "tax_slab_class": 3,
+      "annual_income": 1350000.0
+    },
+    {
+      "user_id": 5792,
+      "pca_x": 3.9788,
+      "pca_y": 0.8169,
+      "pca_z": -1.2377,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    },
+    {
+      "user_id": 4203,
+      "pca_x": -2.3726,
+      "pca_y": 0.2808,
+      "pca_z": -1.2615,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 700000.0
+    },
+    {
+      "user_id": 3046,
+      "pca_x": 2.6028,
+      "pca_y": 2.1081,
+      "pca_z": 0.3343,
+      "cluster_id": 0,
+      "tax_slab_class": 3,
+      "annual_income": 1360800.0
+    },
+    {
+      "user_id": 4823,
+      "pca_x": 2.933,
+      "pca_y": 0.0675,
+      "pca_z": -0.937,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 313200.0
+    },
+    {
+      "user_id": 2665,
+      "pca_x": -2.5518,
+      "pca_y": -1.5003,
+      "pca_z": -0.9873,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 260000.0
+    },
+    {
+      "user_id": 8027,
+      "pca_x": -3.7737,
+      "pca_y": 1.6937,
+      "pca_z": -0.5588,
+      "cluster_id": 1,
+      "tax_slab_class": 6,
+      "annual_income": 2700000.0
+    },
+    {
+      "user_id": 5288,
+      "pca_x": 4.6873,
+      "pca_y": -0.9624,
+      "pca_z": -1.2708,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 4,
+      "pca_x": 0.8799,
+      "pca_y": -0.8756,
+      "pca_z": 0.9521,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 400000.0
+    },
+    {
+      "user_id": 8381,
+      "pca_x": 1.0106,
+      "pca_y": -1.965,
+      "pca_z": 0.191,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 7450,
+      "pca_x": 0.9346,
+      "pca_y": 0.2072,
+      "pca_z": 1.6957,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 900000.0
+    },
+    {
+      "user_id": 7672,
+      "pca_x": -2.8767,
+      "pca_y": -0.0882,
+      "pca_z": 1.1155,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1080000.0
+    },
+    {
+      "user_id": 6299,
+      "pca_x": -3.3252,
+      "pca_y": -1.1214,
+      "pca_z": 1.8447,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1000000.0
+    },
+    {
+      "user_id": 6687,
+      "pca_x": 1.6302,
+      "pca_y": -1.4974,
+      "pca_z": 0.4774,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 276000.0
+    },
+    {
+      "user_id": 6583,
+      "pca_x": -3.1752,
+      "pca_y": 0.9726,
+      "pca_z": -1.2852,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1015200.0
+    },
+    {
+      "user_id": 8796,
+      "pca_x": -2.1819,
+      "pca_y": -1.0749,
+      "pca_z": 0.9428,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 630000.0
+    },
+    {
+      "user_id": 8240,
+      "pca_x": 1.7269,
+      "pca_y": 0.4624,
+      "pca_z": 0.7177,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 780000.0
+    },
+    {
+      "user_id": 6207,
+      "pca_x": 1.0114,
+      "pca_y": -1.1364,
+      "pca_z": 0.2665,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 400000.0
+    },
+    {
+      "user_id": 3140,
+      "pca_x": -2.9387,
+      "pca_y": -1.3424,
+      "pca_z": 0.9816,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 700000.0
+    },
+    {
+      "user_id": 6181,
+      "pca_x": 3.3677,
+      "pca_y": -0.5324,
+      "pca_z": -1.207,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 400000.0
+    },
+    {
+      "user_id": 6814,
+      "pca_x": 3.8703,
+      "pca_y": 2.1119,
+      "pca_z": -0.4596,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1200000.0
+    },
+    {
+      "user_id": 1214,
+      "pca_x": -0.1076,
+      "pca_y": 1.386,
+      "pca_z": 2.5725,
+      "cluster_id": 3,
+      "tax_slab_class": 6,
+      "annual_income": 2700000.0
+    },
+    {
+      "user_id": 2589,
+      "pca_x": -2.256,
+      "pca_y": -1.5721,
+      "pca_z": 0.3236,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 405600.0
+    },
+    {
+      "user_id": 2363,
+      "pca_x": -2.2974,
+      "pca_y": -2.9899,
+      "pca_z": 0.1129,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 836,
+      "pca_x": 1.1465,
+      "pca_y": -1.3395,
+      "pca_z": -0.0222,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 9488,
+      "pca_x": -0.1107,
+      "pca_y": 1.6335,
+      "pca_z": 2.3762,
+      "cluster_id": 3,
+      "tax_slab_class": 6,
+      "annual_income": 3240000.0
+    },
+    {
+      "user_id": 1086,
+      "pca_x": -2.7633,
+      "pca_y": -2.07,
+      "pca_z": -0.5813,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 270000.0
+    },
+    {
+      "user_id": 51,
+      "pca_x": 0.6175,
+      "pca_y": 0.7849,
+      "pca_z": 1.2383,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1170000.0
+    },
+    {
+      "user_id": 3200,
+      "pca_x": 0.5476,
+      "pca_y": -1.1862,
+      "pca_z": -0.0604,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 300000.0
+    },
+    {
+      "user_id": 8005,
+      "pca_x": 0.3956,
+      "pca_y": -0.0385,
+      "pca_z": 0.9973,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 910000.0
+    },
+    {
+      "user_id": 3861,
+      "pca_x": -3.8857,
+      "pca_y": 0.7587,
+      "pca_z": 1.8629,
+      "cluster_id": 1,
+      "tax_slab_class": 6,
+      "annual_income": 2700000.0
+    },
+    {
+      "user_id": 4443,
+      "pca_x": -2.7137,
+      "pca_y": -1.2184,
+      "pca_z": 0.032,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 452400.0
+    },
+    {
+      "user_id": 7560,
+      "pca_x": -2.8079,
+      "pca_y": -0.7008,
+      "pca_z": -3.7995,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 228000.0
+    },
+    {
+      "user_id": 9048,
+      "pca_x": 2.8695,
+      "pca_y": 1.2642,
+      "pca_z": 0.0556,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 720000.0
+    },
+    {
+      "user_id": 9109,
+      "pca_x": 1.4732,
+      "pca_y": -0.4631,
+      "pca_z": 0.5781,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 530400.0
+    },
+    {
+      "user_id": 5103,
+      "pca_x": 1.318,
+      "pca_y": 0.1061,
+      "pca_z": 1.2694,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 820800.0
+    },
+    {
+      "user_id": 7691,
+      "pca_x": 2.1965,
+      "pca_y": -0.0293,
+      "pca_z": -0.7054,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 390000.0
+    },
+    {
+      "user_id": 5196,
+      "pca_x": -2.4698,
+      "pca_y": -1.524,
+      "pca_z": -2.3626,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 9075,
+      "pca_x": 3.4564,
+      "pca_y": 1.7106,
+      "pca_z": 0.3739,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1170000.0
+    },
+    {
+      "user_id": 2035,
+      "pca_x": 0.2675,
+      "pca_y": 0.4564,
+      "pca_z": 2.2899,
+      "cluster_id": 3,
+      "tax_slab_class": 3,
+      "annual_income": 1560000.0
+    },
+    {
+      "user_id": 100085,
+      "pca_x": -3.353,
+      "pca_y": 12.8707,
+      "pca_z": 0.8842,
+      "cluster_id": 2,
+      "tax_slab_class": 6,
+      "annual_income": 148136292.5
+    },
+    {
+      "user_id": 6249,
+      "pca_x": 1.2508,
+      "pca_y": 0.7143,
+      "pca_z": 1.1108,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 780000.0
+    },
+    {
+      "user_id": 3370,
+      "pca_x": 0.9458,
+      "pca_y": -0.7727,
+      "pca_z": 1.496,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 650000.0
+    },
+    {
+      "user_id": 803,
+      "pca_x": 4.0679,
+      "pca_y": -0.9319,
+      "pca_z": -1.22,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 7968,
+      "pca_x": 0.7642,
+      "pca_y": -1.4415,
+      "pca_z": -0.7566,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 8179,
+      "pca_x": -2.5435,
+      "pca_y": -1.005,
+      "pca_z": 1.4914,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 600000.0
+    },
+    {
+      "user_id": 6346,
+      "pca_x": 2.9605,
+      "pca_y": 2.2399,
+      "pca_z": -0.5106,
+      "cluster_id": 0,
+      "tax_slab_class": 3,
+      "annual_income": 1300000.0
+    },
+    {
+      "user_id": 8891,
+      "pca_x": -2.5143,
+      "pca_y": -2.6933,
+      "pca_z": 0.535,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 163,
+      "pca_x": 4.2023,
+      "pca_y": 0.5921,
+      "pca_z": -0.4782,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 514800.0
+    },
+    {
+      "user_id": 1825,
+      "pca_x": 4.6378,
+      "pca_y": 0.0274,
+      "pca_z": -1.9079,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 7036,
+      "pca_x": -2.8508,
+      "pca_y": -2.6239,
+      "pca_z": 0.0954,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 3588,
+      "pca_x": 2.9295,
+      "pca_y": 2.0968,
+      "pca_z": -1.0683,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1260000.0
+    },
+    {
+      "user_id": 7376,
+      "pca_x": -3.0486,
+      "pca_y": 0.7959,
+      "pca_z": -1.8757,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 873600.0
+    },
+    {
+      "user_id": 2976,
+      "pca_x": -0.1931,
+      "pca_y": 0.3651,
+      "pca_z": 1.8873,
+      "cluster_id": 3,
+      "tax_slab_class": 3,
+      "annual_income": 1300000.0
+    },
+    {
+      "user_id": 732,
+      "pca_x": -3.4602,
+      "pca_y": -0.7783,
+      "pca_z": -3.1546,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 367200.0
+    },
+    {
+      "user_id": 3572,
+      "pca_x": 0.5083,
+      "pca_y": 0.4509,
+      "pca_z": 2.3002,
+      "cluster_id": 3,
+      "tax_slab_class": 4,
+      "annual_income": 1820000.0
+    },
+    {
+      "user_id": 6694,
+      "pca_x": 1.1022,
+      "pca_y": -0.9415,
+      "pca_z": 0.3671,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 345600.0
+    },
+    {
+      "user_id": 949,
+      "pca_x": 0.6805,
+      "pca_y": -1.417,
+      "pca_z": -0.028,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 216000.0
+    },
+    {
+      "user_id": 3456,
+      "pca_x": 3.038,
+      "pca_y": 1.0003,
+      "pca_z": -0.4307,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 650000.0
+    },
+    {
+      "user_id": 6269,
+      "pca_x": 3.3736,
+      "pca_y": 0.4661,
+      "pca_z": -0.4522,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 453600.0
+    },
+    {
+      "user_id": 7923,
+      "pca_x": 0.6276,
+      "pca_y": -0.8845,
+      "pca_z": 0.3549,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 356400.0
+    },
+    {
+      "user_id": 632,
+      "pca_x": -2.0482,
+      "pca_y": -2.2719,
+      "pca_z": 1.1763,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 420000.0
+    },
+    {
+      "user_id": 1182,
+      "pca_x": -3.399,
+      "pca_y": -0.6575,
+      "pca_z": -0.0098,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 780000.0
+    },
+    {
+      "user_id": 3504,
+      "pca_x": -2.0195,
+      "pca_y": -2.1149,
+      "pca_z": -2.7745,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 9328,
+      "pca_x": 2.8747,
+      "pca_y": 1.2735,
+      "pca_z": 0.4592,
+      "cluster_id": 0,
+      "tax_slab_class": 3,
+      "annual_income": 1430000.0
+    },
+    {
+      "user_id": 8541,
+      "pca_x": -3.1939,
+      "pca_y": 1.3948,
+      "pca_z": -1.3551,
+      "cluster_id": 1,
+      "tax_slab_class": 3,
+      "annual_income": 1300000.0
+    },
+    {
+      "user_id": 9267,
+      "pca_x": 0.6151,
+      "pca_y": 0.6007,
+      "pca_z": 1.1693,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1200000.0
+    },
+    {
+      "user_id": 2438,
+      "pca_x": -2.5467,
+      "pca_y": -2.1072,
+      "pca_z": 0.0783,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 348000.0
+    },
+    {
+      "user_id": 8908,
+      "pca_x": -2.7838,
+      "pca_y": -0.5668,
+      "pca_z": 0.8795,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 810000.0
+    },
+    {
+      "user_id": 4214,
+      "pca_x": 0.7972,
+      "pca_y": -0.1742,
+      "pca_z": 0.6224,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 700000.0
+    },
+    {
+      "user_id": 2160,
+      "pca_x": -2.5017,
+      "pca_y": -0.7723,
+      "pca_z": 1.1872,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 576000.0
+    },
+    {
+      "user_id": 1636,
+      "pca_x": 3.3048,
+      "pca_y": 1.0042,
+      "pca_z": -0.7706,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 600000.0
+    },
+    {
+      "user_id": 7608,
+      "pca_x": 3.7241,
+      "pca_y": 2.1457,
+      "pca_z": -0.1961,
+      "cluster_id": 0,
+      "tax_slab_class": 3,
+      "annual_income": 1440000.0
+    },
+    {
+      "user_id": 4087,
+      "pca_x": -2.3644,
+      "pca_y": -2.8717,
+      "pca_z": 0.1404,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 7603,
+      "pca_x": 0.9929,
+      "pca_y": -1.06,
+      "pca_z": -0.7009,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 223200.0
+    },
+    {
+      "user_id": 3566,
+      "pca_x": 1.4344,
+      "pca_y": -0.4529,
+      "pca_z": 0.9652,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 648000.0
+    },
+    {
+      "user_id": 3435,
+      "pca_x": 1.2647,
+      "pca_y": 0.003,
+      "pca_z": 1.3185,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 816000.0
+    },
+    {
+      "user_id": 3012,
+      "pca_x": 0.5002,
+      "pca_y": -0.9662,
+      "pca_z": 0.1566,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 475200.0
+    },
+    {
+      "user_id": 9174,
+      "pca_x": 3.8316,
+      "pca_y": 1.0798,
+      "pca_z": -0.9685,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 480000.0
+    },
+    {
+      "user_id": 2799,
+      "pca_x": 2.9797,
+      "pca_y": 1.2185,
+      "pca_z": 0.6228,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 888000.0
+    },
+    {
+      "user_id": 1618,
+      "pca_x": 0.01,
+      "pca_y": 0.1173,
+      "pca_z": 1.2561,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 990000.0
+    },
+    {
+      "user_id": 7828,
+      "pca_x": 2.6328,
+      "pca_y": 1.655,
+      "pca_z": 0.102,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1000000.0
+    },
+    {
+      "user_id": 3498,
+      "pca_x": -2.9857,
+      "pca_y": 0.4139,
+      "pca_z": -4.6262,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 300000.0
+    },
+    {
+      "user_id": 5912,
+      "pca_x": -3.0575,
+      "pca_y": -0.8156,
+      "pca_z": 0.9197,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 600000.0
+    },
+    {
+      "user_id": 8839,
+      "pca_x": -2.7243,
+      "pca_y": -0.3356,
+      "pca_z": -0.7134,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 900000.0
+    },
+    {
+      "user_id": 7904,
+      "pca_x": -2.2383,
+      "pca_y": -0.6424,
+      "pca_z": -3.9756,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 6878,
+      "pca_x": 1.3467,
+      "pca_y": 0.2927,
+      "pca_z": 2.0126,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1040000.0
+    },
+    {
+      "user_id": 8819,
+      "pca_x": 0.7874,
+      "pca_y": -0.5262,
+      "pca_z": 0.8458,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 576000.0
+    },
+    {
+      "user_id": 2369,
+      "pca_x": 4.1914,
+      "pca_y": 1.0947,
+      "pca_z": -0.3478,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    },
+    {
+      "user_id": 687,
+      "pca_x": -2.2201,
+      "pca_y": 0.0513,
+      "pca_z": -2.7759,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 500000.0
+    },
+    {
+      "user_id": 2635,
+      "pca_x": 0.9175,
+      "pca_y": 0.6038,
+      "pca_z": 1.16,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 780000.0
+    },
+    {
+      "user_id": 7030,
+      "pca_x": 1.0238,
+      "pca_y": -0.075,
+      "pca_z": 1.0028,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 800000.0
+    },
+    {
+      "user_id": 2106,
+      "pca_x": 4.1897,
+      "pca_y": 1.7933,
+      "pca_z": -0.5632,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 720000.0
+    },
+    {
+      "user_id": 4279,
+      "pca_x": 0.0328,
+      "pca_y": -0.9282,
+      "pca_z": 1.3837,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 684000.0
+    },
+    {
+      "user_id": 495,
+      "pca_x": 0.9663,
+      "pca_y": 0.3543,
+      "pca_z": 1.3623,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1080000.0
+    },
+    {
+      "user_id": 4565,
+      "pca_x": 3.0138,
+      "pca_y": 2.623,
+      "pca_z": 0.6466,
+      "cluster_id": 0,
+      "tax_slab_class": 6,
+      "annual_income": 2520000.0
+    },
+    {
+      "user_id": 3426,
+      "pca_x": 4.2633,
+      "pca_y": 1.1163,
+      "pca_z": -1.6303,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 600000.0
+    },
+    {
+      "user_id": 7792,
+      "pca_x": 0.864,
+      "pca_y": -0.6863,
+      "pca_z": 0.4657,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 520000.0
+    },
+    {
+      "user_id": 4351,
+      "pca_x": 4.9555,
+      "pca_y": 0.2411,
+      "pca_z": -2.2416,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 270000.0
+    },
+    {
+      "user_id": 3099,
+      "pca_x": 0.3241,
+      "pca_y": -0.1116,
+      "pca_z": 1.6299,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 900000.0
+    },
+    {
+      "user_id": 4941,
+      "pca_x": 0.6777,
+      "pca_y": -0.6195,
+      "pca_z": 1.369,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 630000.0
+    },
+    {
+      "user_id": 5993,
+      "pca_x": -0.1007,
+      "pca_y": 1.1337,
+      "pca_z": 2.2287,
+      "cluster_id": 3,
+      "tax_slab_class": 5,
+      "annual_income": 2160000.0
+    },
+    {
+      "user_id": 983,
+      "pca_x": -2.6012,
+      "pca_y": 0.4373,
+      "pca_z": -0.358,
+      "cluster_id": 1,
+      "tax_slab_class": 4,
+      "annual_income": 1771200.0
+    },
+    {
+      "user_id": 6307,
+      "pca_x": 5.1258,
+      "pca_y": 0.0712,
+      "pca_z": -1.2515,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 378000.0
+    },
+    {
+      "user_id": 9433,
+      "pca_x": -2.1737,
+      "pca_y": -1.9118,
+      "pca_z": -0.3248,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 8258,
+      "pca_x": -0.0368,
+      "pca_y": -0.3168,
+      "pca_z": 0.9078,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 720000.0
+    },
+    {
+      "user_id": 6600,
+      "pca_x": -2.4358,
+      "pca_y": 0.6839,
+      "pca_z": 0.1944,
+      "cluster_id": 1,
+      "tax_slab_class": 4,
+      "annual_income": 1820000.0
+    },
+    {
+      "user_id": 3952,
+      "pca_x": -2.7984,
+      "pca_y": -1.2698,
+      "pca_z": 0.7818,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 500000.0
+    },
+    {
+      "user_id": 6215,
+      "pca_x": 1.7124,
+      "pca_y": -0.317,
+      "pca_z": 0.0458,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 480000.0
+    },
+    {
+      "user_id": 2961,
+      "pca_x": 0.7855,
+      "pca_y": -0.3742,
+      "pca_z": 0.0761,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 552000.0
+    },
+    {
+      "user_id": 6858,
+      "pca_x": -3.388,
+      "pca_y": -1.4394,
+      "pca_z": 1.2434,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 650000.0
+    },
+    {
+      "user_id": 8519,
+      "pca_x": 1.8486,
+      "pca_y": -1.6625,
+      "pca_z": 0.3668,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 216000.0
+    },
+    {
+      "user_id": 8452,
+      "pca_x": 3.9221,
+      "pca_y": 1.5615,
+      "pca_z": -0.3244,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 720000.0
+    },
+    {
+      "user_id": 706,
+      "pca_x": 3.254,
+      "pca_y": 0.049,
+      "pca_z": -1.6128,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 259200.0
+    },
+    {
+      "user_id": 1124,
+      "pca_x": 4.9072,
+      "pca_y": 0.0154,
+      "pca_z": -1.6482,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 1029,
+      "pca_x": 0.7445,
+      "pca_y": -0.8344,
+      "pca_z": 0.2187,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 360000.0
+    },
+    {
+      "user_id": 2053,
+      "pca_x": 1.4374,
+      "pca_y": -1.7766,
+      "pca_z": -0.6627,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 208800.0
+    },
+    {
+      "user_id": 1871,
+      "pca_x": 3.9631,
+      "pca_y": -0.0056,
+      "pca_z": -0.4804,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 400000.0
+    },
+    {
+      "user_id": 6788,
+      "pca_x": -1.1264,
+      "pca_y": -0.9723,
+      "pca_z": -2.1701,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 302400.0
+    },
+    {
+      "user_id": 2923,
+      "pca_x": -1.7366,
+      "pca_y": -0.6413,
+      "pca_z": -2.1835,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 324000.0
+    },
+    {
+      "user_id": 1055,
+      "pca_x": 1.1846,
+      "pca_y": 0.0703,
+      "pca_z": 0.2233,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 576000.0
+    },
+    {
+      "user_id": 3258,
+      "pca_x": -2.2226,
+      "pca_y": -2.5726,
+      "pca_z": -0.5868,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 4104,
+      "pca_x": -2.5819,
+      "pca_y": 0.308,
+      "pca_z": -2.0487,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 885600.0
+    },
+    {
+      "user_id": 5403,
+      "pca_x": 0.4212,
+      "pca_y": -1.2757,
+      "pca_z": -0.0472,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 240000.0
+    },
+    {
+      "user_id": 4390,
+      "pca_x": -2.9993,
+      "pca_y": 0.6998,
+      "pca_z": -2.2356,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 600000.0
+    },
+    {
+      "user_id": 6934,
+      "pca_x": 1.2345,
+      "pca_y": 0.0711,
+      "pca_z": 0.5565,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 650000.0
+    },
+    {
+      "user_id": 4388,
+      "pca_x": 3.3017,
+      "pca_y": 1.6188,
+      "pca_z": 0.1692,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1020000.0
+    },
+    {
+      "user_id": 2887,
+      "pca_x": -3.5956,
+      "pca_y": 0.1592,
+      "pca_z": -1.6899,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 800000.0
+    },
+    {
+      "user_id": 8104,
+      "pca_x": 2.6527,
+      "pca_y": 0.0346,
+      "pca_z": -0.6129,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 500000.0
+    },
+    {
+      "user_id": 7445,
+      "pca_x": 0.4528,
+      "pca_y": -0.6067,
+      "pca_z": 0.1621,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 520000.0
+    },
+    {
+      "user_id": 100046,
+      "pca_x": -5.0164,
+      "pca_y": 12.9303,
+      "pca_z": 1.8192,
+      "cluster_id": 2,
+      "tax_slab_class": 6,
+      "annual_income": 322906468.78
+    },
+    {
+      "user_id": 6198,
+      "pca_x": 1.4676,
+      "pca_y": -1.8844,
+      "pca_z": -0.1354,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 6082,
+      "pca_x": -4.2588,
+      "pca_y": -0.1279,
+      "pca_z": 1.2034,
+      "cluster_id": 1,
+      "tax_slab_class": 3,
+      "annual_income": 1430000.0
+    },
+    {
+      "user_id": 8219,
+      "pca_x": 1.0121,
+      "pca_y": 0.1745,
+      "pca_z": 0.8819,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 800000.0
+    },
+    {
+      "user_id": 4863,
+      "pca_x": -3.0341,
+      "pca_y": -0.8636,
+      "pca_z": 1.5551,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1000000.0
+    },
+    {
+      "user_id": 3080,
+      "pca_x": -2.8954,
+      "pca_y": -2.226,
+      "pca_z": -0.3002,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 205200.0
+    },
+    {
+      "user_id": 6992,
+      "pca_x": -3.9089,
+      "pca_y": -0.1039,
+      "pca_z": -2.0664,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 600000.0
+    },
+    {
+      "user_id": 196,
+      "pca_x": -2.1836,
+      "pca_y": -0.5581,
+      "pca_z": 2.2316,
+      "cluster_id": 1,
+      "tax_slab_class": 3,
+      "annual_income": 1300000.0
+    },
+    {
+      "user_id": 5064,
+      "pca_x": 2.7654,
+      "pca_y": 2.4178,
+      "pca_z": 0.0893,
+      "cluster_id": 0,
+      "tax_slab_class": 4,
+      "annual_income": 1710000.0
+    },
+    {
+      "user_id": 4277,
+      "pca_x": -2.5348,
+      "pca_y": -0.0984,
+      "pca_z": 1.0853,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1170000.0
+    },
+    {
+      "user_id": 3459,
+      "pca_x": -2.1659,
+      "pca_y": -0.7255,
+      "pca_z": -1.4114,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 520000.0
+    },
+    {
+      "user_id": 7598,
+      "pca_x": -0.0823,
+      "pca_y": 0.7791,
+      "pca_z": 0.7868,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1080000.0
+    },
+    {
+      "user_id": 832,
+      "pca_x": 1.2122,
+      "pca_y": -1.2345,
+      "pca_z": -0.5855,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 300000.0
+    },
+    {
+      "user_id": 7285,
+      "pca_x": -2.3728,
+      "pca_y": -0.784,
+      "pca_z": 0.3419,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 444000.0
+    },
+    {
+      "user_id": 7392,
+      "pca_x": 1.1678,
+      "pca_y": -0.2082,
+      "pca_z": 0.4988,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 608400.0
+    },
+    {
+      "user_id": 8678,
+      "pca_x": -3.1486,
+      "pca_y": 0.3499,
+      "pca_z": 0.4231,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1170000.0
+    },
+    {
+      "user_id": 9221,
+      "pca_x": -3.654,
+      "pca_y": 1.4176,
+      "pca_z": 2.2001,
+      "cluster_id": 1,
+      "tax_slab_class": 6,
+      "annual_income": 3420000.0
+    },
+    {
+      "user_id": 2489,
+      "pca_x": -4.6597,
+      "pca_y": 2.7335,
+      "pca_z": -1.2371,
+      "cluster_id": 1,
+      "tax_slab_class": 6,
+      "annual_income": 3400000.0
+    },
+    {
+      "user_id": 8872,
+      "pca_x": 3.1263,
+      "pca_y": 1.515,
+      "pca_z": -0.732,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1060800.0
+    },
+    {
+      "user_id": 8111,
+      "pca_x": -2.3023,
+      "pca_y": 0.4619,
+      "pca_z": -2.3226,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 650000.0
+    },
+    {
+      "user_id": 2255,
+      "pca_x": 3.193,
+      "pca_y": 2.2352,
+      "pca_z": 1.5341,
+      "cluster_id": 0,
+      "tax_slab_class": 4,
+      "annual_income": 2040000.0
+    },
+    {
+      "user_id": 8090,
+      "pca_x": -2.8277,
+      "pca_y": -2.3705,
+      "pca_z": -0.5636,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 7502,
+      "pca_x": -3.9756,
+      "pca_y": -0.8318,
+      "pca_z": 0.6852,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 900000.0
+    },
+    {
+      "user_id": 9016,
+      "pca_x": 0.8616,
+      "pca_y": -0.5199,
+      "pca_z": 0.9404,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 630000.0
+    },
+    {
+      "user_id": 5026,
+      "pca_x": 2.843,
+      "pca_y": 1.6166,
+      "pca_z": 0.6631,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1080000.0
+    },
+    {
+      "user_id": 81,
+      "pca_x": 0.8393,
+      "pca_y": -0.2491,
+      "pca_z": 1.0327,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 630000.0
+    },
+    {
+      "user_id": 5251,
+      "pca_x": 3.6826,
+      "pca_y": 2.6591,
+      "pca_z": 0.0098,
+      "cluster_id": 0,
+      "tax_slab_class": 4,
+      "annual_income": 1800000.0
+    },
+    {
+      "user_id": 1375,
+      "pca_x": 2.5967,
+      "pca_y": 0.2704,
+      "pca_z": 0.1486,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 520000.0
+    },
+    {
+      "user_id": 861,
+      "pca_x": -1.8451,
+      "pca_y": -2.1015,
+      "pca_z": -0.3567,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 1539,
+      "pca_x": -2.5213,
+      "pca_y": 1.9895,
+      "pca_z": 1.9941,
+      "cluster_id": 1,
+      "tax_slab_class": 6,
+      "annual_income": 4160000.0
+    },
+    {
+      "user_id": 3539,
+      "pca_x": -3.0178,
+      "pca_y": 0.8514,
+      "pca_z": -1.4423,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1040000.0
+    },
+    {
+      "user_id": 4684,
+      "pca_x": -2.3961,
+      "pca_y": 0.1975,
+      "pca_z": 0.5017,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 967200.0
+    },
+    {
+      "user_id": 5887,
+      "pca_x": -2.7819,
+      "pca_y": -1.6774,
+      "pca_z": -0.1193,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 300000.0
+    },
+    {
+      "user_id": 7194,
+      "pca_x": -3.4959,
+      "pca_y": -1.0049,
+      "pca_z": 1.1004,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 780000.0
+    },
+    {
+      "user_id": 7160,
+      "pca_x": 0.9336,
+      "pca_y": -1.5213,
+      "pca_z": 0.1608,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 3310,
+      "pca_x": -2.4978,
+      "pca_y": 0.0475,
+      "pca_z": 1.5992,
+      "cluster_id": 1,
+      "tax_slab_class": 3,
+      "annual_income": 1440000.0
+    },
+    {
+      "user_id": 7297,
+      "pca_x": -2.5986,
+      "pca_y": 0.7759,
+      "pca_z": 2.6097,
+      "cluster_id": 1,
+      "tax_slab_class": 4,
+      "annual_income": 1980000.0
+    },
+    {
+      "user_id": 9529,
+      "pca_x": -2.0951,
+      "pca_y": -0.2587,
+      "pca_z": -2.4798,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 360000.0
+    },
+    {
+      "user_id": 5416,
+      "pca_x": 0.7675,
+      "pca_y": -1.6824,
+      "pca_z": 0.5508,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 324000.0
+    },
+    {
+      "user_id": 6793,
+      "pca_x": -4.0588,
+      "pca_y": 1.0269,
+      "pca_z": -2.675,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1000000.0
+    },
+    {
+      "user_id": 5405,
+      "pca_x": -3.6365,
+      "pca_y": 1.6257,
+      "pca_z": 2.0719,
+      "cluster_id": 1,
+      "tax_slab_class": 6,
+      "annual_income": 3420000.0
+    },
+    {
+      "user_id": 3298,
+      "pca_x": -2.8966,
+      "pca_y": 0.7259,
+      "pca_z": 0.8632,
+      "cluster_id": 1,
+      "tax_slab_class": 4,
+      "annual_income": 1800000.0
+    },
+    {
+      "user_id": 3041,
+      "pca_x": 0.0871,
+      "pca_y": -1.0403,
+      "pca_z": 0.4804,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 400000.0
+    },
+    {
+      "user_id": 2547,
+      "pca_x": -2.0126,
+      "pca_y": -1.878,
+      "pca_z": -2.5923,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 319,
+      "pca_x": 0.3561,
+      "pca_y": -0.2811,
+      "pca_z": 0.224,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 561600.0
+    },
+    {
+      "user_id": 7727,
+      "pca_x": -2.8333,
+      "pca_y": -1.1889,
+      "pca_z": -0.3309,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 360000.0
+    },
+    {
+      "user_id": 8644,
+      "pca_x": -3.3619,
+      "pca_y": -1.7158,
+      "pca_z": 0.6633,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    },
+    {
+      "user_id": 8001,
+      "pca_x": -2.8659,
+      "pca_y": 0.1179,
+      "pca_z": 1.7963,
+      "cluster_id": 1,
+      "tax_slab_class": 4,
+      "annual_income": 1690000.0
+    },
+    {
+      "user_id": 6684,
+      "pca_x": 0.5467,
+      "pca_y": 0.3299,
+      "pca_z": 1.4417,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 910000.0
+    },
+    {
+      "user_id": 137,
+      "pca_x": 4.5356,
+      "pca_y": -0.3625,
+      "pca_z": -0.5602,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 1687,
+      "pca_x": -2.9596,
+      "pca_y": -0.2359,
+      "pca_z": -3.1066,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 360000.0
+    },
+    {
+      "user_id": 2162,
+      "pca_x": 3.8413,
+      "pca_y": 0.4793,
+      "pca_z": -1.9124,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 450000.0
+    },
+    {
+      "user_id": 5759,
+      "pca_x": -3.4919,
+      "pca_y": -0.5288,
+      "pca_z": 1.3686,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1170000.0
+    },
+    {
+      "user_id": 860,
+      "pca_x": -3.0677,
+      "pca_y": -0.6372,
+      "pca_z": -3.2134,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 300000.0
+    },
+    {
+      "user_id": 5022,
+      "pca_x": -3.8518,
+      "pca_y": -0.5522,
+      "pca_z": 1.8844,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1260000.0
+    },
+    {
+      "user_id": 6458,
+      "pca_x": 3.3582,
+      "pca_y": -0.3951,
+      "pca_z": -1.0422,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 240000.0
+    },
+    {
+      "user_id": 3458,
+      "pca_x": 0.6962,
+      "pca_y": 0.0344,
+      "pca_z": 1.3774,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1040000.0
+    },
+    {
+      "user_id": 7700,
+      "pca_x": 3.8569,
+      "pca_y": -0.3023,
+      "pca_z": -1.9722,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 4123,
+      "pca_x": -2.9106,
+      "pca_y": 0.916,
+      "pca_z": -2.3901,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 700000.0
+    },
+    {
+      "user_id": 2546,
+      "pca_x": -2.2348,
+      "pca_y": -1.9412,
+      "pca_z": 0.7096,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 324000.0
+    },
+    {
+      "user_id": 8629,
+      "pca_x": 4.1759,
+      "pca_y": 0.8632,
+      "pca_z": -1.1517,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 360000.0
+    },
+    {
+      "user_id": 3678,
+      "pca_x": 2.4134,
+      "pca_y": 2.083,
+      "pca_z": 0.3475,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1170000.0
+    },
+    {
+      "user_id": 282,
+      "pca_x": 0.8822,
+      "pca_y": -0.2252,
+      "pca_z": 1.066,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 720000.0
+    },
+    {
+      "user_id": 6422,
+      "pca_x": -1.9336,
+      "pca_y": -2.5926,
+      "pca_z": 0.1893,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 7873,
+      "pca_x": -2.5421,
+      "pca_y": 0.7741,
+      "pca_z": -2.7115,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 600000.0
+    },
+    {
+      "user_id": 1862,
+      "pca_x": 3.5882,
+      "pca_y": -0.2202,
+      "pca_z": -1.1013,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 270000.0
+    },
+    {
+      "user_id": 1964,
+      "pca_x": 1.4344,
+      "pca_y": 0.2805,
+      "pca_z": -0.0667,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 720000.0
+    },
+    {
+      "user_id": 9248,
+      "pca_x": 3.4589,
+      "pca_y": 2.0738,
+      "pca_z": -0.2641,
+      "cluster_id": 0,
+      "tax_slab_class": 3,
+      "annual_income": 1430000.0
+    },
+    {
+      "user_id": 8461,
+      "pca_x": -2.7547,
+      "pca_y": -1.2624,
+      "pca_z": -2.504,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 324000.0
+    },
+    {
+      "user_id": 4651,
+      "pca_x": -3.4415,
+      "pca_y": 1.2707,
+      "pca_z": 1.1159,
+      "cluster_id": 1,
+      "tax_slab_class": 6,
+      "annual_income": 3240000.0
+    },
+    {
+      "user_id": 604,
+      "pca_x": -2.574,
+      "pca_y": -2.7012,
+      "pca_z": -0.0343,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 6862,
+      "pca_x": -1.9725,
+      "pca_y": -1.0271,
+      "pca_z": 1.2099,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    },
+    {
+      "user_id": 5247,
+      "pca_x": 3.6975,
+      "pca_y": -1.0444,
+      "pca_z": -2.3968,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 5570,
+      "pca_x": 3.2427,
+      "pca_y": 0.9533,
+      "pca_z": -0.7493,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 600000.0
+    },
+    {
+      "user_id": 6465,
+      "pca_x": -2.1199,
+      "pca_y": -0.959,
+      "pca_z": 0.1338,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 530400.0
+    },
+    {
+      "user_id": 790,
+      "pca_x": 3.0555,
+      "pca_y": -0.5809,
+      "pca_z": -0.7736,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 360000.0
+    },
+    {
+      "user_id": 6474,
+      "pca_x": 0.0707,
+      "pca_y": 0.9832,
+      "pca_z": 2.0807,
+      "cluster_id": 3,
+      "tax_slab_class": 4,
+      "annual_income": 2033900.0
+    },
+    {
+      "user_id": 5353,
+      "pca_x": 0.6353,
+      "pca_y": -1.5283,
+      "pca_z": -0.0746,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 240000.0
+    },
+    {
+      "user_id": 6642,
+      "pca_x": 3.1881,
+      "pca_y": 3.485,
+      "pca_z": 0.2183,
+      "cluster_id": 0,
+      "tax_slab_class": 6,
+      "annual_income": 3420000.0
+    },
+    {
+      "user_id": 1530,
+      "pca_x": -2.8946,
+      "pca_y": -0.7319,
+      "pca_z": -1.7617,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 400000.0
+    },
+    {
+      "user_id": 1075,
+      "pca_x": -2.8708,
+      "pca_y": 0.1936,
+      "pca_z": -2.0124,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 990000.0
+    },
+    {
+      "user_id": 1761,
+      "pca_x": 0.1477,
+      "pca_y": -1.164,
+      "pca_z": 0.5467,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 450000.0
+    },
+    {
+      "user_id": 1286,
+      "pca_x": 3.4261,
+      "pca_y": -0.6045,
+      "pca_z": -1.5739,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 9155,
+      "pca_x": 2.6484,
+      "pca_y": 0.0804,
+      "pca_z": -1.4762,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 360000.0
+    },
+    {
+      "user_id": 4042,
+      "pca_x": -2.3492,
+      "pca_y": 0.4858,
+      "pca_z": -1.6943,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 723600.0
+    },
+    {
+      "user_id": 3033,
+      "pca_x": -2.2803,
+      "pca_y": -1.3781,
+      "pca_z": 0.5611,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 327600.0
+    },
+    {
+      "user_id": 9029,
+      "pca_x": 3.9491,
+      "pca_y": 0.4042,
+      "pca_z": -1.286,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 360000.0
+    },
+    {
+      "user_id": 4909,
+      "pca_x": -2.7783,
+      "pca_y": 0.0967,
+      "pca_z": -0.2933,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 910000.0
+    },
+    {
+      "user_id": 391,
+      "pca_x": 0.3486,
+      "pca_y": -0.3132,
+      "pca_z": 1.2504,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 700000.0
+    },
+    {
+      "user_id": 6264,
+      "pca_x": 0.6657,
+      "pca_y": -0.4728,
+      "pca_z": 0.0884,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 452400.0
+    },
+    {
+      "user_id": 2767,
+      "pca_x": -4.3033,
+      "pca_y": 0.1514,
+      "pca_z": -2.8616,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 500000.0
+    },
+    {
+      "user_id": 4631,
+      "pca_x": -3.2583,
+      "pca_y": -1.4957,
+      "pca_z": 0.4017,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 450000.0
+    },
+    {
+      "user_id": 7655,
+      "pca_x": 0.8679,
+      "pca_y": -0.5986,
+      "pca_z": 0.8955,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    },
+    {
+      "user_id": 8491,
+      "pca_x": 1.1779,
+      "pca_y": -0.2338,
+      "pca_z": 0.555,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 800000.0
+    },
+    {
+      "user_id": 9278,
+      "pca_x": -3.8363,
+      "pca_y": 0.5729,
+      "pca_z": -1.8043,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 670800.0
+    },
+    {
+      "user_id": 3406,
+      "pca_x": 2.8449,
+      "pca_y": 0.8399,
+      "pca_z": -0.6662,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 452400.0
+    },
+    {
+      "user_id": 49,
+      "pca_x": 0.6335,
+      "pca_y": 0.1907,
+      "pca_z": 1.6845,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1200000.0
+    },
+    {
+      "user_id": 9444,
+      "pca_x": 1.6039,
+      "pca_y": -1.3355,
+      "pca_z": 0.7167,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 450000.0
+    },
+    {
+      "user_id": 3332,
+      "pca_x": 0.3697,
+      "pca_y": 0.9973,
+      "pca_z": 1.6103,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1166400.0
+    },
+    {
+      "user_id": 1210,
+      "pca_x": -2.3146,
+      "pca_y": -0.279,
+      "pca_z": -0.1699,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 600000.0
+    },
+    {
+      "user_id": 4286,
+      "pca_x": -2.2012,
+      "pca_y": -2.9508,
+      "pca_z": 0.172,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 202800.0
+    },
+    {
+      "user_id": 3494,
+      "pca_x": 3.439,
+      "pca_y": 1.7871,
+      "pca_z": 0.2133,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1101600.0
+    },
+    {
+      "user_id": 533,
+      "pca_x": 3.6272,
+      "pca_y": 1.0833,
+      "pca_z": -1.4041,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 600000.0
+    },
+    {
+      "user_id": 6074,
+      "pca_x": -2.9993,
+      "pca_y": -0.2687,
+      "pca_z": -1.5641,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    },
+    {
+      "user_id": 3100,
+      "pca_x": 0.3864,
+      "pca_y": -0.0887,
+      "pca_z": 0.7828,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 910000.0
+    },
+    {
+      "user_id": 3009,
+      "pca_x": 0.8207,
+      "pca_y": -0.4324,
+      "pca_z": 0.763,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 600000.0
+    },
+    {
+      "user_id": 1691,
+      "pca_x": 4.2882,
+      "pca_y": 1.5912,
+      "pca_z": -0.3737,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1200000.0
+    },
+    {
+      "user_id": 8999,
+      "pca_x": 1.0023,
+      "pca_y": 0.7826,
+      "pca_z": 0.8093,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1000000.0
+    },
+    {
+      "user_id": 3764,
+      "pca_x": -3.6649,
+      "pca_y": 1.1894,
+      "pca_z": -0.5916,
+      "cluster_id": 1,
+      "tax_slab_class": 3,
+      "annual_income": 1400000.0
+    },
+    {
+      "user_id": 703,
+      "pca_x": 0.744,
+      "pca_y": -1.7118,
+      "pca_z": -0.3639,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 8376,
+      "pca_x": 3.6906,
+      "pca_y": 0.67,
+      "pca_z": -1.201,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 405600.0
+    },
+    {
+      "user_id": 6176,
+      "pca_x": -1.9384,
+      "pca_y": -2.0223,
+      "pca_z": -0.2368,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 270000.0
+    },
+    {
+      "user_id": 9346,
+      "pca_x": 3.2377,
+      "pca_y": -0.4432,
+      "pca_z": -0.6346,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 260000.0
+    },
+    {
+      "user_id": 71,
+      "pca_x": 2.3702,
+      "pca_y": 1.9431,
+      "pca_z": 0.4304,
+      "cluster_id": 0,
+      "tax_slab_class": 4,
+      "annual_income": 1980000.0
+    },
+    {
+      "user_id": 6077,
+      "pca_x": 2.7884,
+      "pca_y": 0.6581,
+      "pca_z": -0.3913,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 630000.0
+    },
+    {
+      "user_id": 5851,
+      "pca_x": 0.9232,
+      "pca_y": -0.3094,
+      "pca_z": 0.6437,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    },
+    {
+      "user_id": 8417,
+      "pca_x": 4.417,
+      "pca_y": 0.4805,
+      "pca_z": -0.039,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 450000.0
+    },
+    {
+      "user_id": 162,
+      "pca_x": 0.6843,
+      "pca_y": -1.3045,
+      "pca_z": -0.1963,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 312000.0
+    },
+    {
+      "user_id": 2781,
+      "pca_x": -3.7253,
+      "pca_y": -1.4221,
+      "pca_z": -2.4933,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 270000.0
+    },
+    {
+      "user_id": 6044,
+      "pca_x": 3.8998,
+      "pca_y": 0.197,
+      "pca_z": -0.957,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 324000.0
+    },
+    {
+      "user_id": 1311,
+      "pca_x": -1.971,
+      "pca_y": -1.9791,
+      "pca_z": 0.2978,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 400000.0
+    },
+    {
+      "user_id": 246,
+      "pca_x": 3.5907,
+      "pca_y": 2.2847,
+      "pca_z": 0.2161,
+      "cluster_id": 0,
+      "tax_slab_class": 3,
+      "annual_income": 1500000.0
+    },
+    {
+      "user_id": 2126,
+      "pca_x": 0.7962,
+      "pca_y": 0.3061,
+      "pca_z": 1.2723,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 990000.0
+    },
+    {
+      "user_id": 9758,
+      "pca_x": 0.4352,
+      "pca_y": 1.138,
+      "pca_z": 1.1329,
+      "cluster_id": 3,
+      "tax_slab_class": 3,
+      "annual_income": 1513200.0
+    },
+    {
+      "user_id": 3927,
+      "pca_x": -3.7865,
+      "pca_y": 0.2788,
+      "pca_z": -1.2409,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1000000.0
+    },
+    {
+      "user_id": 6809,
+      "pca_x": -2.5118,
+      "pca_y": 1.7463,
+      "pca_z": -0.6839,
+      "cluster_id": 1,
+      "tax_slab_class": 4,
+      "annual_income": 1950000.0
+    },
+    {
+      "user_id": 5546,
+      "pca_x": -0.1841,
+      "pca_y": 1.0119,
+      "pca_z": 1.5386,
+      "cluster_id": 3,
+      "tax_slab_class": 3,
+      "annual_income": 1560000.0
+    },
+    {
+      "user_id": 6253,
+      "pca_x": -2.9736,
+      "pca_y": -0.8911,
+      "pca_z": 1.3902,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 792000.0
+    },
+    {
+      "user_id": 9240,
+      "pca_x": 2.6066,
+      "pca_y": 3.1367,
+      "pca_z": 0.9374,
+      "cluster_id": 0,
+      "tax_slab_class": 6,
+      "annual_income": 4160000.0
+    },
+    {
+      "user_id": 5691,
+      "pca_x": 2.9998,
+      "pca_y": 1.2057,
+      "pca_z": -0.3131,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1040000.0
+    },
+    {
+      "user_id": 2829,
+      "pca_x": 1.3167,
+      "pca_y": -1.2181,
+      "pca_z": -0.3956,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 300000.0
+    },
+    {
+      "user_id": 4672,
+      "pca_x": 2.6408,
+      "pca_y": 0.923,
+      "pca_z": -0.7134,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 420000.0
+    },
+    {
+      "user_id": 2139,
+      "pca_x": 1.3907,
+      "pca_y": -0.5542,
+      "pca_z": 0.7589,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 480000.0
+    },
+    {
+      "user_id": 5931,
+      "pca_x": -2.1498,
+      "pca_y": -2.3609,
+      "pca_z": 0.7451,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 300000.0
+    },
+    {
+      "user_id": 7374,
+      "pca_x": 0.2595,
+      "pca_y": 0.779,
+      "pca_z": 0.7344,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1200000.0
+    },
+    {
+      "user_id": 6812,
+      "pca_x": -3.1497,
+      "pca_y": 1.0884,
+      "pca_z": -2.2531,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1000000.0
+    },
+    {
+      "user_id": 1856,
+      "pca_x": 0.6544,
+      "pca_y": -0.4954,
+      "pca_z": 0.8233,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 450000.0
+    },
+    {
+      "user_id": 1611,
+      "pca_x": -1.9066,
+      "pca_y": -0.7547,
+      "pca_z": 0.6143,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 650000.0
+    },
+    {
+      "user_id": 733,
+      "pca_x": 2.3609,
+      "pca_y": 2.0405,
+      "pca_z": -0.0373,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1260000.0
+    },
+    {
+      "user_id": 1990,
+      "pca_x": 0.6152,
+      "pca_y": -1.3471,
+      "pca_z": 1.188,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 400000.0
+    },
+    {
+      "user_id": 8518,
+      "pca_x": 0.835,
+      "pca_y": 0.503,
+      "pca_z": 2.3935,
+      "cluster_id": 3,
+      "tax_slab_class": 3,
+      "annual_income": 1300000.0
+    },
+    {
+      "user_id": 6231,
+      "pca_x": 1.5172,
+      "pca_y": -0.8308,
+      "pca_z": -0.0778,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 400000.0
+    },
+    {
+      "user_id": 8707,
+      "pca_x": 0.8884,
+      "pca_y": -1.544,
+      "pca_z": 0.4685,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 378000.0
+    },
+    {
+      "user_id": 1098,
+      "pca_x": 1.3249,
+      "pca_y": -1.3676,
+      "pca_z": -0.4932,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 270000.0
+    },
+    {
+      "user_id": 2390,
+      "pca_x": 0.3454,
+      "pca_y": -0.1583,
+      "pca_z": 1.2216,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1080000.0
+    },
+    {
+      "user_id": 2385,
+      "pca_x": 0.4424,
+      "pca_y": -0.6349,
+      "pca_z": 1.0317,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 583200.0
+    },
+    {
+      "user_id": 863,
+      "pca_x": 1.0225,
+      "pca_y": -0.0566,
+      "pca_z": 1.9722,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 951600.0
+    },
+    {
+      "user_id": 7661,
+      "pca_x": 3.1509,
+      "pca_y": 1.0847,
+      "pca_z": 0.8415,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1040000.0
+    },
+    {
+      "user_id": 5391,
+      "pca_x": 1.6074,
+      "pca_y": -1.4209,
+      "pca_z": -0.006,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 240000.0
+    },
+    {
+      "user_id": 5649,
+      "pca_x": 3.8688,
+      "pca_y": 0.4737,
+      "pca_z": -0.5576,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 390000.0
+    },
+    {
+      "user_id": 1300,
+      "pca_x": 4.514,
+      "pca_y": 0.7541,
+      "pca_z": -0.3057,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 630000.0
+    },
+    {
+      "user_id": 4216,
+      "pca_x": 0.922,
+      "pca_y": -0.3092,
+      "pca_z": 1.1889,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 720000.0
+    },
+    {
+      "user_id": 9132,
+      "pca_x": -0.0181,
+      "pca_y": 1.8551,
+      "pca_z": 2.4517,
+      "cluster_id": 3,
+      "tax_slab_class": 6,
+      "annual_income": 2500000.0
+    },
+    {
+      "user_id": 7804,
+      "pca_x": 3.4179,
+      "pca_y": 0.4548,
+      "pca_z": -0.4379,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 516000.0
+    },
+    {
+      "user_id": 7231,
+      "pca_x": 3.6994,
+      "pca_y": 0.8748,
+      "pca_z": 0.0505,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 800000.0
+    },
+    {
+      "user_id": 7776,
+      "pca_x": -3.6384,
+      "pca_y": 1.7075,
+      "pca_z": -2.5558,
+      "cluster_id": 1,
+      "tax_slab_class": 3,
+      "annual_income": 1300000.0
+    },
+    {
+      "user_id": 444,
+      "pca_x": -2.7341,
+      "pca_y": -0.5149,
+      "pca_z": -2.0641,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    },
+    {
+      "user_id": 5552,
+      "pca_x": -1.8751,
+      "pca_y": -1.3589,
+      "pca_z": 0.0919,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 420000.0
+    },
+    {
+      "user_id": 2166,
+      "pca_x": -2.3183,
+      "pca_y": -0.9891,
+      "pca_z": 0.6907,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 520000.0
+    },
+    {
+      "user_id": 4285,
+      "pca_x": 2.7941,
+      "pca_y": 1.3187,
+      "pca_z": 0.2072,
+      "cluster_id": 0,
+      "tax_slab_class": 3,
+      "annual_income": 1300000.0
+    },
+    {
+      "user_id": 7092,
+      "pca_x": 1.246,
+      "pca_y": -1.1599,
+      "pca_z": 0.3323,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 300000.0
+    },
+    {
+      "user_id": 4426,
+      "pca_x": -1.8696,
+      "pca_y": -2.1432,
+      "pca_z": -0.3121,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 9112,
+      "pca_x": 3.2405,
+      "pca_y": 2.2702,
+      "pca_z": 0.2886,
+      "cluster_id": 0,
+      "tax_slab_class": 5,
+      "annual_income": 2470000.0
+    },
+    {
+      "user_id": 7229,
+      "pca_x": -3.6483,
+      "pca_y": -1.0001,
+      "pca_z": -3.5244,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 3001,
+      "pca_x": -2.4871,
+      "pca_y": 1.4518,
+      "pca_z": -2.199,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1000000.0
+    },
+    {
+      "user_id": 7249,
+      "pca_x": 3.7932,
+      "pca_y": -0.3053,
+      "pca_z": -0.4426,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 360000.0
+    },
+    {
+      "user_id": 5254,
+      "pca_x": -2.9546,
+      "pca_y": -1.1105,
+      "pca_z": 0.5486,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    },
+    {
+      "user_id": 2208,
+      "pca_x": 0.4095,
+      "pca_y": 0.5858,
+      "pca_z": 1.0305,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1080000.0
+    },
+    {
+      "user_id": 3210,
+      "pca_x": -3.0441,
+      "pca_y": -1.4451,
+      "pca_z": 0.5678,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 529200.0
+    },
+    {
+      "user_id": 2703,
+      "pca_x": -2.3128,
+      "pca_y": -2.2985,
+      "pca_z": -0.2355,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 3751,
+      "pca_x": -3.1177,
+      "pca_y": -1.5347,
+      "pca_z": -0.6047,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 252000.0
+    },
+    {
+      "user_id": 7583,
+      "pca_x": 0.9708,
+      "pca_y": 0.388,
+      "pca_z": 1.3878,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1080000.0
+    },
+    {
+      "user_id": 195,
+      "pca_x": -1.76,
+      "pca_y": -1.4357,
+      "pca_z": -0.3303,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 300000.0
+    },
+    {
+      "user_id": 8457,
+      "pca_x": 1.108,
+      "pca_y": -0.7498,
+      "pca_z": 0.4627,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 500000.0
+    },
+    {
+      "user_id": 9384,
+      "pca_x": 0.4506,
+      "pca_y": -0.0029,
+      "pca_z": 1.3909,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 900000.0
+    },
+    {
+      "user_id": 3245,
+      "pca_x": 0.4441,
+      "pca_y": 0.1188,
+      "pca_z": 1.3088,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1045200.0
+    },
+    {
+      "user_id": 1527,
+      "pca_x": 0.6918,
+      "pca_y": -1.4118,
+      "pca_z": 0.7991,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 312000.0
+    },
+    {
+      "user_id": 6806,
+      "pca_x": -2.3228,
+      "pca_y": -2.554,
+      "pca_z": -0.3563,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 7769,
+      "pca_x": 0.5806,
+      "pca_y": 1.1315,
+      "pca_z": 2.3849,
+      "cluster_id": 3,
+      "tax_slab_class": 4,
+      "annual_income": 1980000.0
+    },
+    {
+      "user_id": 1937,
+      "pca_x": -2.3046,
+      "pca_y": -1.0143,
+      "pca_z": 1.4212,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1000000.0
+    },
+    {
+      "user_id": 4208,
+      "pca_x": -2.4454,
+      "pca_y": -0.4562,
+      "pca_z": 1.3703,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 900000.0
+    },
+    {
+      "user_id": 7504,
+      "pca_x": 4.766,
+      "pca_y": 0.7498,
+      "pca_z": -0.6553,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 600000.0
+    },
+    {
+      "user_id": 3748,
+      "pca_x": -2.8809,
+      "pca_y": -0.4674,
+      "pca_z": 0.9856,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 800000.0
+    },
+    {
+      "user_id": 6657,
+      "pca_x": 3.2576,
+      "pca_y": 1.0023,
+      "pca_z": -1.0644,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 600000.0
+    },
+    {
+      "user_id": 8057,
+      "pca_x": 0.2452,
+      "pca_y": 0.0639,
+      "pca_z": 1.3778,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 900000.0
+    },
+    {
+      "user_id": 6954,
+      "pca_x": 0.8272,
+      "pca_y": -1.0858,
+      "pca_z": 0.96,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 408000.0
+    },
+    {
+      "user_id": 5810,
+      "pca_x": 4.1547,
+      "pca_y": -0.0847,
+      "pca_z": -1.9586,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 324000.0
+    },
+    {
+      "user_id": 3921,
+      "pca_x": 2.6345,
+      "pca_y": 2.0283,
+      "pca_z": 0.5438,
+      "cluster_id": 0,
+      "tax_slab_class": 4,
+      "annual_income": 1820000.0
+    },
+    {
+      "user_id": 7349,
+      "pca_x": -3.1529,
+      "pca_y": -1.1283,
+      "pca_z": 1.4579,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1000000.0
+    },
+    {
+      "user_id": 582,
+      "pca_x": 1.4271,
+      "pca_y": -2.0287,
+      "pca_z": -0.3321,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 216000.0
+    },
+    {
+      "user_id": 3060,
+      "pca_x": 1.3689,
+      "pca_y": -1.0332,
+      "pca_z": 0.4491,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 356400.0
+    },
+    {
+      "user_id": 2000,
+      "pca_x": -2.0209,
+      "pca_y": -1.0693,
+      "pca_z": -2.7628,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 8593,
+      "pca_x": 1.3725,
+      "pca_y": -1.6358,
+      "pca_z": -0.244,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 1038,
+      "pca_x": 1.5038,
+      "pca_y": -0.8029,
+      "pca_z": 0.044,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 480000.0
+    },
+    {
+      "user_id": 1529,
+      "pca_x": -2.4669,
+      "pca_y": -1.9614,
+      "pca_z": 0.3424,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 360000.0
+    },
+    {
+      "user_id": 6250,
+      "pca_x": -2.9134,
+      "pca_y": -2.4592,
+      "pca_z": -0.1061,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 270000.0
+    },
+    {
+      "user_id": 423,
+      "pca_x": -2.4373,
+      "pca_y": -0.2974,
+      "pca_z": -1.7286,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 500000.0
+    },
+    {
+      "user_id": 8297,
+      "pca_x": 0.5107,
+      "pca_y": -0.1844,
+      "pca_z": 1.3375,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 939600.0
+    },
+    {
+      "user_id": 3779,
+      "pca_x": -3.0859,
+      "pca_y": -0.1745,
+      "pca_z": 1.7886,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1152000.0
+    },
+    {
+      "user_id": 1519,
+      "pca_x": -2.3811,
+      "pca_y": -0.7691,
+      "pca_z": 0.0763,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 500000.0
+    },
+    {
+      "user_id": 409,
+      "pca_x": -2.6485,
+      "pca_y": -0.2847,
+      "pca_z": -1.5347,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 520000.0
+    },
+    {
+      "user_id": 2505,
+      "pca_x": 1.5586,
+      "pca_y": -1.2106,
+      "pca_z": -0.238,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 4594,
+      "pca_x": 2.7156,
+      "pca_y": 1.5543,
+      "pca_z": -0.027,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 720000.0
+    },
+    {
+      "user_id": 7218,
+      "pca_x": 0.3864,
+      "pca_y": -0.8486,
+      "pca_z": 0.605,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 500000.0
+    },
+    {
+      "user_id": 6603,
+      "pca_x": 4.3724,
+      "pca_y": 0.1557,
+      "pca_z": -1.4587,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 390000.0
+    },
+    {
+      "user_id": 6685,
+      "pca_x": 0.6002,
+      "pca_y": 0.1013,
+      "pca_z": 0.8749,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 900000.0
+    },
+    {
+      "user_id": 7259,
+      "pca_x": 2.491,
+      "pca_y": 1.6292,
+      "pca_z": 0.496,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1020000.0
+    },
+    {
+      "user_id": 8689,
+      "pca_x": 3.4143,
+      "pca_y": -0.4052,
+      "pca_z": -2.2785,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 3305,
+      "pca_x": 3.2877,
+      "pca_y": -0.9384,
+      "pca_z": -1.5344,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 205200.0
+    },
+    {
+      "user_id": 5829,
+      "pca_x": 0.7726,
+      "pca_y": -0.335,
+      "pca_z": 0.0283,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 480000.0
+    },
+    {
+      "user_id": 5290,
+      "pca_x": -2.8581,
+      "pca_y": -0.9104,
+      "pca_z": 1.1577,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 720000.0
+    },
+    {
+      "user_id": 1701,
+      "pca_x": -2.7998,
+      "pca_y": -2.2262,
+      "pca_z": 0.9639,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 390000.0
+    },
+    {
+      "user_id": 7538,
+      "pca_x": -2.3786,
+      "pca_y": -0.1455,
+      "pca_z": -0.7868,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    },
+    {
+      "user_id": 7587,
+      "pca_x": -3.2363,
+      "pca_y": -1.7092,
+      "pca_z": -0.5133,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 280800.0
+    },
+    {
+      "user_id": 7860,
+      "pca_x": -2.6246,
+      "pca_y": -1.5917,
+      "pca_z": -1.2939,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 4926,
+      "pca_x": -3.2119,
+      "pca_y": 0.1496,
+      "pca_z": 2.0896,
+      "cluster_id": 1,
+      "tax_slab_class": 4,
+      "annual_income": 1900000.0
+    },
+    {
+      "user_id": 725,
+      "pca_x": -3.1452,
+      "pca_y": -1.4902,
+      "pca_z": 0.0511,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 450000.0
+    },
+    {
+      "user_id": 5656,
+      "pca_x": 4.1106,
+      "pca_y": 0.2653,
+      "pca_z": -1.527,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 400000.0
+    },
+    {
+      "user_id": 336,
+      "pca_x": -3.4584,
+      "pca_y": -1.8886,
+      "pca_z": -0.3442,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 288000.0
+    },
+    {
+      "user_id": 8098,
+      "pca_x": -2.2903,
+      "pca_y": -2.2454,
+      "pca_z": 0.6563,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 300000.0
+    },
+    {
+      "user_id": 4057,
+      "pca_x": 0.7464,
+      "pca_y": 1.0041,
+      "pca_z": 1.7422,
+      "cluster_id": 3,
+      "tax_slab_class": 4,
+      "annual_income": 1700000.0
+    },
+    {
+      "user_id": 6716,
+      "pca_x": -1.889,
+      "pca_y": -2.0598,
+      "pca_z": -0.8343,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 237600.0
+    },
+    {
+      "user_id": 4236,
+      "pca_x": -3.2411,
+      "pca_y": -2.292,
+      "pca_z": 0.166,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 270000.0
+    },
+    {
+      "user_id": 4223,
+      "pca_x": -2.109,
+      "pca_y": -2.6414,
+      "pca_z": 0.1848,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 216000.0
+    },
+    {
+      "user_id": 100059,
+      "pca_x": -4.4729,
+      "pca_y": 10.6631,
+      "pca_z": 0.1494,
+      "cluster_id": 2,
+      "tax_slab_class": 6,
+      "annual_income": 47961400.58
+    },
+    {
+      "user_id": 8168,
+      "pca_x": -3.3825,
+      "pca_y": -0.4299,
+      "pca_z": 0.8887,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 700000.0
+    },
+    {
+      "user_id": 4275,
+      "pca_x": 1.2737,
+      "pca_y": -0.8409,
+      "pca_z": 0.1152,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 390000.0
+    },
+    {
+      "user_id": 8207,
+      "pca_x": 3.9144,
+      "pca_y": -0.4073,
+      "pca_z": -0.7292,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 240000.0
+    },
+    {
+      "user_id": 5216,
+      "pca_x": 1.5798,
+      "pca_y": -1.1931,
+      "pca_z": -0.2115,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 296400.0
+    },
+    {
+      "user_id": 4283,
+      "pca_x": 0.6487,
+      "pca_y": -0.6434,
+      "pca_z": 0.8057,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 552000.0
+    },
+    {
+      "user_id": 6901,
+      "pca_x": -3.0671,
+      "pca_y": 0.1359,
+      "pca_z": -2.2098,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 500000.0
+    },
+    {
+      "user_id": 46,
+      "pca_x": -2.2801,
+      "pca_y": -1.3582,
+      "pca_z": 0.9067,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 518400.0
+    },
+    {
+      "user_id": 4322,
+      "pca_x": -3.0675,
+      "pca_y": 0.7258,
+      "pca_z": -1.9242,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 990000.0
+    },
+    {
+      "user_id": 964,
+      "pca_x": 2.9203,
+      "pca_y": -0.4404,
+      "pca_z": -1.1859,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 8727,
+      "pca_x": 0.9978,
+      "pca_y": -1.8361,
+      "pca_z": 0.0139,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 216000.0
+    },
+    {
+      "user_id": 8916,
+      "pca_x": 1.8582,
+      "pca_y": -1.6896,
+      "pca_z": -0.3254,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 1026,
+      "pca_x": -2.9316,
+      "pca_y": -1.6624,
+      "pca_z": 0.9398,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 516000.0
+    },
+    {
+      "user_id": 8765,
+      "pca_x": 0.9354,
+      "pca_y": -1.1184,
+      "pca_z": -0.2635,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 324000.0
+    },
+    {
+      "user_id": 6237,
+      "pca_x": -2.4298,
+      "pca_y": -0.3413,
+      "pca_z": 0.4526,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1000000.0
+    },
+    {
+      "user_id": 3506,
+      "pca_x": 0.7622,
+      "pca_y": -0.7005,
+      "pca_z": 0.3654,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 420000.0
+    },
+    {
+      "user_id": 7509,
+      "pca_x": 0.1624,
+      "pca_y": -0.2206,
+      "pca_z": 1.1172,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 720000.0
+    },
+    {
+      "user_id": 3179,
+      "pca_x": 3.0396,
+      "pca_y": 0.4472,
+      "pca_z": -0.7446,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 500000.0
+    },
+    {
+      "user_id": 5300,
+      "pca_x": -3.2647,
+      "pca_y": 0.5507,
+      "pca_z": 1.9242,
+      "cluster_id": 1,
+      "tax_slab_class": 6,
+      "annual_income": 2700000.0
+    },
+    {
+      "user_id": 3421,
+      "pca_x": -3.4362,
+      "pca_y": 0.346,
+      "pca_z": -3.2136,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 360000.0
+    },
+    {
+      "user_id": 6294,
+      "pca_x": -3.7159,
+      "pca_y": 0.6497,
+      "pca_z": -2.1263,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 800000.0
+    },
+    {
+      "user_id": 6874,
+      "pca_x": 0.9198,
+      "pca_y": -1.4278,
+      "pca_z": 0.2792,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 378000.0
+    },
+    {
+      "user_id": 8811,
+      "pca_x": 2.8753,
+      "pca_y": 1.0541,
+      "pca_z": -0.2925,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 800000.0
+    },
+    {
+      "user_id": 7917,
+      "pca_x": -2.6141,
+      "pca_y": -0.1649,
+      "pca_z": -2.5158,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 500000.0
+    },
+    {
+      "user_id": 148,
+      "pca_x": -2.799,
+      "pca_y": -0.943,
+      "pca_z": 0.5743,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 600000.0
+    },
+    {
+      "user_id": 1522,
+      "pca_x": 0.5054,
+      "pca_y": -1.9261,
+      "pca_z": 0.4049,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 259200.0
+    },
+    {
+      "user_id": 6497,
+      "pca_x": 0.3213,
+      "pca_y": -0.6799,
+      "pca_z": 0.2728,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 453600.0
+    },
+    {
+      "user_id": 680,
+      "pca_x": 3.0904,
+      "pca_y": 2.8057,
+      "pca_z": 1.1002,
+      "cluster_id": 0,
+      "tax_slab_class": 6,
+      "annual_income": 3420000.0
+    },
+    {
+      "user_id": 7984,
+      "pca_x": 0.1114,
+      "pca_y": 1.3828,
+      "pca_z": 1.4776,
+      "cluster_id": 3,
+      "tax_slab_class": 5,
+      "annual_income": 2470000.0
+    },
+    {
+      "user_id": 4511,
+      "pca_x": 0.7265,
+      "pca_y": 0.2153,
+      "pca_z": 1.3257,
+      "cluster_id": 3,
+      "tax_slab_class": 3,
+      "annual_income": 1300000.0
+    },
+    {
+      "user_id": 3303,
+      "pca_x": 0.4672,
+      "pca_y": -0.2831,
+      "pca_z": 0.8276,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 780000.0
+    },
+    {
+      "user_id": 3712,
+      "pca_x": 0.7186,
+      "pca_y": -0.118,
+      "pca_z": 0.9755,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 900000.0
+    },
+    {
+      "user_id": 5507,
+      "pca_x": 0.1945,
+      "pca_y": 0.1294,
+      "pca_z": 1.6882,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1170000.0
+    },
+    {
+      "user_id": 4587,
+      "pca_x": 1.0672,
+      "pca_y": -0.1658,
+      "pca_z": 0.7889,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    },
+    {
+      "user_id": 5028,
+      "pca_x": 3.1225,
+      "pca_y": 2.0146,
+      "pca_z": -0.4109,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1260000.0
+    },
+    {
+      "user_id": 8285,
+      "pca_x": 1.0075,
+      "pca_y": 0.0422,
+      "pca_z": 0.5094,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 720000.0
+    },
+    {
+      "user_id": 8396,
+      "pca_x": -2.8056,
+      "pca_y": -2.4686,
+      "pca_z": -0.4621,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 240000.0
+    },
+    {
+      "user_id": 2831,
+      "pca_x": 3.6432,
+      "pca_y": -0.3979,
+      "pca_z": -1.2457,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 260000.0
+    },
+    {
+      "user_id": 3555,
+      "pca_x": 4.7108,
+      "pca_y": 0.6372,
+      "pca_z": -0.102,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    },
+    {
+      "user_id": 4127,
+      "pca_x": 0.7011,
+      "pca_y": -0.3465,
+      "pca_z": 1.1035,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 864000.0
+    },
+    {
+      "user_id": 9086,
+      "pca_x": -2.8574,
+      "pca_y": -1.5891,
+      "pca_z": -0.2485,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 390000.0
+    },
+    {
+      "user_id": 7275,
+      "pca_x": -2.4555,
+      "pca_y": -0.9764,
+      "pca_z": 0.2592,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 630000.0
+    },
+    {
+      "user_id": 955,
+      "pca_x": -3.2302,
+      "pca_y": 2.1076,
+      "pca_z": -2.7925,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1200000.0
+    },
+    {
+      "user_id": 5657,
+      "pca_x": 0.7103,
+      "pca_y": -0.8373,
+      "pca_z": 0.8098,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 630000.0
+    },
+    {
+      "user_id": 1476,
+      "pca_x": 2.8782,
+      "pca_y": 0.0325,
+      "pca_z": -0.5534,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 270000.0
+    },
+    {
+      "user_id": 1083,
+      "pca_x": -2.3589,
+      "pca_y": 0.5698,
+      "pca_z": -1.487,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 810000.0
+    },
+    {
+      "user_id": 1551,
+      "pca_x": -2.7293,
+      "pca_y": -1.1809,
+      "pca_z": 0.7053,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 500000.0
+    },
+    {
+      "user_id": 7964,
+      "pca_x": -2.6737,
+      "pca_y": -1.3802,
+      "pca_z": 0.7624,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 583200.0
+    },
+    {
+      "user_id": 8061,
+      "pca_x": 0.7798,
+      "pca_y": -1.5051,
+      "pca_z": 1.1717,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 390000.0
+    },
+    {
+      "user_id": 868,
+      "pca_x": -2.8314,
+      "pca_y": -0.9634,
+      "pca_z": 0.1448,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    },
+    {
+      "user_id": 4574,
+      "pca_x": -2.1871,
+      "pca_y": -1.105,
+      "pca_z": 0.7974,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 520000.0
+    },
+    {
+      "user_id": 6092,
+      "pca_x": 2.9447,
+      "pca_y": 2.099,
+      "pca_z": 0.0364,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1200000.0
+    },
+    {
+      "user_id": 6008,
+      "pca_x": 1.5692,
+      "pca_y": -0.618,
+      "pca_z": 0.5237,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 480000.0
+    },
+    {
+      "user_id": 6469,
+      "pca_x": -2.7552,
+      "pca_y": 1.4515,
+      "pca_z": -0.6104,
+      "cluster_id": 1,
+      "tax_slab_class": 5,
+      "annual_income": 2430000.0
+    },
+    {
+      "user_id": 5688,
+      "pca_x": 3.1686,
+      "pca_y": 1.7305,
+      "pca_z": -0.1527,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1140000.0
+    },
+    {
+      "user_id": 9200,
+      "pca_x": 0.5005,
+      "pca_y": -0.7116,
+      "pca_z": 0.868,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 400000.0
+    },
+    {
+      "user_id": 9324,
+      "pca_x": -2.677,
+      "pca_y": -1.0097,
+      "pca_z": -0.3903,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 450000.0
+    },
+    {
+      "user_id": 694,
+      "pca_x": -3.0122,
+      "pca_y": -0.8899,
+      "pca_z": -0.0589,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 450000.0
+    },
+    {
+      "user_id": 7753,
+      "pca_x": -2.5084,
+      "pca_y": -2.0452,
+      "pca_z": -0.3119,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 266400.0
+    },
+    {
+      "user_id": 1090,
+      "pca_x": -2.9885,
+      "pca_y": -0.7734,
+      "pca_z": 0.069,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 648000.0
+    },
+    {
+      "user_id": 8986,
+      "pca_x": 0.2005,
+      "pca_y": -0.5554,
+      "pca_z": 0.9327,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 780000.0
+    },
+    {
+      "user_id": 8977,
+      "pca_x": 3.3567,
+      "pca_y": 0.0583,
+      "pca_z": -0.2623,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 348000.0
+    },
+    {
+      "user_id": 2488,
+      "pca_x": 3.8444,
+      "pca_y": 0.6758,
+      "pca_z": -0.7939,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 450000.0
+    },
+    {
+      "user_id": 1146,
+      "pca_x": 0.8028,
+      "pca_y": 0.1508,
+      "pca_z": 1.3423,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 900000.0
+    },
+    {
+      "user_id": 6105,
+      "pca_x": 1.2552,
+      "pca_y": -1.6428,
+      "pca_z": 0.3657,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 313200.0
+    },
+    {
+      "user_id": 3015,
+      "pca_x": -0.1504,
+      "pca_y": 0.3821,
+      "pca_z": 1.2289,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1170000.0
+    },
+    {
+      "user_id": 4068,
+      "pca_x": 3.0194,
+      "pca_y": -0.0891,
+      "pca_z": -0.8892,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 260000.0
+    },
+    {
+      "user_id": 100055,
+      "pca_x": -4.087,
+      "pca_y": 12.6736,
+      "pca_z": 2.5359,
+      "cluster_id": 2,
+      "tax_slab_class": 6,
+      "annual_income": 196461187.23
+    },
+    {
+      "user_id": 8786,
+      "pca_x": 3.1716,
+      "pca_y": 0.3063,
+      "pca_z": -1.1211,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 450000.0
+    },
+    {
+      "user_id": 7908,
+      "pca_x": 0.5998,
+      "pca_y": -1.4025,
+      "pca_z": 1.2928,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 400000.0
+    },
+    {
+      "user_id": 1113,
+      "pca_x": 0.2246,
+      "pca_y": 0.1593,
+      "pca_z": 0.6773,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 900000.0
+    },
+    {
+      "user_id": 1524,
+      "pca_x": 3.3319,
+      "pca_y": 0.9668,
+      "pca_z": 0.3019,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 630000.0
+    },
+    {
+      "user_id": 4014,
+      "pca_x": 3.2218,
+      "pca_y": 1.2251,
+      "pca_z": -0.3653,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 799200.0
+    },
+    {
+      "user_id": 712,
+      "pca_x": -1.8717,
+      "pca_y": -2.8187,
+      "pca_z": 0.2012,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 2811,
+      "pca_x": 1.2073,
+      "pca_y": -0.6883,
+      "pca_z": 0.5893,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 450000.0
+    },
+    {
+      "user_id": 1763,
+      "pca_x": 4.8562,
+      "pca_y": 2.3077,
+      "pca_z": 0.0154,
+      "cluster_id": 0,
+      "tax_slab_class": 3,
+      "annual_income": 1560000.0
+    },
+    {
+      "user_id": 2710,
+      "pca_x": 1.1906,
+      "pca_y": -1.5633,
+      "pca_z": 0.7225,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 324000.0
+    },
+    {
+      "user_id": 5840,
+      "pca_x": 1.7127,
+      "pca_y": -0.9894,
+      "pca_z": 1.1863,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 480000.0
+    },
+    {
+      "user_id": 291,
+      "pca_x": 3.3138,
+      "pca_y": 1.1242,
+      "pca_z": -0.4745,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    },
+    {
+      "user_id": 3951,
+      "pca_x": 1.7664,
+      "pca_y": -1.3913,
+      "pca_z": -0.305,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 4708,
+      "pca_x": 1.341,
+      "pca_y": -1.0191,
+      "pca_z": 0.2406,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 432000.0
+    },
+    {
+      "user_id": 6042,
+      "pca_x": 3.2702,
+      "pca_y": -0.0465,
+      "pca_z": -1.0709,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 260000.0
+    },
+    {
+      "user_id": 2394,
+      "pca_x": -2.6344,
+      "pca_y": -1.7752,
+      "pca_z": -2.6026,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 9092,
+      "pca_x": 1.188,
+      "pca_y": -0.9405,
+      "pca_z": 0.3801,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 360000.0
+    },
+    {
+      "user_id": 1096,
+      "pca_x": 3.1242,
+      "pca_y": 2.0374,
+      "pca_z": 0.1132,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1260000.0
+    },
+    {
+      "user_id": 6987,
+      "pca_x": 3.5751,
+      "pca_y": 1.6365,
+      "pca_z": -0.6566,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1107600.0
+    },
+    {
+      "user_id": 5820,
+      "pca_x": 2.8933,
+      "pca_y": 0.8814,
+      "pca_z": -1.236,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 600000.0
+    },
+    {
+      "user_id": 5295,
+      "pca_x": -2.268,
+      "pca_y": -1.7063,
+      "pca_z": -0.2391,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 300000.0
+    },
+    {
+      "user_id": 5567,
+      "pca_x": 3.6456,
+      "pca_y": -0.4489,
+      "pca_z": -1.1067,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 509,
+      "pca_x": 1.1169,
+      "pca_y": -0.5876,
+      "pca_z": 0.4396,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    },
+    {
+      "user_id": 3367,
+      "pca_x": 2.5655,
+      "pca_y": 1.8655,
+      "pca_z": 0.1226,
+      "cluster_id": 0,
+      "tax_slab_class": 2,
+      "annual_income": 1080000.0
+    },
+    {
+      "user_id": 7814,
+      "pca_x": -3.0431,
+      "pca_y": -1.4488,
+      "pca_z": 1.4681,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 608400.0
+    },
+    {
+      "user_id": 3314,
+      "pca_x": -2.0583,
+      "pca_y": -1.6439,
+      "pca_z": -1.4094,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 9099,
+      "pca_x": 0.1183,
+      "pca_y": 0.7484,
+      "pca_z": 2.2417,
+      "cluster_id": 3,
+      "tax_slab_class": 4,
+      "annual_income": 1980000.0
+    },
+    {
+      "user_id": 2886,
+      "pca_x": 3.5036,
+      "pca_y": 1.1218,
+      "pca_z": -0.6053,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 873600.0
+    },
+    {
+      "user_id": 4764,
+      "pca_x": -4.7955,
+      "pca_y": 1.8751,
+      "pca_z": -2.8653,
+      "cluster_id": 1,
+      "tax_slab_class": 3,
+      "annual_income": 1300000.0
+    },
+    {
+      "user_id": 1282,
+      "pca_x": 2.9005,
+      "pca_y": 0.6897,
+      "pca_z": -1.1081,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 520000.0
+    },
+    {
+      "user_id": 5826,
+      "pca_x": -2.2395,
+      "pca_y": -1.9626,
+      "pca_z": -0.4181,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 7808,
+      "pca_x": -3.2953,
+      "pca_y": 1.6001,
+      "pca_z": -1.5263,
+      "cluster_id": 1,
+      "tax_slab_class": 3,
+      "annual_income": 1300000.0
+    },
+    {
+      "user_id": 8925,
+      "pca_x": 0.2438,
+      "pca_y": 0.5158,
+      "pca_z": 2.0452,
+      "cluster_id": 3,
+      "tax_slab_class": 3,
+      "annual_income": 1560000.0
+    },
+    {
+      "user_id": 9487,
+      "pca_x": 0.6058,
+      "pca_y": -1.0594,
+      "pca_z": 0.2518,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 360000.0
+    },
+    {
+      "user_id": 8781,
+      "pca_x": 3.4178,
+      "pca_y": 0.2698,
+      "pca_z": -0.8525,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 360000.0
+    },
+    {
+      "user_id": 6262,
+      "pca_x": 3.436,
+      "pca_y": 0.9663,
+      "pca_z": -1.263,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 396000.0
+    },
+    {
+      "user_id": 251,
+      "pca_x": 1.5692,
+      "pca_y": -1.7387,
+      "pca_z": 0.1934,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 300000.0
+    },
+    {
+      "user_id": 779,
+      "pca_x": -3.8362,
+      "pca_y": -0.2342,
+      "pca_z": -2.4846,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 400000.0
+    },
+    {
+      "user_id": 4260,
+      "pca_x": 0.5655,
+      "pca_y": -0.8711,
+      "pca_z": 0.1917,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 500000.0
+    },
+    {
+      "user_id": 1767,
+      "pca_x": 0.8266,
+      "pca_y": -1.0016,
+      "pca_z": -0.3132,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 400000.0
+    },
+    {
+      "user_id": 3055,
+      "pca_x": 0.1731,
+      "pca_y": 0.9213,
+      "pca_z": 1.7873,
+      "cluster_id": 3,
+      "tax_slab_class": 4,
+      "annual_income": 1900000.0
+    },
+    {
+      "user_id": 5329,
+      "pca_x": 4.059,
+      "pca_y": 0.9285,
+      "pca_z": -0.2697,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 650000.0
+    },
+    {
+      "user_id": 3782,
+      "pca_x": -2.1518,
+      "pca_y": -0.2752,
+      "pca_z": 1.7559,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1260000.0
+    },
+    {
+      "user_id": 6993,
+      "pca_x": -2.2239,
+      "pca_y": -1.7284,
+      "pca_z": -1.2287,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 216000.0
+    },
+    {
+      "user_id": 3212,
+      "pca_x": 1.0211,
+      "pca_y": -0.0954,
+      "pca_z": 0.5059,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 720000.0
+    },
+    {
+      "user_id": 8701,
+      "pca_x": -3.5204,
+      "pca_y": -0.816,
+      "pca_z": -0.1537,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    },
+    {
+      "user_id": 6734,
+      "pca_x": 1.2846,
+      "pca_y": -0.7989,
+      "pca_z": 0.6624,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 400000.0
+    },
+    {
+      "user_id": 6521,
+      "pca_x": 1.4319,
+      "pca_y": 0.2355,
+      "pca_z": 0.2783,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 604800.0
+    },
+    {
+      "user_id": 7668,
+      "pca_x": -3.1839,
+      "pca_y": -1.3096,
+      "pca_z": -3.1086,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 6462,
+      "pca_x": 0.5695,
+      "pca_y": -1.0964,
+      "pca_z": 0.7189,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 360000.0
+    },
+    {
+      "user_id": 3770,
+      "pca_x": 0.54,
+      "pca_y": -0.814,
+      "pca_z": 1.4535,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 800000.0
+    },
+    {
+      "user_id": 457,
+      "pca_x": 1.6809,
+      "pca_y": -1.413,
+      "pca_z": -0.4808,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 6971,
+      "pca_x": 1.1206,
+      "pca_y": 0.1097,
+      "pca_z": 1.724,
+      "cluster_id": 3,
+      "tax_slab_class": 2,
+      "annual_income": 1036800.0
+    },
+    {
+      "user_id": 1317,
+      "pca_x": 2.5582,
+      "pca_y": 0.6231,
+      "pca_z": -0.2271,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 588000.0
+    },
+    {
+      "user_id": 7543,
+      "pca_x": -1.9628,
+      "pca_y": -2.7476,
+      "pca_z": 0.5461,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 666,
+      "pca_x": 3.6511,
+      "pca_y": -0.7689,
+      "pca_z": -1.1602,
+      "cluster_id": 0,
+      "tax_slab_class": 0,
+      "annual_income": 200000.0
+    },
+    {
+      "user_id": 100041,
+      "pca_x": -5.5118,
+      "pca_y": 12.465,
+      "pca_z": -1.007,
+      "cluster_id": 2,
+      "tax_slab_class": 6,
+      "annual_income": 62132250.56
+    },
+    {
+      "user_id": 24,
+      "pca_x": -2.4597,
+      "pca_y": 0.1344,
+      "pca_z": -0.4916,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 800000.0
+    },
+    {
+      "user_id": 7487,
+      "pca_x": 3.2069,
+      "pca_y": 2.4526,
+      "pca_z": 0.6915,
+      "cluster_id": 0,
+      "tax_slab_class": 4,
+      "annual_income": 1950000.0
+    },
+    {
+      "user_id": 6529,
+      "pca_x": -3.6085,
+      "pca_y": 2.2325,
+      "pca_z": -1.6073,
+      "cluster_id": 1,
+      "tax_slab_class": 3,
+      "annual_income": 1528800.0
+    },
+    {
+      "user_id": 1534,
+      "pca_x": -2.173,
+      "pca_y": -0.8092,
+      "pca_z": -0.0437,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 500000.0
+    },
+    {
+      "user_id": 3703,
+      "pca_x": -3.4877,
+      "pca_y": 0.0353,
+      "pca_z": -1.205,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 700000.0
+    },
+    {
+      "user_id": 9386,
+      "pca_x": 3.3103,
+      "pca_y": 1.2872,
+      "pca_z": 0.4989,
+      "cluster_id": 0,
+      "tax_slab_class": 1,
+      "annual_income": 780000.0
+    },
+    {
+      "user_id": 113,
+      "pca_x": -2.397,
+      "pca_y": -0.8281,
+      "pca_z": 0.6024,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 520000.0
+    },
+    {
+      "user_id": 547,
+      "pca_x": 0.9387,
+      "pca_y": 0.0183,
+      "pca_z": 0.6482,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 700000.0
+    },
+    {
+      "user_id": 8903,
+      "pca_x": -3.0075,
+      "pca_y": 0.2655,
+      "pca_z": 1.9708,
+      "cluster_id": 1,
+      "tax_slab_class": 4,
+      "annual_income": 1690000.0
+    },
+    {
+      "user_id": 8008,
+      "pca_x": 2.6928,
+      "pca_y": 1.9845,
+      "pca_z": 1.1315,
+      "cluster_id": 0,
+      "tax_slab_class": 4,
+      "annual_income": 1900000.0
+    },
+    {
+      "user_id": 1592,
+      "pca_x": -2.4881,
+      "pca_y": -0.7803,
+      "pca_z": -1.5231,
+      "cluster_id": 1,
+      "tax_slab_class": 0,
+      "annual_income": 453600.0
+    },
+    {
+      "user_id": 4267,
+      "pca_x": 1.5516,
+      "pca_y": -1.5516,
+      "pca_z": -0.313,
+      "cluster_id": 3,
+      "tax_slab_class": 0,
+      "annual_income": 218400.0
+    },
+    {
+      "user_id": 2095,
+      "pca_x": -3.7436,
+      "pca_y": -1.4037,
+      "pca_z": 0.8185,
+      "cluster_id": 1,
+      "tax_slab_class": 1,
+      "annual_income": 630000.0
+    },
+    {
+      "user_id": 1511,
+      "pca_x": -2.5264,
+      "pca_y": 0.0392,
+      "pca_z": -0.0167,
+      "cluster_id": 1,
+      "tax_slab_class": 2,
+      "annual_income": 1080000.0
+    },
+    {
+      "user_id": 1615,
+      "pca_x": 1.556,
+      "pca_y": -0.2079,
+      "pca_z": 0.3576,
+      "cluster_id": 3,
+      "tax_slab_class": 1,
+      "annual_income": 540000.0
+    }
+  ]
+}

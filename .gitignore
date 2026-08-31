@@ -51,3 +51,10 @@ yarn-error.log*
 .vscode/
 *.swp
 *.swo
+
+# Large Raw Datasets & PDF archives
+data/huggingface_agami/
+data/kaggle_bank_customer_segmentation/
+data/kaggle_upi_2024/
+data/raw/
+

@@ -48,39 +48,42 @@ FinSight provides a **data-driven financial diagnostics assistant**:
                        ┌──────────────────────────┴──────────────────────────┐
                        │                                                     │
                        ▼                                                     ▼
-        ┌──────────────────────────────┐                      ┌──────────────────────────────┐
-        │ 1. Income Regression Model   │                      │ 2. Tax Slab Classifier       │
-        │ • Ridge vs Random Forest     │                      │ • Logistic Reg vs RF vs SVC  │
-        │ • Target: Annual Income (₹)  │                      │ • Target: Slabs 0 to 5       │
-        │ • Metrics: RMSE, MAE, R²     │                      │ • Metrics: Accuracy, F1, CM  │
-        └──────────────┬───────────────┘                      └──────────────┬───────────────┘
-                       │                                                     │
-                       └──────────────────────────┬──────────────────────────┘
-                                                  │
-                       ┌──────────────────────────┴──────────────────────────┐
-                       │                                                     │
-                       ▼                                                     ▼
-        ┌──────────────────────────────┐                      ┌──────────────────────────────┐
-        │ 3. Persona Clustering        │                      │ 4. PCA Projection Visualizer │
-        │ • K-Means (Elbow + Silhouette│                      │ • 2D / 3D Coordinate Mapping │
-        │ • Personas: Savers / Spenders│                      │ • Explained Variance Ratio   │
-        └──────────────────────────────┘                      └──────────────────────────────┘
+         ┌──────────────────────────────┐                      ┌──────────────────────────────┐
+         │ 1. Income Regression Model   │                      │ 2. Tax Slab Classifier       │
+         │ • Ridge vs Random Forest/GBR │                      │ • Logistic Reg vs RF vs SVC  │
+         │ • Target: Annual Income (₹)  │                      │ • Target: Slabs 0 to 6       │
+         │ • Metrics: RMSE, MAE, R²     │                      │ • Metrics: Accuracy, F1, CM  │
+         └──────────────┬───────────────┘                      └──────────────┬───────────────┘
+                        │                                                     │
+                        └──────────────────────────┬──────────────────────────┘
+                                                   │
+                        ┌──────────────────────────┴──────────────────────────┐
+                        │                                                     │
+                        ▼                                                     ▼
+         ┌──────────────────────────────┐                      ┌──────────────────────────────┐
+         │ 3. Persona Clustering        │                      │ 4. PCA Projection Visualizer │
+         │ • K-Means (Elbow + Silhouette│                      │ • 2D / 3D Coordinate Mapping │
+         │ • Personas: Savers / Spenders│                      │ • Explained Variance Ratio   │
+         └──────────────────────────────┘                      └──────────────────────────────┘
 ```
 
 ---
 
-## 🇮🇳 Indian Tax System Modeling (Section 115BAC)
+## 🇮🇳 Indian Tax System Modeling (Section 115BAC - FY 2025–26)
 
-FinSight is specifically grounded in the **Indian Income Tax New Tax Regime** (FY 2024–25 / FY 2025–26):
+FinSight is calibrated against the official **Indian Income Tax New Tax Regime** (FY 2025–26 / Finance Act 2025):
 
 | Slab Class | Taxable Income Range (₹) | Base Tax Rate | Effective Notes |
 | :---: | :--- | :---: | :--- |
-| **Class 0** | Up to ₹3,00,000 | 0% (Nil) | Tax Exempt |
-| **Class 1** | ₹3,00,001 to ₹7,00,000 | 5% | 87A Rebate makes effective tax ₹0 |
-| **Class 2** | ₹7,00,001 to ₹10,00,000 | 10% | Moderate bracket |
-| **Class 3** | ₹10,00,001 to ₹12,00,000 | 15% | Standard corporate bracket |
-| **Class 4** | ₹12,00,001 to ₹15,00,000 | 20% | Senior corporate bracket |
-| **Class 5** | Above ₹15,00,000 | 30% | Highest marginal rate |
+| **Class 0** | Up to ₹4,00,000 | 0% (Nil) | Basic Exemption Limit |
+| **Class 1** | ₹4,00,001 to ₹8,00,000 | 5% | Fully covered under Section 87A rebate |
+| **Class 2** | ₹8,00,001 to ₹12,00,000 | 10% | Sec 87A rebate up to ₹60,000 $\rightarrow$ **₹0 Effective Tax** |
+| **Class 3** | ₹12,00,001 to ₹16,00,000 | 15% | Standard professional bracket |
+| **Class 4** | ₹16,00,001 to ₹20,00,000 | 20% | Senior tech / managerial bracket |
+| **Class 5** | ₹20,00,001 to ₹24,00,000 | 25% | Executive bracket |
+| **Class 6** | Above ₹24,00,000 | 30% | Highest marginal rate |
+
+*Note: Salaried individuals receive a flat **₹75,000 standard deduction**, lifting the effective zero-tax ceiling to **₹12.75 Lakhs**.*
 
 ---
 
