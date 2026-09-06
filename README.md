@@ -9,6 +9,8 @@
 [![Hugging Face Models](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models-orange)](https://huggingface.co/sanjeevafk/finsight-indian-tax-models)
 [![Hugging Face Datasets](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Datasets-yellow)](https://huggingface.co/datasets/sanjeevafk/indian-banking-tax-profiles-2025)
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/sanjeevafk/finsight)
+[![CI Suite](https://github.com/sanjeevafk/finsight/actions/workflows/ci.yml/badge.svg)](https://github.com/sanjeevafk/finsight/actions/workflows/ci.yml)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 FinSight is a production-grade machine learning system that automates bank statement diagnostic analysis, extracts 16-dimensional financial behavioral vectors, predicts annual gross income via regression, classifies statutory tax slabs under the Indian New Tax Regime (Section 115BAC - FY 2025-26), and discovers spending personas through unsupervised geometric clustering.
 
@@ -178,6 +180,17 @@ finsight/
 | **Error / Loss** | $\text{RMSE} = \text{₹34,815}$ | $\text{Macro F1} = 0.9556$ | WCSS optimized | $\text{MSE}_{\text{recon}} < 0.05$ |
 | **Real Holdout Data** | $R^2 = 0.9657$ | Accuracy = $100.0\%$ | 4 Personas | Spatial separation |
 | **Latency (p50)** | $< 2\text{ ms}$ | $< 3\text{ ms}$ | $< 1\text{ ms}$ | $< 1\text{ ms}$ |
+
+---
+
+## Contributing
+
+We welcome open-source contributions from developers, ML engineers, domain experts in Indian tax law, and documentation writers!
+
+- Read our **[Contributing Guide](CONTRIBUTING.md)** for step-by-step local setup, development workflow, commit conventions, and testing commands.
+- Review our **[Code of Conduct](CODE_OF_CONDUCT.md)** for community standards.
+- Check our **[Security Policy](SECURITY.md)** for reporting security vulnerabilities privately.
+- Use our **[GitHub Issue Templates](.github/ISSUE_TEMPLATE/)** to report bugs, request features, or propose ML improvements.
 
 ---
 
