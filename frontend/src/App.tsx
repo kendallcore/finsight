@@ -3,7 +3,6 @@ import { Navbar } from './components/Navbar';
 import { DiagnosticView } from './components/DiagnosticView';
 import { SimulatorView } from './components/SimulatorView';
 import { EvaluationHub } from './components/EvaluationHub';
-import { PCAScatterView } from './components/PCAScatterView';
 import { VivaPresetsView } from './components/VivaPresetsView';
 import { api } from './services/api';
 import { UploadStatementResponse } from './types';
@@ -46,7 +45,6 @@ export const App: React.FC = () => {
         )}
         {activeTab === 'simulator' && <SimulatorView />}
         {activeTab === 'evaluation' && <EvaluationHub />}
-        {activeTab === 'pca' && <PCAScatterView currentResult={analysisResult} />}
         {activeTab === 'viva' && <VivaPresetsView onSelectSample={handleSelectSample} />}
       </main>
 
