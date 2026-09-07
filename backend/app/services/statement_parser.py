@@ -254,6 +254,7 @@ class StatementParser:
         business_metrics = extractor.extract_business_breakdown(df)
 
         summary = StatementSummary(
+            filename=filename,
             total_transactions=total_txns,
             date_range={"from": date_from, "to": date_to},
             total_credits=round(total_credits, 2),

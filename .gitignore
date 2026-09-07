@@ -63,3 +63,5 @@ plans/
 local-docs/
 data/
 data/parsed_statements/
+!data/sample_statements/
+!data/sample_statements/*.csv

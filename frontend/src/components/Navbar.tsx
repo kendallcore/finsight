@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, Layers, Cpu, Zap, Award } from 'lucide-react';
+import { Activity, Layers, Cpu, Zap, Users } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: string;
@@ -13,7 +13,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, apiHeal
     { id: 'simulator', label: 'What-If Simulator', icon: Zap },
     { id: 'evaluation', label: 'Model Evaluation Hub', icon: Cpu },
     { id: 'pca', label: '3D Latent Space (PCA)', icon: Layers },
-    { id: 'viva', label: 'Viva Defense Presets', icon: Award },
+    { id: 'viva', label: 'Profile Simulations', icon: Users },
   ];
 
   return (

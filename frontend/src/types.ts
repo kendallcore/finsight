@@ -1,4 +1,5 @@
 export interface StatementSummary {
+  filename?: string;
   total_transactions: number;
   date_range: {
     from: string;

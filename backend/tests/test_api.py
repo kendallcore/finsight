@@ -52,15 +52,51 @@ def test_sample_profiles_endpoints():
     response = client.get("/api/samples")
     assert response.status_code == 200
     data = response.json()
-    assert len(data) >= 4
-    
-    # Test analyze sample
-    analyze_resp = client.post("/api/samples/balanced_pro/analyze")
-    assert analyze_resp.status_code == 200
-    res_data = analyze_resp.json()
-    assert res_data["status"] == "success"
-    assert "predictions" in res_data
-    assert "tax_breakdown" in res_data["predictions"]
+    assert len(data) == 5
+    profile_ids = [p["profile_id"] for p in data]
+    assert "student_entry" in profile_ids
+    assert "balanced_pro" in profile_ids
+    assert "wealth_builder" in profile_ids
+    assert "lifestyle_spender" in profile_ids
+    assert "real_agami_account" in profile_ids
+
+    # 1. Test CSV downloads for all 5 presets
+    for pid in profile_ids:
+        csv_resp = client.get(f"/api/samples/{pid}/csv")
+        assert csv_resp.status_code == 200
+        assert "text/csv" in csv_resp.headers.get("content-type", "")
+        assert len(csv_resp.content) > 100
+
+    # 2. Test analysis for student_entry: Class 0 Nil
+    student_resp = client.post("/api/samples/student_entry/analyze")
+    assert student_resp.status_code == 200
+    st_data = student_resp.json()
+    assert st_data["predictions"]["estimated_annual_income"] < 450000.0
+    assert st_data["predictions"]["predicted_tax_slab"]["class_id"] == 0
+    assert st_data["predictions"]["tax_breakdown"]["net_tax_payable"] == 0.0
+
+    # 3. Test analysis for wealth_builder: Class 6 high tax bracket
+    wb_resp = client.post("/api/samples/wealth_builder/analyze")
+    assert wb_resp.status_code == 200
+    wb_data = wb_resp.json()
+    assert wb_data["predictions"]["estimated_annual_income"] > 2400000.0
+    assert wb_data["predictions"]["predicted_tax_slab"]["class_id"] == 6
+    assert wb_data["predictions"]["tax_breakdown"]["net_tax_payable"] > 200000.0
+    assert wb_data["predictions"]["assigned_cluster"]["persona_name"] == "High-Growth Wealth Builder"
+
+    # 4. Test analysis for balanced_pro
+    bp_resp = client.post("/api/samples/balanced_pro/analyze")
+    assert bp_resp.status_code == 200
+    bp_data = bp_resp.json()
+    assert 1000000.0 < bp_data["predictions"]["estimated_annual_income"] < 1500000.0
+    assert bp_data["predictions"]["predicted_tax_slab"]["class_id"] in [2, 3]
+
+    # 5. Test analysis for lifestyle_spender
+    ls_resp = client.post("/api/samples/lifestyle_spender/analyze")
+    assert ls_resp.status_code == 200
+    ls_data = ls_resp.json()
+    assert 1200000.0 < ls_data["predictions"]["estimated_annual_income"] < 1600000.0
+    assert ls_data["predictions"]["predicted_tax_slab"]["class_id"] == 3
 
 
 def test_predict_features_manual():

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Award, Download, Play } from 'lucide-react';
+import { Users, Download, Play, AlertCircle, Loader2 } from 'lucide-react';
 import { api } from '../services/api';
 import { SampleProfileItem, UploadStatementResponse } from '../types';
 
@@ -10,14 +10,16 @@ interface VivaPresetsViewProps {
 export const VivaPresetsView: React.FC<VivaPresetsViewProps> = ({ onSelectSample }) => {
   const [samples, setSamples] = useState<SampleProfileItem[]>([]);
   const [analyzingId, setAnalyzingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSamples = async () => {
       try {
         const res = await api.getSamples();
         setSamples(res);
-      } catch (err) {
+      } catch (err: any) {
         console.error('Failed to load sample presets:', err);
+        setError(err.message || 'Failed to connect to FinSight backend API. Ensure backend is running.');
       }
     };
     fetchSamples();
@@ -25,11 +27,13 @@ export const VivaPresetsView: React.FC<VivaPresetsViewProps> = ({ onSelectSample
 
   const handleAnalyze = async (profileId: string) => {
     setAnalyzingId(profileId);
+    setError(null);
     try {
       const res = await api.analyzeSample(profileId);
       onSelectSample(res);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to run preset analysis:', err);
+      setError(err.message || `Failed to analyze preset '${profileId}'. Please check backend logs.`);
     } finally {
       setAnalyzingId(null);
     }
@@ -47,15 +51,22 @@ export const VivaPresetsView: React.FC<VivaPresetsViewProps> = ({ onSelectSample
     <div className="space-y-6">
       <div className="border border-neutral-800 bg-[#121316] rounded-lg p-6">
         <div className="flex items-center space-x-2">
-          <Award className="w-5 h-5 text-emerald-400" />
+          <Users className="w-5 h-5 text-emerald-400" />
           <h2 className="text-base font-semibold text-neutral-100">
-            Academic Viva & Examiner Demonstration Presets
+            Profile-Based Financial Simulations
           </h2>
         </div>
         <p className="text-xs text-neutral-400 mt-1">
-          Pre-calibrated Indian banking statements designed for live college PBL presentations. Tests boundary conditions across FY 2025–26 tax exemptions, Section 87A rebates, and high-frequency UPI velocity.
+          Pre-calibrated Indian banking statements representing distinct taxpayer personas and cashflow structures. Evaluates real-world boundary conditions across FY 2025–26 tax exemptions, Section 87A rebates, and high-frequency UPI velocity.
         </p>
       </div>
+
+      {error && (
+        <div className="p-4 rounded-lg bg-rose-950/40 border border-rose-800/60 text-rose-300 text-xs flex items-center space-x-2">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {samples.map((sample) => (
@@ -100,10 +111,14 @@ export const VivaPresetsView: React.FC<VivaPresetsViewProps> = ({ onSelectSample
               <button
                 onClick={() => handleAnalyze(sample.profile_id)}
                 disabled={analyzingId === sample.profile_id}
-                className="flex-1 flex items-center justify-center space-x-1.5 px-3 py-2 text-xs font-medium rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition"
+                className="flex-1 flex items-center justify-center space-x-1.5 px-3 py-2 text-xs font-medium rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition disabled:opacity-50"
               >
-                <Play className="w-3.5 h-3.5 fill-current" />
-                <span>{analyzingId === sample.profile_id ? 'Analyzing...' : 'Run Diagnostics'}</span>
+                {analyzingId === sample.profile_id ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                )}
+                <span>{analyzingId === sample.profile_id ? 'Analyzing Pipeline...' : 'Run Diagnostics'}</span>
               </button>
               <a
                 href={sample.download_url}

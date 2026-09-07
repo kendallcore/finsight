@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 
 class StatementSummary(BaseModel):
+    filename: Optional[str] = None
     total_transactions: int
     date_range: Dict[str, str]
     total_credits: float

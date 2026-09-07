@@ -1,6 +1,6 @@
 """
 FinSight Sample Profiles Service
-Provides pre-built statement presets for 1-click academic viva demonstrations and examiner testing.
+Provides pre-built statement presets for profile-based simulations and benchmark testing.
 """
 
 import os
@@ -18,18 +18,18 @@ SAMPLE_PROFILES: List[Dict[str, Any]] = [
         "annual_income_approx": 320000.0,
         "tax_slab_expected": "Class 0: Up to ₹4,00,000 (0% Nil)",
         "persona_expected": "Entry-Level / Student Saver",
-        "transaction_count": 210,
+        "transaction_count": 145,
         "download_url": "/api/samples/student_entry/csv"
     },
     {
         "profile_id": "balanced_pro",
         "title": "Priya Nair — Software Engineer (TCS)",
         "category": "Corporate Salaried",
-        "description": "Consistent monthly salary, regular HDFC home rent, balanced SIP investments, standard deduction applied.",
+        "description": "Consistent monthly salary, regular HDFC home rent, balanced SIP investments, Section 87A rebate applied.",
         "annual_income_approx": 1250000.0,
-        "tax_slab_expected": "Class 3: ₹12,00,001 - ₹16,00,000 (15%)",
+        "tax_slab_expected": "Class 2: ₹8,00,001 - ₹12,00,000 (10%)",
         "persona_expected": "Balanced Corporate Professional",
-        "transaction_count": 340,
+        "transaction_count": 267,
         "download_url": "/api/samples/balanced_pro/csv"
     },
     {
@@ -37,10 +37,10 @@ SAMPLE_PROFILES: List[Dict[str, Any]] = [
         "title": "Vikram Malhotra — Senior Tech Lead (Google India)",
         "category": "High-Growth Executive",
         "description": "High base compensation with annual bonus, 35% SIP & NPS allocations, high tax bracket.",
-        "annual_income_approx": 2450000.0,
+        "annual_income_approx": 2600000.0,
         "tax_slab_expected": "Class 6: Above ₹24,00,000 (30%)",
         "persona_expected": "High-Growth Wealth Builder",
-        "transaction_count": 420,
+        "transaction_count": 110,
         "download_url": "/api/samples/wealth_builder/csv"
     },
     {
@@ -48,21 +48,21 @@ SAMPLE_PROFILES: List[Dict[str, Any]] = [
         "title": "Rohan Mehta — Freelance UI/UX Consultant",
         "category": "Discretionary Spender",
         "description": "High credit coefficient of variation (irregular client payouts), high dining & travel expenditures, low savings rate.",
-        "annual_income_approx": 1400000.0,
+        "annual_income_approx": 1450000.0,
         "tax_slab_expected": "Class 3: ₹12,00,001 - ₹16,00,000 (15%)",
         "persona_expected": "Discretionary Lifestyle Spender",
-        "transaction_count": 280,
+        "transaction_count": 81,
         "download_url": "/api/samples/lifestyle_spender/csv"
     },
     {
         "profile_id": "real_agami_account",
-        "title": "Real Corporate Statement (Metropolitan Bank)",
+        "title": "Real Banking Statement (Metropolitan Bank)",
         "category": "Real Banking Benchmark",
-        "description": "Extracted from real HuggingFace/Agami Indian banking statements corpus (51k transactions benchmark).",
-        "annual_income_approx": 1850000.0,
-        "tax_slab_expected": "Class 4: ₹16,00,001 - ₹20,00,000 (20%)",
-        "persona_expected": "Balanced Corporate Professional",
-        "transaction_count": 292,
+        "description": "Extracted from real HuggingFace/Agami Indian banking statements corpus (Account #11447241261).",
+        "annual_income_approx": 1633303.0,
+        "tax_slab_expected": "Class 3: ₹12,00,001 - ₹16,00,000 (15%)",
+        "persona_expected": "Discretionary Lifestyle Spender",
+        "transaction_count": 312,
         "download_url": "/api/samples/real_agami_account/csv"
     }
 ]
@@ -75,10 +75,14 @@ class SampleService:
     @staticmethod
     def get_sample_csv_bytes(profile_id: str) -> Optional[bytes]:
         """Generates or loads representative CSV bytes for the chosen preset."""
-        # Use synthetic or real transactions
+        preset_file = settings.SAMPLE_STATEMENTS_DIR / f"{profile_id}.csv"
+        if preset_file.exists():
+            with open(preset_file, "rb") as f:
+                return f.read()
+
+        # Fallback to synthetic transactions if dedicated preset file doesn't exist
         if os.path.exists(settings.SYNTHETIC_TXNS_PATH):
             df = pd.read_csv(settings.SYNTHETIC_TXNS_PATH)
-            # Pick a subset of transactions
             return df.to_csv(index=False).encode("utf-8")
         return None
 

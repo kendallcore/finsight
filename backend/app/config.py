@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     USER_PROFILES_PATH: Path = DATA_DIR / "user_profiles.csv"
     SYNTHETIC_TXNS_PATH: Path = DATA_DIR / "synthetic_transactions.csv"
     REAL_PROFILES_PATH: Path = DATA_DIR / "real_user_profiles_agami.csv"
+    SAMPLE_STATEMENTS_DIR: Path = DATA_DIR / "sample_statements"
     
     # Database
     DATABASE_URL: str = f"sqlite:///{BASE_DIR}/finsight.db"

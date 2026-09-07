@@ -1,6 +1,6 @@
 """
 Sample Presets Router
-Serves 1-click viva demonstration profiles and downloadable sample CSVs.
+Serves profile-based financial simulations and downloadable sample CSVs.
 """
 
 from typing import List
@@ -40,9 +40,12 @@ async def analyze_sample_profile(profile_id: str):
     if not csv_bytes:
         raise HTTPException(status_code=404, detail=f"Sample profile '{profile_id}' not found.")
 
+    preset_meta = next((p for p in sample_service.get_all_samples() if p.profile_id == profile_id), None)
+    display_name = preset_meta.title if preset_meta else f"{profile_id}.csv"
+
     summary, features, business_metrics = statement_parser.parse_and_extract(
         file_bytes=csv_bytes,
-        filename=f"{profile_id}.csv"
+        filename=display_name
     )
     predictions = ml_service.predict(
         features_dict=features.model_dump(),

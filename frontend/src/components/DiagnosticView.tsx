@@ -168,13 +168,13 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
           <div className="border border-neutral-800 bg-neutral-900/40 rounded-lg p-6 flex flex-col justify-between">
             <div>
               <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                1-Click Viva Presets
+                Profile Simulation
               </span>
               <h4 className="text-sm font-medium text-neutral-200 mt-3">
-                Instant Statement Evaluation
+                Instant Profile Evaluation
               </h4>
               <p className="text-xs text-neutral-400 mt-1 leading-relaxed">
-                No statement file on hand? Run inference on a calibrated 340-transaction statement instantly.
+                No statement file on hand? Run inference on a calibrated salaried corporate profile instantly.
               </p>
             </div>
             <button
@@ -199,6 +199,20 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
       {/* Results Dashboard */}
       {data && pred && (
         <div className="space-y-6">
+          {/* Active Statement Profile Banner */}
+          {summary?.filename && (
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono">
+              <div className="flex items-center space-x-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-neutral-400">Active Diagnostic Statement:</span>
+                <span className="font-semibold text-emerald-300">{summary.filename}</span>
+              </div>
+              <span className="text-neutral-400">
+                {summary.total_transactions} txns • Total Inflow: {formatINR(summary.total_credits)}
+              </span>
+            </div>
+          )}
+
           {/* Executive Verdict Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Predicted Income / Turnover */}
