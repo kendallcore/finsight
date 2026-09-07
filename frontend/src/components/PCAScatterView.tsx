@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Plotly from 'plotly.js-dist-min';
+import { Monitor, ArrowRight } from 'lucide-react';
 import { api } from '../services/api';
 import { PCAPoint, UploadStatementResponse } from '../types';
 
@@ -7,11 +8,25 @@ interface PCAScatterViewProps {
   currentResult?: UploadStatementResponse | null;
 }
 
+const checkWebGLSupport = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  try {
+    const canvas = document.createElement('canvas');
+    return Boolean(
+      window.WebGLRenderingContext &&
+      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+    );
+  } catch {
+    return false;
+  }
+};
+
 export const PCAScatterView: React.FC<PCAScatterViewProps> = ({ currentResult }) => {
   const plotContainerRef = useRef<HTMLDivElement>(null);
   const [points, setPoints] = useState<PCAPoint[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'3d' | '2d'>('3d');
+  const [hasWebGL] = useState<boolean>(() => checkWebGLSupport());
+  const [viewMode, setViewMode] = useState<'3d' | '2d'>(() => (checkWebGLSupport() ? '3d' : '2d'));
   const [colorMode, setColorMode] = useState<'persona' | 'slab'>('persona');
 
   useEffect(() => {
@@ -156,6 +171,13 @@ export const PCAScatterView: React.FC<PCAScatterViewProps> = ({ currentResult })
       }
     }
 
+    if (viewMode === '3d' && !hasWebGL) {
+      if (plotContainerRef.current) {
+        Plotly.purge(plotContainerRef.current);
+      }
+      return;
+    }
+
     const layout: any = {
       paper_bgcolor: '#121316',
       plot_bgcolor: '#121316',
@@ -172,7 +194,7 @@ export const PCAScatterView: React.FC<PCAScatterViewProps> = ({ currentResult })
     };
 
     Plotly.newPlot(plotContainerRef.current, traces, layout, { responsive: true, displayModeBar: false });
-  }, [points, viewMode, colorMode, currentResult]);
+  }, [points, viewMode, colorMode, currentResult, hasWebGL]);
 
   return (
     <div className="space-y-6">
@@ -225,10 +247,40 @@ export const PCAScatterView: React.FC<PCAScatterViewProps> = ({ currentResult })
       <div className="border border-neutral-800 bg-[#121316] rounded-lg p-4 h-[550px] relative">
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center text-xs font-mono text-neutral-400 bg-[#121316]/80 z-10">
-            Rendering 3D Latent Point Cloud...
+            Rendering Latent Point Cloud...
           </div>
         )}
-        <div ref={plotContainerRef} className="w-full h-full" />
+
+        {viewMode === '3d' && !hasWebGL ? (
+          <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-neutral-950/60 rounded-lg border border-neutral-800/80">
+            <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-4">
+              <Monitor className="w-6 h-6" />
+            </div>
+            <h3 className="text-sm font-semibold text-neutral-200">
+              WebGL Hardware Acceleration Disabled
+            </h3>
+            <p className="text-xs text-neutral-400 max-w-md mt-2 leading-relaxed">
+              Your browser or Linux display currently has WebGL acceleration turned off. The 2D Planar view uses standard SVG/Canvas and works without WebGL.
+            </p>
+
+            <button
+              onClick={() => setViewMode('2d')}
+              className="mt-5 flex items-center space-x-2 px-4 py-2 text-xs font-medium rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition"
+            >
+              <span>Switch to 2D Planar Projection</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+
+            <div className="mt-6 pt-4 border-t border-neutral-800/80 text-left max-w-md w-full text-[11px] font-mono text-neutral-400 space-y-1">
+              <div className="text-neutral-300 font-semibold mb-1">To enable 3D WebGL in your browser:</div>
+              <div>• Chrome / Brave: Open <span className="text-emerald-400">chrome://settings/system</span> and toggle "Use graphics acceleration when available" ON.</div>
+              <div>• Or enable <span className="text-emerald-400">chrome://flags/#ignore-gpu-blocklist</span> (Override software rendering list).</div>
+              <div>• Firefox: Open <span className="text-emerald-400">about:config</span> and set <span className="text-emerald-400">webgl.force-enabled</span> to true.</div>
+            </div>
+          </div>
+        ) : (
+          <div ref={plotContainerRef} className="w-full h-full" />
+        )}
       </div>
     </div>
   );
