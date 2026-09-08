@@ -122,22 +122,6 @@ export interface ModelEvaluationResponse {
   };
 }
 
-export interface PCAPoint {
-  user_id: number;
-  pca_x: number;
-  pca_y: number;
-  pca_z: number;
-  cluster_id: number;
-  tax_slab_class: number;
-  annual_income: number;
-}
-
-export interface PCAPointsResponse {
-  status: string;
-  total_points: number;
-  points: PCAPoint[];
-}
-
 export interface SampleProfileItem {
   profile_id: string;
   title: string;
