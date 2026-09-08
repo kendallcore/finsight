@@ -12,18 +12,32 @@ echo "  FinSight: Smart Financial Intelligence & Tax System      "
 echo "  Indian New Tax Regime (Section 115BAC - FY 2025-26)      "
 echo "============================================================"
 
-# 1. Check Python Virtual Environment
-if [ ! -d ".venv" ]; then
-    echo "Creating Python virtual environment..."
-    python3 -m venv .venv
-    .venv/bin/pip install --upgrade pip
-    .venv/bin/pip install -r backend/requirements.txt
+# 1. Detect or Create Python Virtual Environment
+VENV_DIR=""
+for candidate in .venv venv env; do
+    if [ -d "$candidate" ] && [ -f "$candidate/bin/python" ]; then
+        VENV_DIR="$candidate"
+        break
+    fi
+done
+
+if [ -z "$VENV_DIR" ]; then
+    VENV_DIR=".venv"
+    echo "Creating Python virtual environment in $VENV_DIR..."
+    python3 -m venv "$VENV_DIR"
+fi
+
+# Ensure requirements (including uvicorn) are installed
+if [ ! -f "$VENV_DIR/bin/uvicorn" ]; then
+    echo "Installing Python backend dependencies in $VENV_DIR..."
+    "$VENV_DIR/bin/pip" install --upgrade pip
+    "$VENV_DIR/bin/pip" install -r backend/requirements.txt
 fi
 
 # 2. Check Trained Models
 if [ ! -f "models/income_regressor.joblib" ]; then
     echo "Training ML models on multi-source Indian datasets..."
-    PYTHONPATH=scripts .venv/bin/python scripts/train_models.py
+    PYTHONPATH=scripts "$VENV_DIR/bin/python" scripts/train_models.py
 fi
 
 # 3. Build Frontend if not built
@@ -42,4 +56,4 @@ echo "   - Interactive Swagger API   : http://localhost:8000/docs"
 echo "   - Health Check Endpoint     : http://localhost:8000/api/health"
 echo ""
 
-PYTHONPATH=backend:scripts .venv/bin/uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port 8000 --reload
+PYTHONPATH=backend:scripts "$VENV_DIR/bin/uvicorn" app.main:app --app-dir backend --host 0.0.0.0 --port 8000 --reload
