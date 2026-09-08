@@ -7,7 +7,7 @@ import os
 import json
 import joblib
 import numpy as np
-from typing import Dict, List, Any, Tuple
+from typing import Dict, List, Any, Tuple, Optional
 from pathlib import Path
 
 from app.config import settings
@@ -26,9 +26,9 @@ TAX_SLAB_DEFINITIONS = [
 
 PERSONA_NAMES = {
     0: "High-Growth Wealth Builder",
-    1: "Balanced Corporate Professional",
-    2: "Discretionary Lifestyle Spender",
-    3: "Entry-Level / Student Saver"
+    1: "Discretionary Lifestyle Spender",
+    2: "Commercial Enterprise / High-Throughput Business",
+    3: "Balanced Corporate Professional"
 }
 
 FEATURE_ORDER = [
@@ -180,7 +180,8 @@ class MLService:
         entity_type: str = "salaried_individual",
         opex: float = 0.0,
         capex: float = 0.0,
-        digital_ratio: float = 1.0
+        digital_ratio: float = 1.0,
+        actual_turnover: Optional[float] = None
     ) -> PredictionOutput:
         """Executes full inference pipeline for a 16-feature input."""
         # Convert dictionary to ordered feature vector
@@ -231,10 +232,11 @@ class MLService:
             pca_3d_coord=[round(c, 4) for c in pca_3d]
         )
 
-        # 5. Statutory Tax Calculation
+        # 5. Statutory Tax Calculation (uses actual turnover when available, else ML estimated gross)
         is_salaried = (entity_type == "salaried_individual")
+        tax_gross = actual_turnover if (actual_turnover is not None and actual_turnover > 0) else pred_income
         tax_breakdown = self.calculate_statutory_tax(
-            gross_income=pred_income,
+            gross_income=tax_gross,
             is_salaried=is_salaried,
             entity_type=entity_type,
             opex=opex,

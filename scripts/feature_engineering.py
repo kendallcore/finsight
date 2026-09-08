@@ -13,15 +13,15 @@ from sklearn.preprocessing import StandardScaler, PowerTransformer
 
 
 # Regular expressions for Indian Banking Narrations
-SALARY_PATTERNS = re.compile(r"(?i)(salary|sal\b|ach\s*cr|neft\s*cr.*(?:ltd|corp|tech|infotech|services|consultancy|google|tcs|infosys|wipro|amazon|accenture)|cms\s*cr|payroll)")
+SALARY_PATTERNS = re.compile(r"(?i)(\bsalary\b|\bsal\b|\bpayroll\b|\bstipend\b|\bremuneration\b|cms\s*cr|ach\s*cr.*(?:salary|payroll|stipend))")
 INVESTMENT_PATTERNS = re.compile(r"(?i)(zerodha|groww|kuvera|cams|kfintech|mutual\s*fund|sip\b|uti\s*mf|nippon|hdfc\s*mf|icici\s*pru|stocks|sebi)")
 TAX_SHIELD_PATTERNS = re.compile(r"(?i)(ppf|nps\b|national\s*pension|lic\s*of\s*india|max\s*life|hdfc\s*ergo|icici\s*lombard|star\s*health|insurance|sukanya)")
-FIXED_OBLIGATION_PATTERNS = re.compile(r"(?i)(rent\b|landlord|nobroker|emi\b|loan|housing|auto\s*loan|bescom|tneb|mgl|indane|airtel\s*fiber|jio\s*fiber|bbps)")
+FIXED_OBLIGATION_PATTERNS = re.compile(r"(?i)(rent\b|landlord|nobroker|emi\b|loan|housing|auto\s*loan|bescom|tneb|mgl|indane|airtel\s*fiber|jio\s*fiber|bbps|manappuram|indifi|bajaj\s*finserv|cholamandalam)")
 DISCRETIONARY_PATTERNS = re.compile(r"(?i)(swiggy|zomato|blinkit|zepto|instamart|amazon|flipkart|myntra|makemytrip|goibibo|bookmyshow|pvr|inox|uber|ola|starbucks)")
 CAPITAL_GAINS_PATTERNS = re.compile(r"(?i)(dividend|redemption|mf\s*red|zerodha\s*cr|groww\s*cr|payout)")
 
 # Regular expressions for Business Deductions (OPEX & Section 32 CAPEX)
-OPEX_PATTERNS = re.compile(r"(?i)(rent\b|landlord|nobroker|electricity|bescom|tneb|mgl|staff|wages|trainer|salary\s*paid|vendor|supplier|wholesale|materials|maintenance|repair|courier|marketing|adwords|meta\s*ads|software|saas|subscription|aws|gcp|cleaning|stationery|office\s*exp)")
+OPEX_PATTERNS = re.compile(r"(?i)(rent\b|landlord|nobroker|electricity|bescom|tneb|mgl|staff|wages|trainer|salary\s*paid|vendor|supplier|wholesale|materials|maintenance|repair|courier|marketing|adwords|meta\s*ads|software|saas|subscription|aws|gcp|cleaning|stationery|office\s*exp|agency|manufacturer|traders|stores|enterprise|nutrition|security\s*systems|fitness)")
 CAPEX_PATTERNS = re.compile(r"(?i)(machinery|equipment|treadmill|gym\s*equip|weights|dumbbells|hardware|computer|laptop|macbook|dell|server|furniture|interior|renovation|air\s*conditioner|cctv|sound\s*system|pos\s*machine)")
 
 
@@ -66,7 +66,10 @@ def detect_payment_mode(narration: str) -> str:
 def detect_category(narration: str, txn_type: str) -> str:
     s = str(narration).upper()
     if txn_type == "CREDIT":
-        if any(w in s for w in ["SALARY", "SAL ", "PAYROLL", "CORP", "LTD", "SERVICES", "CONSULTING", "INFOSYS", "TCS", "WIPRO", "GOOGLE"]):
+        # Merchant QR settlements like Google Pay, Paytm, etc. are business receipts, not personal salary
+        if any(w in s for w in ["GOOGLE INDIA DIGITAL", "PAYTM", "BHARATPE", "RAZORPAY", "PINELABS", "POS", "QR", "MERCHANT"]):
+            return "BUSINESS_MERCHANT_RECEIPT"
+        elif any(w in s for w in ["SALARY", "SAL ", "PAYROLL", "STIPEND", "REMUNERATION"]):
             return "SALARY"
         elif any(w in s for w in ["DIVIDEND", "REDEMPTION", "ZERODHA", "GROWW", "INTEREST"]):
             return "REDEMPTION"
@@ -83,9 +86,9 @@ def detect_category(narration: str, txn_type: str) -> str:
             return "UTILITIES"
         elif any(w in s for w in ["STAFF", "WAGES", "TRAINER", "SALARY PAID"]):
             return "STAFF_SALARY"
-        elif any(w in s for w in ["VENDOR", "SUPPLIER", "WHOLESALE", "MATERIALS", "MAINTENANCE"]):
+        elif any(w in s for w in ["VENDOR", "SUPPLIER", "WHOLESALE", "MATERIALS", "MAINTENANCE", "AGENCY", "MANUFACTURER", "TRADERS", "STORES"]):
             return "VENDOR_PAYOUT"
-        elif any(w in s for w in ["EMI", "LOAN", "HOUSING", "AUTO"]):
+        elif any(w in s for w in ["EMI", "LOAN", "HOUSING", "AUTO", "MANAPPURAM", "INDIFI", "BAJAJ", "CHOLAMANDALAM"]):
             return "EMI"
         elif any(w in s for w in ["SWIGGY", "ZOMATO", "BLINKIT", "ZEPTO", "RESTAURANT", "CAFE", "FOOD"]):
             return "FOOD"

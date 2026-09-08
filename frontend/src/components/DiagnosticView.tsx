@@ -32,10 +32,34 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
     try {
       const res = await api.uploadStatement(file, entityType, pdfPassword || undefined);
       setData(res);
+      if (res.statement_summary?.suggested_entity_type) {
+        setEntityType(res.statement_summary.suggested_entity_type);
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to process statement');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEntityChange = async (newType: string) => {
+    setEntityType(newType);
+    if (!data) return;
+    try {
+      const payload = {
+        ...data.extracted_features,
+        entity_type: newType,
+        opex_amount: data.statement_summary.detected_opex || 0.0,
+        capex_amount: data.statement_summary.detected_capex || 0.0,
+        actual_turnover: data.statement_summary.total_credits || undefined,
+      };
+      const res = await api.predictFeatures(payload as any);
+      setData({
+        ...data,
+        predictions: res.predictions
+      });
+    } catch (err: any) {
+      console.error('Failed to update entity tax calculations:', err);
     }
   };
 
@@ -53,6 +77,7 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
     try {
       const res = await api.analyzeSample('balanced_pro');
       setData(res);
+      setEntityType('salaried_individual');
     } catch (err: any) {
       setError(err.message || 'Failed to load sample');
     } finally {
@@ -99,7 +124,7 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setEntityType(tab.id)}
+                onClick={() => handleEntityChange(tab.id)}
                 className={`px-3 py-1.5 text-xs font-medium rounded transition ${
                   entityType === tab.id
                     ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
@@ -201,15 +226,37 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
         <div className="space-y-6">
           {/* Active Statement Profile Banner */}
           {summary?.filename && (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono">
-              <div className="flex items-center space-x-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-neutral-400">Active Diagnostic Statement:</span>
-                <span className="font-semibold text-emerald-300">{summary.filename}</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-neutral-400">Statement:</span>
+                  <span className="font-semibold text-emerald-300">{summary.account_holder_name || summary.filename}</span>
+                </div>
+                {summary.account_type && (
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 border border-neutral-700">
+                    {summary.account_type}
+                  </span>
+                )}
+                {summary.suggested_entity_type === 'presumptive_business_44ad' && (
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                    Auto-Detected Business Current Account
+                  </span>
+                )}
               </div>
-              <span className="text-neutral-400">
-                {summary.total_transactions} txns • Total Inflow: {formatINR(summary.total_credits)}
-              </span>
+              <div className="flex flex-wrap items-center gap-3 text-neutral-400 text-[11px]">
+                <span>{summary.total_transactions} txns</span>
+                <span>•</span>
+                <span>Inflow: <strong className="text-emerald-400 font-semibold">{formatINR(summary.total_credits)}</strong></span>
+                <span>•</span>
+                <span>Outflow: <strong className="text-neutral-200 font-semibold">{formatINR(summary.total_debits)}</strong></span>
+                {summary.closing_balance !== undefined && summary.closing_balance !== null && (
+                  <>
+                    <span>•</span>
+                    <span>Closing: <strong className="text-neutral-300 font-semibold">{formatINR(summary.closing_balance)}</strong></span>
+                  </>
+                )}
+              </div>
             </div>
           )}
 

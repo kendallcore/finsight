@@ -25,10 +25,11 @@ class StatementParser:
     """Parses arbitrary Indian bank statement CSVs and PDFs into standard schema."""
 
     @staticmethod
-    def parse_pdf_bytes(pdf_bytes: bytes, password: Optional[str] = None) -> pd.DataFrame:
+    def parse_pdf_bytes(pdf_bytes: bytes, password: Optional[str] = None) -> Tuple[pd.DataFrame, Dict[str, Any]]:
         """
         Parses text from bank statement PDFs using pdftotext (preferred for layout)
-        or pypdf as fallback. Reconstructs running balances and maps to standard schema.
+        or pypdf as fallback. Extracts account metadata, official statement summaries,
+        and accurately classifies debit/credit transactions with column and sign awareness.
         """
         text = ""
         # 1. Try pdftotext with layout preservation
@@ -36,12 +37,12 @@ class StatementParser:
             with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
                 tmp.write(pdf_bytes)
                 tmp_path = tmp.name
-            
+
             cmd = ["pdftotext", "-layout"]
             if password:
                 cmd.extend(["-upw", str(password)])
             cmd.extend([tmp_path, "-"])
-            
+
             proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
             text = proc.stdout.decode("utf-8", errors="ignore")
             os.remove(tmp_path)
@@ -61,6 +62,77 @@ class StatementParser:
         if not text.strip():
             raise ValueError("PDF statement contains no readable text. Ensure password is valid if encrypted.")
 
+        # 3. Extract Account Metadata
+        first_page = text.split("\x0c")[0]
+        account_holder = None
+        account_no = None
+        account_type = None
+
+        for l in first_page.splitlines()[:35]:
+            s = l.strip()
+            if any(s.startswith(p) for p in ["M/S.", "MR.", "MS.", "MRS."]):
+                account_holder = re.split(r"\s{4,}", s)[0].strip()
+                break
+            elif "CUSTOMER NAME" in s:
+                m = re.search(r"CUSTOMER\s+NAME\s*:\s*(.+)", s)
+                if m:
+                    account_holder = re.split(r"\s{4,}", m.group(1).strip())[0].strip()
+                    break
+
+        acc_m = re.search(r"Account\s+No\s*:\s*([A-Za-z0-9\s]+)", first_page, re.IGNORECASE)
+        if acc_m:
+            account_no = acc_m.group(1).split()[0].strip()
+
+        type_m = re.search(r"Account\s+Type\s*:\s*([^\n]+)", first_page, re.IGNORECASE)
+        if type_m:
+            account_type = type_m.group(1).strip()
+
+        meta_str = f"{account_holder or ''} {account_no or ''} {account_type or ''}".upper()
+        is_biz = any(k in meta_str for k in [
+            "CAGEN", "CURRENT", "BIZ", "ENTERPRISE", "M/S", "PVT LTD", "LIMITED",
+            "LLP", "TRADERS", "AGENCY", "GYM", "STORES", "SHOP", "COMMERCIAL"
+        ])
+        suggested_entity = "presumptive_business_44ad" if is_biz else "salaried_individual"
+
+        # 4. Extract Official Statement Summary if present
+        official_summary = {}
+        sum_m = re.search(
+            r"STATEMENT\s+SUMMARY\s*:-.*?\n\s*Opening\s+Balance\s+Dr\s+Count\s+Cr\s+Count\s+Debits\s+Credits\s+Closing\s+Bal\s*\n\s*([\d,]+\.\d{2})\s+(\d+)\s+(\d+)\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})",
+            text,
+            re.DOTALL
+        )
+        if sum_m:
+            official_summary = {
+                "opening_balance": float(sum_m.group(1).replace(",", "")),
+                "dr_count": int(sum_m.group(2)),
+                "cr_count": int(sum_m.group(3)),
+                "total_debits": float(sum_m.group(4).replace(",", "")),
+                "total_credits": float(sum_m.group(5).replace(",", "")),
+                "closing_balance": float(sum_m.group(6).replace(",", ""))
+            }
+        else:
+            idfc_sum = re.search(
+                r"Opening\s+Balance\s+Total\s+Debit\s+Total\s+Credit\s+Closing\s+Balance\s*\n\s*([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})",
+                text
+            )
+            if idfc_sum:
+                official_summary = {
+                    "opening_balance": float(idfc_sum.group(1).replace(",", "")),
+                    "total_debits": float(idfc_sum.group(2).replace(",", "")),
+                    "total_credits": float(idfc_sum.group(3).replace(",", "")),
+                    "closing_balance": float(idfc_sum.group(4).replace(",", ""))
+                }
+
+        # 5. Determine Column Header Offsets
+        split_pos = None
+        for l in text.splitlines():
+            if "Withdrawal Amt." in l and "Deposit Amt." in l:
+                split_pos = (l.find("Withdrawal Amt.") + l.find("Deposit Amt.")) / 2
+                break
+            elif "Particulars" in l and "Debit" in l and "Credit" in l and "Balance" in l:
+                split_pos = (l.find("Debit") + l.find("Credit")) / 2
+                break
+
         pages = text.split("\x0c")
         parsed_txns = []
         current_txn = None
@@ -71,80 +143,75 @@ class StatementParser:
                 if "STATEMENT SUMMARY" in line:
                     break
 
-                # Detect transaction start line (e.g. '01/04/25 ... 01/04/25 ... 100.00 ... 55,034.69')
-                m = re.search(r"^\s*(\d{2}/\d{2}/\d{2,4})\s+(.+?)(\d{2}/\d{2}/\d{2,4})\s+(.+)$", line)
+                # Support HDFC DD/MM/YY and IDFC DD-Mon-YYYY date patterns
+                m1 = re.search(r"^\s*(\d{2}/\d{2}/\d{2,4})\s+(.+?)(\d{2}/\d{2}/\d{2,4})\s+(.+)$", line)
+                m2 = re.search(r"^\s*(\d{2}-[A-Za-z]{3}-\d{2,4})\s+(\d{2}-[A-Za-z]{3}-\d{2,4})\s+(.+)$", line)
+                m = m1 or m2
+
                 if m:
                     if current_txn:
                         parsed_txns.append(current_txn)
 
-                    txn_date = m.group(1)
-                    middle_text = m.group(2)
-                    val_date = m.group(3)
-                    after_val_dt = m.group(4)
-                    nums = re.findall(r"[\d,]+\.\d{2}", after_val_dt)
+                    matches = list(re.finditer(r"(-?[\d,]+\.\d{2})", line))
+                    if len(matches) >= 2:
+                        amt_m = matches[-2]
+                        bal_m = matches[-1]
+                        amt = float(amt_m.group().replace(",", ""))
+                        bal = float(bal_m.group().replace(",", ""))
+                        pos = amt_m.start()
 
-                    if len(nums) >= 2:
-                        amt = float(nums[0].replace(",", ""))
-                        bal = float(nums[1].replace(",", ""))
-                    elif len(nums) == 1:
-                        amt = float(nums[0].replace(",", ""))
+                        if split_pos is not None:
+                            is_dr = (pos < split_pos)
+                        else:
+                            is_dr = (pos < 165)
+
+                        txn_type = "DEBIT" if is_dr else "CREDIT"
+                    elif len(matches) == 1:
+                        amt = float(matches[0].group().replace(",", ""))
                         bal = 0.0
+                        txn_type = "DEBIT"
                     else:
                         amt = 0.0
                         bal = 0.0
+                        txn_type = "DEBIT"
 
                     current_txn = {
-                        "date": txn_date,
-                        "narration": middle_text.strip(),
-                        "value_date": val_date,
+                        "date": m.group(1),
+                        "narration": m.group(2 if m1 else 3).strip(),
                         "amount": amt,
                         "closing_balance": bal,
+                        "type": txn_type,
                         "page": p_idx + 1
                     }
                 else:
                     # Multi-line narration continuation
                     if current_txn and line.strip() and not line.strip().startswith("*"):
-                        if not any(h in line for h in ["Page No", "Account Branch", "Address", "RTGS/NEFT", "Nomination", "From :"]):
+                        if not any(h in line for h in [
+                            "Page No", "Account Branch", "Address", "RTGS/NEFT",
+                            "Nomination", "From :", "HDFC BANK LIMITED", "STATEMENT OF ACCOUNT"
+                        ]):
                             current_txn["narration"] += " " + line.strip()
 
         if current_txn:
             parsed_txns.append(current_txn)
 
         if not parsed_txns:
-            # Fallback: scan for any lines with standard date and amount
+            # Fallback scanner for date and amount patterns
             for line in text.splitlines():
                 dm = re.match(r"^\s*(\d{2}[/-]\d{2}[/-]\d{2,4})\s+(.+)", line)
                 if dm:
-                    nums = re.findall(r"[\d,]+\.\d{2}", line)
+                    nums = list(re.finditer(r"(-?[\d,]+\.\d{2})", line))
                     if nums:
                         parsed_txns.append({
                             "date": dm.group(1),
                             "narration": dm.group(2),
-                            "amount": float(nums[0].replace(",", "")),
-                            "closing_balance": float(nums[-1].replace(",", "")) if len(nums) > 1 else 0.0,
+                            "amount": float(nums[0].group().replace(",", "")),
+                            "closing_balance": float(nums[-1].group().replace(",", "")) if len(nums) > 1 else 0.0,
                             "type": "CREDIT" if any(w in line.upper() for w in ["CR", "CREDIT", "DEPOSIT", "SALARY"]) else "DEBIT"
                         })
 
         if not parsed_txns:
             raise ValueError("No transaction records could be extracted from the PDF statement.")
-
-        # Reconstruct Credit/Debit directions via running balances if balances exist
-        if len(parsed_txns) > 1 and all("closing_balance" in t for t in parsed_txns):
-            first_bal = parsed_txns[0]["closing_balance"]
-            first_amt = parsed_txns[0]["amount"]
-            is_cr = any(w in parsed_txns[0]["narration"].upper() for w in ["CR", "CREDIT", "SALARY", "DEPOSIT", "REFUND", "DIVIDEND"])
-            prev_bal = (first_bal - first_amt) if is_cr else (first_bal + first_amt)
-
-            for t in parsed_txns:
-                amt = t["amount"]
-                bal = t["closing_balance"]
-                if abs((prev_bal + amt) - bal) < 0.05:
-                    t["type"] = "CREDIT"
-                elif abs((prev_bal - amt) - bal) < 0.05:
-                    t["type"] = "DEBIT"
-                else:
-                    t["type"] = "CREDIT" if any(w in t["narration"].upper() for w in ["CR", "CREDIT", "SALARY", "DEPOSIT", "REFUND"]) else "DEBIT"
-                prev_bal = bal if bal > 0 else prev_bal
 
         standardized_rows = []
         for t in parsed_txns:
@@ -159,17 +226,24 @@ class StatementParser:
                 "category": detect_category(narration, ttype)
             })
 
-        return pd.DataFrame(standardized_rows)
+        metadata = {
+            "account_holder_name": account_holder,
+            "account_number": account_no,
+            "account_type": account_type,
+            "suggested_entity_type": suggested_entity,
+            "opening_balance": official_summary.get("opening_balance"),
+            "closing_balance": official_summary.get("closing_balance"),
+            "official_summary": official_summary
+        }
+        return pd.DataFrame(standardized_rows), metadata
 
     @staticmethod
-    def normalize_csv_statement(csv_bytes: bytes) -> pd.DataFrame:
+    def normalize_csv_statement(csv_bytes: bytes) -> Tuple[pd.DataFrame, Dict[str, Any]]:
         """Reads CSV/TXT bytes and maps columns to standard names."""
         df = pd.read_csv(io.BytesIO(csv_bytes))
-        
-        # Lowercase column names for fuzzy mapping
+
         cols_lower = {c: c.strip().lower() for c in df.columns}
-        
-        # Column mappings
+
         date_col = next((c for c, l in cols_lower.items() if "date" in l or "time" in l), None)
         desc_col = next((c for c, l in cols_lower.items() if "narration" in l or "desc" in l or "particular" in l or "detail" in l or "remark" in l), None)
         credit_col = next((c for c, l in cols_lower.items() if "credit" in l or "deposit" in l or "cr" == l), None)
@@ -185,7 +259,6 @@ class StatementParser:
             raw_date = str(row[date_col]) if date_col and pd.notna(row[date_col]) else "2025-01-01"
             narration = str(row[desc_col]) if desc_col and pd.notna(row[desc_col]) else "TRANSACTION"
 
-            # Determine Amount and Direction (Credit vs Debit)
             if credit_col and debit_col:
                 cr_val = float(pd.to_numeric(row[credit_col], errors="coerce") or 0.0)
                 dr_val = float(pd.to_numeric(row[debit_col], errors="coerce") or 0.0)
@@ -218,7 +291,16 @@ class StatementParser:
                 "category": category
             })
 
-        return pd.DataFrame(standardized_rows)
+        metadata = {
+            "account_holder_name": None,
+            "account_number": None,
+            "account_type": None,
+            "suggested_entity_type": "salaried_individual",
+            "opening_balance": None,
+            "closing_balance": None,
+            "official_summary": {}
+        }
+        return pd.DataFrame(standardized_rows), metadata
 
     @classmethod
     def parse_and_extract(
@@ -229,18 +311,23 @@ class StatementParser:
     ) -> Tuple[StatementSummary, ExtractedFeatures, Dict[str, float]]:
         """Parses CSV/PDF and extracts statement summary + 16D feature vector + business metrics."""
         is_pdf = filename.lower().endswith(".pdf") or file_bytes.startswith(b"%PDF")
-        
+
         if is_pdf:
-            df = cls.parse_pdf_bytes(file_bytes, password=password)
+            df, metadata = cls.parse_pdf_bytes(file_bytes, password=password)
         else:
-            df = cls.normalize_csv_statement(file_bytes)
-        
+            df, metadata = cls.normalize_csv_statement(file_bytes)
+
         # Summary
         total_txns = len(df)
-        credits_df = df[df["type"] == "CREDIT"]
-        debits_df = df[df["type"] == "DEBIT"]
-        total_credits = float(credits_df["amount"].sum())
-        total_debits = float(debits_df["amount"].sum())
+        official_sum = metadata.get("official_summary", {})
+        if official_sum and official_sum.get("total_credits") is not None and official_sum.get("total_debits") is not None:
+            total_credits = float(official_sum["total_credits"])
+            total_debits = float(official_sum["total_debits"])
+        else:
+            credits_df = df[df["type"] == "CREDIT"]
+            debits_df = df[df["type"] == "DEBIT"]
+            total_credits = float(credits_df["amount"].sum())
+            total_debits = float(debits_df["amount"].sum())
 
         dates = pd.to_datetime(df["date"], dayfirst=True, format="mixed", errors="coerce").dropna()
         if len(dates) > 0:
@@ -255,6 +342,12 @@ class StatementParser:
 
         summary = StatementSummary(
             filename=filename,
+            account_holder_name=metadata.get("account_holder_name"),
+            account_number=metadata.get("account_number"),
+            account_type=metadata.get("account_type"),
+            suggested_entity_type=metadata.get("suggested_entity_type", "salaried_individual"),
+            opening_balance=metadata.get("opening_balance"),
+            closing_balance=metadata.get("closing_balance"),
             total_transactions=total_txns,
             date_range={"from": date_from, "to": date_to},
             total_credits=round(total_credits, 2),
@@ -271,4 +364,3 @@ class StatementParser:
 
 
 statement_parser = StatementParser()
-

@@ -1,5 +1,11 @@
 export interface StatementSummary {
   filename?: string;
+  account_holder_name?: string;
+  account_number?: string;
+  account_type?: string;
+  suggested_entity_type?: string;
+  opening_balance?: number;
+  closing_balance?: number;
   total_transactions: number;
   date_range: {
     from: string;

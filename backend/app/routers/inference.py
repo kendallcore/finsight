@@ -45,13 +45,19 @@ async def upload_statement(
             password=pdf_password
         )
 
-        # 2. Execute inference tailored to entity type
+        # Auto-detect entity type if statement is identified as a business/current account
+        effective_entity = entity_type
+        if (entity_type == "salaried_individual" or entity_type == "auto") and summary.suggested_entity_type and summary.suggested_entity_type != "salaried_individual":
+            effective_entity = summary.suggested_entity_type
+
+        # 2. Execute inference tailored to entity type with actual statement turnover
         predictions = ml_service.predict(
             features_dict=features.model_dump(),
-            entity_type=entity_type,
+            entity_type=effective_entity,
             opex=business_metrics.get("detected_opex", 0.0),
             capex=business_metrics.get("detected_capex", 0.0),
-            digital_ratio=business_metrics.get("digital_receipts_ratio", 1.0)
+            digital_ratio=business_metrics.get("digital_receipts_ratio", 1.0),
+            actual_turnover=summary.total_credits
         )
 
         # 3. Log to SQLite
@@ -93,12 +99,14 @@ async def predict_features(input_data: ManualFeatureInput):
         entity_type = feat_dict.pop("entity_type", "salaried_individual")
         opex_amount = feat_dict.pop("opex_amount", 0.0)
         capex_amount = feat_dict.pop("capex_amount", 0.0)
+        actual_turnover = feat_dict.pop("actual_turnover", None)
 
         predictions = ml_service.predict(
             features_dict=feat_dict,
             entity_type=entity_type,
             opex=opex_amount,
-            capex=capex_amount
+            capex=capex_amount,
+            actual_turnover=actual_turnover
         )
         features = ExtractedFeatures(**feat_dict)
 

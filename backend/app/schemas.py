@@ -9,6 +9,12 @@ from pydantic import BaseModel, Field
 
 class StatementSummary(BaseModel):
     filename: Optional[str] = None
+    account_holder_name: Optional[str] = None
+    account_number: Optional[str] = None
+    account_type: Optional[str] = None
+    suggested_entity_type: Optional[str] = None
+    opening_balance: Optional[float] = None
+    closing_balance: Optional[float] = None
     total_transactions: int
     date_range: Dict[str, str]
     total_credits: float
@@ -87,6 +93,7 @@ class ManualFeatureInput(BaseModel):
     entity_type: str = Field("salaried_individual", description="Tax entity type: salaried_individual, presumptive_business_44ad, presumptive_professional_44ada, regular_business_pnl")
     opex_amount: float = Field(0.0, ge=0.0, description="Deductible OPEX for business P&L")
     capex_amount: float = Field(0.0, ge=0.0, description="Capex for depreciation under Sec 32")
+    actual_turnover: Optional[float] = Field(None, ge=0.0, description="Actual annual statement turnover / gross revenue if known")
     log_annual_credit: float = Field(..., description="Log of annual credit inflows")
     log_annual_debit: float = Field(..., description="Log of annual debit outflows")
     net_savings_ratio: float = Field(0.30, ge=-1.0, le=1.0)
