@@ -1,7 +1,6 @@
 import {
   UploadStatementResponse,
   ModelEvaluationResponse,
-  PCAPointsResponse,
   SampleProfileItem,
   ExtractedFeatures
 } from '../types';
@@ -50,12 +49,6 @@ export const api = {
   async getEvaluation(): Promise<ModelEvaluationResponse> {
     const res = await fetch(`${API_BASE}/models/evaluation`);
     if (!res.ok) throw new Error('Failed to fetch model evaluations');
-    return res.json();
-  },
-
-  async getPCAPoints(): Promise<PCAPointsResponse> {
-    const res = await fetch(`${API_BASE}/clusters/pca-points`);
-    if (!res.ok) throw new Error('Failed to fetch PCA points');
     return res.json();
   },
 
