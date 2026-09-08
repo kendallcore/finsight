@@ -20,6 +20,10 @@ FIXED_OBLIGATION_PATTERNS = re.compile(r"(?i)(rent\b|landlord|nobroker|emi\b|loa
 DISCRETIONARY_PATTERNS = re.compile(r"(?i)(swiggy|zomato|blinkit|zepto|instamart|amazon|flipkart|myntra|makemytrip|goibibo|bookmyshow|pvr|inox|uber|ola|starbucks)")
 CAPITAL_GAINS_PATTERNS = re.compile(r"(?i)(dividend|redemption|mf\s*red|zerodha\s*cr|groww\s*cr|payout)")
 
+# Regular expressions for Business Deductions (OPEX & Section 32 CAPEX)
+OPEX_PATTERNS = re.compile(r"(?i)(rent\b|landlord|nobroker|electricity|bescom|tneb|mgl|staff|wages|trainer|salary\s*paid|vendor|supplier|wholesale|materials|maintenance|repair|courier|marketing|adwords|meta\s*ads|software|saas|subscription|aws|gcp|cleaning|stationery|office\s*exp)")
+CAPEX_PATTERNS = re.compile(r"(?i)(machinery|equipment|treadmill|gym\s*equip|weights|dumbbells|hardware|computer|laptop|macbook|dell|server|furniture|interior|renovation|air\s*conditioner|cctv|sound\s*system|pos\s*machine)")
+
 
 FEATURE_NAMES = [
     "log_annual_credit",
@@ -71,8 +75,16 @@ def detect_category(narration: str, txn_type: str) -> str:
         else:
             return "GENERAL_CREDIT"
     else:
-        if any(w in s for w in ["RENT", "LANDLORD", "NOBROKER"]):
+        if bool(CAPEX_PATTERNS.search(s)):
+            return "CAPEX_EQUIPMENT"
+        elif any(w in s for w in ["RENT", "LANDLORD", "NOBROKER"]):
             return "RENT"
+        elif any(w in s for w in ["ELECTRICITY", "BESCOM", "TNEB", "AIRTEL", "JIO", "GAS", "BBPS", "BILL"]):
+            return "UTILITIES"
+        elif any(w in s for w in ["STAFF", "WAGES", "TRAINER", "SALARY PAID"]):
+            return "STAFF_SALARY"
+        elif any(w in s for w in ["VENDOR", "SUPPLIER", "WHOLESALE", "MATERIALS", "MAINTENANCE"]):
+            return "VENDOR_PAYOUT"
         elif any(w in s for w in ["EMI", "LOAN", "HOUSING", "AUTO"]):
             return "EMI"
         elif any(w in s for w in ["SWIGGY", "ZOMATO", "BLINKIT", "ZEPTO", "RESTAURANT", "CAFE", "FOOD"]):
@@ -81,15 +93,14 @@ def detect_category(narration: str, txn_type: str) -> str:
             return "SHOPPING"
         elif any(w in s for w in ["UBER", "OLA", "FASTAG", "PETROL", "FUEL", "IRCTC", "MAKEMYTRIP"]):
             return "TRAVEL"
-        elif any(w in s for w in ["ELECTRICITY", "BESCOM", "AIRTEL", "JIO", "GAS", "BBPS", "BILL"]):
-            return "UTILITIES"
         elif any(w in s for w in ["ZERODHA", "GROWW", "MUTUAL FUND", "SIP", "STOCKS", "MF"]):
             return "INVESTMENT"
         elif any(w in s for w in ["NPS", "PPF", "INSURANCE", "LIC", "MAX LIFE", "HDFC ERGO"]):
             return "TAX_SHIELD"
+        elif bool(OPEX_PATTERNS.search(s)):
+            return "OPERATIONAL_EXPENSE"
         else:
             return "GENERAL_DEBIT"
-
 
 
 class FinancialFeatureExtractor:
@@ -131,15 +142,12 @@ class FinancialFeatureExtractor:
         monthly_burn_rate = float(total_debit / (total_credit + self.eps))
 
         # 2. Income Dynamics & Regularity
-        # Salary detection by category or regex narration
         salary_mask = credits["category"].astype(str).str.upper().str.contains("SALARY") | credits["narration"].apply(lambda s: bool(SALARY_PATTERNS.search(s)))
         salary_credits = credits[salary_mask]
         total_salary = float(salary_credits["amount"].sum())
         salary_inflow_ratio = float(total_salary / (total_credit + self.eps))
 
-        # Monthly Credit CV & Regularity
         monthly_credits = credits.groupby("month")["amount"].sum()
-        # Reindex to 12 months if possible
         if len(monthly_credits) > 1:
             credit_mean = float(monthly_credits.mean())
             credit_std = float(monthly_credits.std(ddof=0))
@@ -147,32 +155,26 @@ class FinancialFeatureExtractor:
         else:
             monthly_credit_cv = 0.0
 
-        # Salary regularity: distinct months with salary
         salary_months = salary_credits["month"].nunique()
         salary_regularity_score = float(min(salary_months / 12.0, 1.0))
 
-        # Outsized Bonus / Lump-sum ratio (credits > 2x monthly mean)
         mean_monthly_credit = (total_credit / 12.0) if total_credit > 0 else 1.0
         bonus_credits = credits[credits["amount"] >= (2.0 * mean_monthly_credit)]["amount"].sum()
         bonus_lump_sum_ratio = float(bonus_credits / (total_credit + self.eps))
 
         # 3. Outflow Allocation & Tax-Shield Proxies
-        # Investment (SIP, Mutual Funds, Stocks)
         inv_mask = debits["category"].astype(str).str.upper().isin(["INVESTMENT", "SIP", "MUTUAL_FUND", "STOCKS"]) | debits["narration"].apply(lambda s: bool(INVESTMENT_PATTERNS.search(s)))
         total_inv = float(debits[inv_mask]["amount"].sum())
         investment_ratio = float(total_inv / (total_credit + self.eps))
 
-        # Fixed Obligations (Rent, EMI, Utilities)
         fixed_mask = debits["category"].astype(str).str.upper().isin(["RENT", "EMI", "UTILITIES", "HOUSING"]) | debits["narration"].apply(lambda s: bool(FIXED_OBLIGATION_PATTERNS.search(s)))
         total_fixed = float(debits[fixed_mask]["amount"].sum())
         fixed_obligation_ratio = float(total_fixed / (total_debit + self.eps))
 
-        # Discretionary (Dining, Shopping, Travel)
         disc_mask = debits["category"].astype(str).str.upper().isin(["FOOD", "DINING", "SHOPPING", "TRAVEL", "ENTERTAINMENT"]) | debits["narration"].apply(lambda s: bool(DISCRETIONARY_PATTERNS.search(s)))
         total_disc = float(debits[disc_mask]["amount"].sum())
         discretionary_ratio = float(total_disc / (total_debit + self.eps))
 
-        # Tax-Shield Outflows (PPF, NPS 14%, Health Insurance)
         tax_shield_mask = debits["category"].astype(str).str.upper().isin(["NPS", "PPF", "INSURANCE", "TAX_SAVING"]) | debits["narration"].apply(lambda s: bool(TAX_SHIELD_PATTERNS.search(s)))
         total_tax_shield = float(debits[tax_shield_mask]["amount"].sum())
         tax_shield_ratio = float(total_tax_shield / (total_credit + self.eps))
@@ -187,7 +189,6 @@ class FinancialFeatureExtractor:
         avg_ticket_size = float(df["amount"].mean()) if len(df) > 0 else 0.0
         log_avg_ticket_size = float(np.log1p(avg_ticket_size))
 
-        # Capital Gains Inflows / Liquidations
         cap_gains_mask = credits["category"].astype(str).str.upper().isin(["REDEMPTION", "DIVIDEND", "CAPITAL_GAINS"]) | credits["narration"].apply(lambda s: bool(CAPITAL_GAINS_PATTERNS.search(s)))
         total_cap_gains = float(credits[cap_gains_mask]["amount"].sum())
         capital_gains_flux = float(total_cap_gains / (total_credit + self.eps))
@@ -209,6 +210,43 @@ class FinancialFeatureExtractor:
             "micro_spend_density": round(micro_spend_density, 4),
             "log_avg_ticket_size": round(log_avg_ticket_size, 4),
             "capital_gains_flux": round(capital_gains_flux, 4)
+        }
+
+    def extract_business_breakdown(self, df: pd.DataFrame) -> Dict[str, float]:
+        """
+        Extracts business-specific financial aggregates:
+        Deductible OPEX, Capital Expenditures (CAPEX), and Digital Receipts Ratio.
+        """
+        if df.empty:
+            return {"detected_opex": 0.0, "detected_capex": 0.0, "digital_receipts_ratio": 1.0}
+
+        df = df.copy()
+        df["amount"] = pd.to_numeric(df["amount"], errors="coerce").fillna(0.0).abs()
+        df["type"] = df["type"].astype(str).str.upper()
+        df["payment_mode"] = df["payment_mode"].astype(str).str.upper()
+        df["narration"] = df["narration"].astype(str)
+
+        credits = df[df["type"] == "CREDIT"]
+        debits = df[df["type"] == "DEBIT"]
+
+        total_credits = float(credits["amount"].sum())
+        total_debits = float(debits["amount"].sum())
+
+        digital_credit_mask = credits["payment_mode"].isin(["UPI", "NEFT", "IMPS", "ACH", "POS", "NETBANKING", "CARD"])
+        digital_credits = float(credits[digital_credit_mask]["amount"].sum())
+        digital_ratio = (digital_credits / total_credits) if total_credits > 0 else 1.0
+
+        capex_mask = debits["narration"].apply(lambda s: bool(CAPEX_PATTERNS.search(s))) | debits["category"].astype(str).str.upper().isin(["CAPEX_EQUIPMENT"])
+        total_capex = float(debits[capex_mask]["amount"].sum())
+
+        inv_mask = debits["category"].astype(str).str.upper().isin(["INVESTMENT", "SIP", "MUTUAL_FUND", "STOCKS"])
+        pure_opex_mask = (~capex_mask) & (~inv_mask)
+        total_opex = float(debits[pure_opex_mask]["amount"].sum())
+
+        return {
+            "detected_opex": round(total_opex, 2),
+            "detected_capex": round(total_capex, 2),
+            "digital_receipts_ratio": round(digital_ratio, 4)
         }
 
     def extract_vector(self, df: pd.DataFrame) -> np.ndarray:
