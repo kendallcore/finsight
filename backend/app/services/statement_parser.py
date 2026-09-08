@@ -21,6 +21,36 @@ from app.services.feature_engineering import (
 from app.schemas import StatementSummary, ExtractedFeatures
 
 
+HEADER_KEYWORDS = [
+    "statement of account", "customer id", "account no", "statement period",
+    "customer name", "account branch", "communication", "branch address",
+    "email id", "ifsc", "phone no", "micr", "ckyc id", "account opening",
+    "nomination", "account status", "nominee name", "account type",
+    "opening balance", "total debit", "total credit", "closing balance",
+    "transaction date", "particulars", "debit", "credit", "balance",
+    "page no", "account branch", "address", "rtgs/neft", "from :", "cheque no",
+    "currency", "inr", "registered office", "important message", "important safety tips",
+    "contact us", "grievance redressal", "commonly used abbreviations", "end of the statement",
+    "value date", "transaction", "cheque", "date", "no.", "chennai", "tamil nadu", "india"
+]
+
+
+def is_header_line(line: str) -> bool:
+    s = line.strip().lower()
+    if not s:
+        return True
+    if s in ["date", "date no", "cheque no", "no", "transaction", "particulars", "value date"]:
+        return True
+    for k in HEADER_KEYWORDS:
+        if k in s:
+            return True
+    if re.search(r"page\s+\d+\s+of\s+\d+", s):
+        return True
+    if re.match(r"^\s*(?:[\d,]+\.\d{2}\s*){2,}$", line):
+        return True
+    return False
+
+
 class StatementParser:
     """Parses arbitrary Indian bank statement CSVs and PDFs into standard schema."""
 
@@ -29,7 +59,7 @@ class StatementParser:
         """
         Parses text from bank statement PDFs using pdftotext (preferred for layout)
         or pypdf as fallback. Extracts account metadata, official statement summaries,
-        and accurately classifies debit/credit transactions with column and sign awareness.
+        and accurately classifies debit/credit transactions across multi-layout Indian bank PDFs.
         """
         text = ""
         # 1. Try pdftotext with layout preservation
@@ -123,7 +153,10 @@ class StatementParser:
                     "closing_balance": float(idfc_sum.group(4).replace(",", ""))
                 }
 
-        # 5. Determine Column Header Offsets
+        op_m = re.search(r"Opening\s+Balance[^\n\d]*([\d,]+\.\d{2})", text, re.IGNORECASE)
+        opening_bal = float(op_m.group(1).replace(",", "")) if op_m else official_summary.get("opening_balance")
+
+        # 5. Determine Column Header Offsets if HDFC-style layout
         split_pos = None
         for l in text.splitlines():
             if "Withdrawal Amt." in l and "Deposit Amt." in l:
@@ -133,78 +166,136 @@ class StatementParser:
                 split_pos = (l.find("Debit") + l.find("Credit")) / 2
                 break
 
-        pages = text.split("\x0c")
+        lines = text.splitlines()
+
+        # Flexibly match dates like 01/04/2025, 19-May-2025, 19-May-25, 01-04-2025
+        DATE_PAT = r"(\d{1,2}[-/\s](?:[A-Za-z]{3}|\d{1,2})[-/\s]\d{2,4})"
+
+        pattern_two_dates_narration = re.compile(r"^\s*" + DATE_PAT + r"\s+(.+?)\s+" + DATE_PAT + r"\s+(.+)$")
+        pattern_two_dates = re.compile(r"^\s*" + DATE_PAT + r"\s+" + DATE_PAT + r"\s+(.+)$")
+        pattern_one_date = re.compile(r"^\s*" + DATE_PAT + r"\s+(.+)$")
+
+        date_lines_info = []
+
+        for idx, line in enumerate(lines):
+            if "STATEMENT SUMMARY" in line:
+                break
+
+            mA = pattern_two_dates_narration.search(line)
+            if mA:
+                d1, mid, d2, rest = mA.group(1), mA.group(2), mA.group(3), mA.group(4)
+                nums = re.findall(r"[\d,]+\.\d{2}", rest)
+                if nums:
+                    date_lines_info.append({
+                        "line_idx": idx,
+                        "date": d1,
+                        "value_date": d2,
+                        "mid_text": mid.strip(),
+                        "nums": nums,
+                        "line_text": line
+                    })
+                    continue
+
+            mB = pattern_two_dates.search(line)
+            if mB:
+                d1, d2, rest = mB.group(1), mB.group(2), mB.group(3)
+                nums = re.findall(r"[\d,]+\.\d{2}", rest)
+                if nums:
+                    mid_text = re.sub(r"[\d,]+\.\d{2}", "", rest).strip()
+                    date_lines_info.append({
+                        "line_idx": idx,
+                        "date": d1,
+                        "value_date": d2,
+                        "mid_text": mid_text,
+                        "nums": nums,
+                        "line_text": line
+                    })
+                    continue
+
+            mC = pattern_one_date.search(line)
+            if mC:
+                d1, rest = mC.group(1), mC.group(2)
+                nums = re.findall(r"[\d,]+\.\d{2}", rest)
+                if nums:
+                    mid_text = re.sub(r"[\d,]+\.\d{2}", "", rest).strip()
+                    date_lines_info.append({
+                        "line_idx": idx,
+                        "date": d1,
+                        "value_date": d1,
+                        "mid_text": mid_text,
+                        "nums": nums,
+                        "line_text": line
+                    })
+
         parsed_txns = []
-        current_txn = None
 
-        for p_idx, page in enumerate(pages):
-            lines = page.splitlines()
-            for line in lines:
-                if "STATEMENT SUMMARY" in line:
-                    break
+        if date_lines_info:
+            for i, info in enumerate(date_lines_info):
+                curr_idx = info["line_idx"]
+                prev_idx = date_lines_info[i-1]["line_idx"] if i > 0 else -1
+                next_idx = date_lines_info[i+1]["line_idx"] if i < len(date_lines_info)-1 else len(lines)
 
-                # Support HDFC DD/MM/YY and IDFC DD-Mon-YYYY date patterns
-                m1 = re.search(r"^\s*(\d{2}/\d{2}/\d{2,4})\s+(.+?)(\d{2}/\d{2}/\d{2,4})\s+(.+)$", line)
-                m2 = re.search(r"^\s*(\d{2}-[A-Za-z]{3}-\d{2,4})\s+(\d{2}-[A-Za-z]{3}-\d{2,4})\s+(.+)$", line)
-                m = m1 or m2
+                between_prev = [lines[j].strip() for j in range(prev_idx + 1, curr_idx) if not is_header_line(lines[j])]
 
-                if m:
-                    if current_txn:
-                        parsed_txns.append(current_txn)
+                leading_lines = []
+                if i > 0 and len(between_prev) >= 2:
+                    leading_lines = between_prev[1:]
+                elif i > 0 and len(between_prev) == 1:
+                    leading_lines = between_prev
+                elif i == 0:
+                    leading_lines = between_prev
 
-                    matches = list(re.finditer(r"(-?[\d,]+\.\d{2})", line))
-                    if len(matches) >= 2:
-                        amt_m = matches[-2]
-                        bal_m = matches[-1]
-                        amt = float(amt_m.group().replace(",", ""))
-                        bal = float(bal_m.group().replace(",", ""))
-                        pos = amt_m.start()
+                next_between = [lines[j].strip() for j in range(curr_idx + 1, next_idx) if not is_header_line(lines[j])]
+                trailing_lines = [next_between[0]] if len(next_between) >= 1 else []
 
-                        if split_pos is not None:
-                            is_dr = (pos < split_pos)
-                        else:
-                            is_dr = (pos < 165)
+                narration_parts = leading_lines + ([info["mid_text"]] if info["mid_text"] else []) + trailing_lines
+                narration = " ".join([p for p in narration_parts if p]).strip()
+                if not narration:
+                    narration = "TRANSACTION"
 
-                        txn_type = "DEBIT" if is_dr else "CREDIT"
-                    elif len(matches) == 1:
-                        amt = float(matches[0].group().replace(",", ""))
-                        bal = 0.0
-                        txn_type = "DEBIT"
-                    else:
-                        amt = 0.0
-                        bal = 0.0
-                        txn_type = "DEBIT"
+                nums = info["nums"]
+                line = info["line_text"]
 
-                    current_txn = {
-                        "date": m.group(1),
-                        "narration": m.group(2 if m1 else 3).strip(),
-                        "amount": amt,
-                        "closing_balance": bal,
-                        "type": txn_type,
-                        "page": p_idx + 1
-                    }
+                # Debit vs Credit positioning check for HDFC / ICICI column layouts
+                matches = list(re.finditer(r"(-?[\d,]+\.\d{2})", line))
+                txn_type = None
+
+                if split_pos is not None and len(matches) >= 2:
+                    pos = matches[-2].start()
+                    txn_type = "DEBIT" if pos < split_pos else "CREDIT"
+
+                if len(nums) >= 2:
+                    amt = float(nums[0].replace(",", ""))
+                    bal = float(nums[1].replace(",", ""))
+                elif len(nums) == 1:
+                    amt = float(nums[0].replace(",", ""))
+                    bal = 0.0
                 else:
-                    # Multi-line narration continuation
-                    if current_txn and line.strip() and not line.strip().startswith("*"):
-                        if not any(h in line for h in [
-                            "Page No", "Account Branch", "Address", "RTGS/NEFT",
-                            "Nomination", "From :", "HDFC BANK LIMITED", "STATEMENT OF ACCOUNT"
-                        ]):
-                            current_txn["narration"] += " " + line.strip()
+                    amt = 0.0
+                    bal = 0.0
 
-        if current_txn:
-            parsed_txns.append(current_txn)
+                txn_dict = {
+                    "date": info["date"],
+                    "narration": narration,
+                    "amount": amt,
+                    "closing_balance": bal,
+                    "value_date": info.get("value_date", info["date"])
+                }
+                if txn_type:
+                    txn_dict["type"] = txn_type
+
+                parsed_txns.append(txn_dict)
 
         if not parsed_txns:
-            # Fallback scanner for date and amount patterns
+            # Fallback: scan for any lines with standard date and amount
             for line in text.splitlines():
-                dm = re.match(r"^\s*(\d{2}[/-]\d{2}[/-]\d{2,4})\s+(.+)", line)
+                dm = re.match(r"^\s*(\d{1,2}[-/\s](?:[A-Za-z]{3}|\d{1,2})[-/\s]\d{2,4})\s+(.+)", line)
                 if dm:
                     nums = list(re.finditer(r"(-?[\d,]+\.\d{2})", line))
                     if nums:
                         parsed_txns.append({
                             "date": dm.group(1),
-                            "narration": dm.group(2),
+                            "narration": dm.group(2).strip(),
                             "amount": float(nums[0].group().replace(",", "")),
                             "closing_balance": float(nums[-1].group().replace(",", "")) if len(nums) > 1 else 0.0,
                             "type": "CREDIT" if any(w in line.upper() for w in ["CR", "CREDIT", "DEPOSIT", "SALARY"]) else "DEBIT"
@@ -212,6 +303,39 @@ class StatementParser:
 
         if not parsed_txns:
             raise ValueError("No transaction records could be extracted from the PDF statement.")
+
+        # Reconstruct Credit/Debit directions via running balances if balances exist and not already assigned by column split
+        if len(parsed_txns) > 1 and all("closing_balance" in t for t in parsed_txns):
+            for idx in range(len(parsed_txns)):
+                t = parsed_txns[idx]
+                if "type" in t:
+                    continue
+                amt = t["amount"]
+                bal = t["closing_balance"]
+
+                if idx > 0:
+                    prev_bal = parsed_txns[idx-1]["closing_balance"]
+                    diff = bal - prev_bal
+                    if abs(diff - amt) < 0.05:
+                        t["type"] = "CREDIT"
+                    elif abs(abs(diff) - amt) < 0.05:
+                        t["type"] = "DEBIT"
+                    else:
+                        t["type"] = "CREDIT" if any(w in t["narration"].upper() for w in ["CR", "CREDIT", "SALARY", "DEPOSIT", "REFUND", "INTEREST"]) else "DEBIT"
+                else:
+                    if opening_bal is not None:
+                        if abs((opening_bal + amt) - bal) < 0.05:
+                            t["type"] = "CREDIT"
+                        elif abs((opening_bal - amt) - bal) < 0.05:
+                            t["type"] = "DEBIT"
+                        else:
+                            t["type"] = "CREDIT" if any(w in t["narration"].upper() for w in ["CR", "CREDIT", "SALARY", "DEPOSIT", "REFUND", "INTEREST"]) else "DEBIT"
+                    else:
+                        t["type"] = "CREDIT" if any(w in t["narration"].upper() for w in ["CR", "CREDIT", "SALARY", "DEPOSIT", "REFUND", "INTEREST"]) else "DEBIT"
+        else:
+            for t in parsed_txns:
+                if "type" not in t:
+                    t["type"] = "CREDIT" if any(w in t["narration"].upper() for w in ["CR", "CREDIT", "SALARY", "DEPOSIT", "REFUND"]) else "DEBIT"
 
         standardized_rows = []
         for t in parsed_txns:
@@ -231,7 +355,7 @@ class StatementParser:
             "account_number": account_no,
             "account_type": account_type,
             "suggested_entity_type": suggested_entity,
-            "opening_balance": official_summary.get("opening_balance"),
+            "opening_balance": official_summary.get("opening_balance", opening_bal),
             "closing_balance": official_summary.get("closing_balance"),
             "official_summary": official_summary
         }
