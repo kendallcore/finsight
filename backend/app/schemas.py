@@ -51,6 +51,26 @@ class TaxSlabPrediction(BaseModel):
     probabilities: List[float]
 
 
+class LifestyleArchetypePrediction(BaseModel):
+    archetype_id: int
+    archetype_name: str
+    confidence: float
+    probabilities: List[float]
+    summary: str
+    key_traits: List[str]
+
+
+class LifestyleDiagnostics(BaseModel):
+    financial_health_score: int
+    health_grade: str
+    cash_runway_months: float
+    needs_ratio_percent: float
+    wants_ratio_percent: float
+    savings_ratio_percent: float
+    top_spend_leakages: List[str]
+    coaching_insights: List[str]
+
+
 class AssignedCluster(BaseModel):
     cluster_id: int
     persona_name: str
@@ -77,9 +97,11 @@ class TaxBreakdownSummary(BaseModel):
 class PredictionOutput(BaseModel):
     estimated_annual_income: float
     income_confidence_interval: List[float]
-    predicted_tax_slab: TaxSlabPrediction
-    tax_breakdown: TaxBreakdownSummary
+    lifestyle_archetype: LifestyleArchetypePrediction
+    lifestyle_diagnostics: LifestyleDiagnostics
     assigned_cluster: AssignedCluster
+    predicted_tax_slab: Optional[TaxSlabPrediction] = None
+    tax_breakdown: Optional[TaxBreakdownSummary] = None
 
 
 class UploadStatementResponse(BaseModel):
@@ -171,9 +193,15 @@ class PCAPointsResponse(BaseModel):
 class SampleProfileItem(BaseModel):
     profile_id: str
     title: str
+    subtitle: Optional[str] = None
     category: str
     description: str
     annual_income_approx: float
+    monthly_inflow: Optional[str] = None
+    discretionary_ratio: Optional[str] = None
+    savings_buffer: Optional[str] = None
+    primary_channel: Optional[str] = None
+    archetype_expected: Optional[str] = None
     tax_slab_expected: str
     persona_expected: str
     transaction_count: int

@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar } from './components/Navbar';
+import { Sidebar } from './components/Sidebar';
+import { TopHeader } from './components/TopHeader';
 import { DiagnosticView } from './components/DiagnosticView';
 import { SimulatorView } from './components/SimulatorView';
 import { EvaluationHub } from './components/EvaluationHub';
 import { VivaPresetsView } from './components/VivaPresetsView';
+import { ApiIntegrationsView } from './components/ApiIntegrationsView';
 import { api } from './services/api';
 import { UploadStatementResponse } from './types';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('diagnostic');
   const [analysisResult, setAnalysisResult] = useState<UploadStatementResponse | null>(null);
-  const [apiHealthy, setApiHealthy] = useState<boolean>(false);
+  const [, setApiHealthy] = useState<boolean>(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
 
   useEffect(() => {
     const checkApi = async () => {
@@ -32,28 +35,33 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0c0d0e] text-neutral-200">
-      <Navbar
+    <div className="flex h-screen w-screen overflow-hidden bg-[#0a0c10] text-neutral-200">
+      {/* Persistent Left Sidebar */}
+      <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        apiHealthy={apiHealthy}
+        isOpen={isSidebarOpen}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'diagnostic' && (
-          <DiagnosticView data={analysisResult} setData={setAnalysisResult} />
-        )}
-        {activeTab === 'simulator' && <SimulatorView />}
-        {activeTab === 'evaluation' && <EvaluationHub />}
-        {activeTab === 'viva' && <VivaPresetsView onSelectSample={handleSelectSample} />}
-      </main>
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+        <TopHeader onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
 
-      <footer className="border-t border-neutral-900 bg-[#0f1012] py-6 text-center text-xs font-mono text-neutral-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>FinSight — Introduction to Machine Learning (PBL Mini-Project)</span>
-          <span>Section 115BAC (FY 2025–26) • 16D Feature Vector • Random Forest & GBR</span>
-        </div>
-      </footer>
+        <main className="flex-1 overflow-y-auto px-6 py-6 scrollbar-thin scrollbar-thumb-neutral-800">
+          {activeTab === 'diagnostic' && (
+            <DiagnosticView data={analysisResult} setData={setAnalysisResult} />
+          )}
+          {activeTab === 'simulator' && <SimulatorView />}
+          {activeTab === 'evaluation' && <EvaluationHub />}
+          {activeTab === 'viva' && (
+            <VivaPresetsView
+              onSelectSample={handleSelectSample}
+              onGoToSimulator={() => setActiveTab('simulator')}
+            />
+          )}
+          {activeTab === 'api' && <ApiIntegrationsView />}
+        </main>
+      </div>
     </div>
   );
 };

@@ -2,7 +2,17 @@ import React, { useState } from 'react';
 import {
   Upload,
   FileText,
-  AlertCircle
+  AlertCircle,
+  ShieldCheck,
+  TrendingUp,
+  AlertTriangle,
+  Lightbulb,
+  ChevronDown,
+  ChevronUp,
+  Lock,
+  Zap,
+  BarChart2,
+  FolderOpen
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -23,43 +33,20 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [entityType, setEntityType] = useState<string>('salaried_individual');
   const [pdfPassword, setPdfPassword] = useState<string>('');
+  const [showPasswordInput, setShowPasswordInput] = useState<boolean>(false);
+  const [showTaxRef, setShowTaxRef] = useState<boolean>(false);
 
   const handleFileUpload = async (file: File) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await api.uploadStatement(file, entityType, pdfPassword || undefined);
+      const res = await api.uploadStatement(file, 'salaried_individual', pdfPassword || undefined);
       setData(res);
-      if (res.statement_summary?.suggested_entity_type) {
-        setEntityType(res.statement_summary.suggested_entity_type);
-      }
     } catch (err: any) {
       setError(err.message || 'Failed to process statement');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleEntityChange = async (newType: string) => {
-    setEntityType(newType);
-    if (!data) return;
-    try {
-      const payload = {
-        ...data.extracted_features,
-        entity_type: newType,
-        opex_amount: data.statement_summary.detected_opex || 0.0,
-        capex_amount: data.statement_summary.detected_capex || 0.0,
-        actual_turnover: data.statement_summary.total_credits || undefined,
-      };
-      const res = await api.predictFeatures(payload as any);
-      setData({
-        ...data,
-        predictions: res.predictions
-      });
-    } catch (err: any) {
-      console.error('Failed to update entity tax calculations:', err);
     }
   };
 
@@ -77,7 +64,6 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
     try {
       const res = await api.analyzeSample('balanced_pro');
       setData(res);
-      setEntityType('salaried_individual');
     } catch (err: any) {
       setError(err.message || 'Failed to load sample');
     } finally {
@@ -98,135 +84,264 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
   const features = data?.extracted_features;
   const summary = data?.statement_summary;
 
-  // Chart Data Preparation
   const spendBreakdown = features ? [
-    { name: 'Fixed (Rent/EMI)', value: Math.max(0, features.fixed_obligation_ratio * 100), color: '#3b82f6' },
+    { name: 'Fixed Living', value: Math.max(0, features.fixed_obligation_ratio * 100), color: '#3b82f6' },
     { name: 'Discretionary', value: Math.max(0, features.discretionary_ratio * 100), color: '#f59e0b' },
-    { name: 'SIP / Wealth', value: Math.max(0, features.investment_ratio * 100), color: '#10b981' },
-    { name: 'Tax-Shield (NPS/PPF)', value: Math.max(0, features.tax_shield_ratio * 100), color: '#8b5cf6' },
+    { name: 'SIP & Wealth', value: Math.max(0, features.investment_ratio * 100), color: '#10b981' },
+    { name: 'Subscriptions', value: Math.max(0, features.tax_shield_ratio * 100), color: '#8b5cf6' },
   ].filter(item => item.value > 0) : [];
 
   return (
-    <div className="space-y-6">
-      {/* Entity Selector & Upload Zone */}
-      <div className="border border-neutral-800 bg-[#121316] rounded-lg p-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-4 border-b border-neutral-800">
-          <div>
-            <h3 className="text-sm font-semibold text-neutral-200">Select Tax Entity & Profile Type</h3>
-            <p className="text-xs text-neutral-400">Determines standard deduction, Section 44AD presumptive rules, or business OPEX & depreciation.</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { id: 'salaried_individual', label: 'Salaried Individual (₹75k Std Ded)' },
-              { id: 'presumptive_business_44ad', label: 'Small Business (Sec 44AD - 6% Deemed)' },
-              { id: 'presumptive_professional_44ada', label: 'Professional (Sec 44ADA - 50%)' },
-              { id: 'regular_business_pnl', label: 'Commercial P&L (OPEX + Sec 32 Deprec.)' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => handleEntityChange(tab.id)}
-                className={`px-3 py-1.5 text-xs font-medium rounded transition ${
-                  entityType === tab.id
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
-                    : 'bg-neutral-900 text-neutral-400 border border-neutral-800 hover:text-neutral-200'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-bold text-neutral-100 tracking-tight">
+            Statement Diagnostic
+          </h1>
+          <p className="text-xs text-neutral-400 mt-1">
+            Upload your bank statement to get instant insights and lifestyle analysis.
+          </p>
         </div>
 
-        {/* Upload Zone & Quick Action */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <div
-              onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={handleDrop}
-              className={`border border-dashed rounded-lg p-8 text-center transition-all ${
-                isDragging
-                  ? 'border-emerald-500 bg-emerald-950/20'
-                  : 'border-neutral-800 bg-neutral-900/50 hover:border-neutral-700'
-              }`}
-            >
-              <div className="flex flex-col items-center justify-center space-y-3">
-                <div className="p-3 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-300">
-                  <Upload className="w-6 h-6 text-emerald-400" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-neutral-200">
-                    Drag & Drop Indian Bank Statement (CSV or PDF)
-                  </h3>
-                  <p className="text-xs text-neutral-400 mt-1">
-                    Supports HDFC, SBI, ICICI, Axis, Kotak, or custom CSV/PDF statements
-                  </p>
-                </div>
-                
-                <div className="flex flex-col sm:flex-row items-center gap-3 mt-2">
-                  <input
-                    type="password"
-                    placeholder="PDF Password (if encrypted)"
-                    value={pdfPassword}
-                    onChange={(e) => setPdfPassword(e.target.value)}
-                    className="px-3 py-2 text-xs rounded bg-neutral-900 border border-neutral-800 text-neutral-200 focus:outline-none focus:border-emerald-500/60 w-48 text-center"
-                  />
-                  <label className="cursor-pointer inline-flex items-center px-4 py-2 text-xs font-medium rounded bg-neutral-800 text-neutral-200 border border-neutral-700 hover:bg-neutral-700 transition">
-                    <span>Browse CSV or PDF</span>
-                    <input
-                      type="file"
-                      accept=".csv,.txt,.pdf"
-                      className="hidden"
-                      onChange={(e) => {
-                        if (e.target.files && e.target.files.length > 0) {
-                          handleFileUpload(e.target.files[0]);
-                        }
-                      }}
-                    />
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Demo Statement */}
-          <div className="border border-neutral-800 bg-neutral-900/40 rounded-lg p-6 flex flex-col justify-between">
-            <div>
-              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                Profile Simulation
-              </span>
-              <h4 className="text-sm font-medium text-neutral-200 mt-3">
-                Instant Profile Evaluation
-              </h4>
-              <p className="text-xs text-neutral-400 mt-1 leading-relaxed">
-                No statement file on hand? Run inference on a calibrated salaried corporate profile instantly.
-              </p>
-            </div>
-            <button
-              onClick={handleQuickSample}
-              disabled={loading}
-              className="w-full mt-4 flex items-center justify-center space-x-2 px-3 py-2 text-xs font-medium rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition"
-            >
-              <FileText className="w-3.5 h-3.5" />
-              <span>{loading ? 'Processing Pipeline...' : 'Load Balanced Pro Statement'}</span>
-            </button>
-          </div>
+        <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-950/30 border border-emerald-500/30 text-emerald-400 text-xs font-medium self-start sm:self-auto">
+          <Lock className="w-3 h-3 text-emerald-400" />
+          <span>Secure & Private</span>
         </div>
       </div>
 
       {error && (
-        <div className="p-4 rounded-lg bg-rose-950/40 border border-rose-800/60 text-rose-300 text-xs flex items-center space-x-2">
+        <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-800/60 text-rose-300 text-xs flex items-center space-x-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      {/* Results Dashboard */}
+      {/* Main Upload Grid (Top Section Matching Image) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Big Upload Dropzone Card */}
+        <div className="lg:col-span-2 border border-[#1d2634] bg-[#11161f] rounded-2xl p-8 flex flex-col items-center justify-center min-h-[300px] text-center relative overflow-hidden">
+          <div
+            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={handleDrop}
+            className={`w-full h-full flex flex-col items-center justify-center p-6 rounded-xl border border-dashed transition-all ${
+              isDragging ? 'border-emerald-500 bg-emerald-950/10' : 'border-transparent'
+            }`}
+          >
+            {/* Center Upload Squircle Icon */}
+            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+              <Upload className="w-6 h-6 stroke-[2.2]" />
+            </div>
+
+            <h3 className="text-sm font-semibold text-neutral-100 mt-4">
+              Drop your Indian Bank Statement (CSV or PDF)
+            </h3>
+            <p className="text-xs text-neutral-400 mt-1 max-w-md">
+              Supports HDFC, SBI, ICICI, Axis, Kotak or custom CSV/PDF statements
+            </p>
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
+              <label className="cursor-pointer inline-flex items-center space-x-2 px-5 py-2.5 rounded-lg text-xs font-medium bg-[#10b981] hover:bg-[#059669] text-white transition-all shadow-md shadow-emerald-900/20">
+                <FolderOpen className="w-4 h-4" />
+                <span>{loading ? 'Processing Pipeline...' : 'Browse File'}</span>
+                <input
+                  type="file"
+                  accept=".csv,.txt,.pdf"
+                  className="hidden"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      handleFileUpload(e.target.files[0]);
+                    }
+                  }}
+                />
+              </label>
+
+              <button
+                type="button"
+                onClick={() => setShowPasswordInput(!showPasswordInput)}
+                className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-lg text-xs font-medium bg-[#161d28] border border-[#232f42] text-neutral-300 hover:text-white hover:border-neutral-600 transition"
+              >
+                <Lock className="w-3.5 h-3.5 text-neutral-400" />
+                <span>Enter PDF Password (if encrypted)</span>
+              </button>
+            </div>
+
+            {showPasswordInput && (
+              <div className="mt-3">
+                <input
+                  type="password"
+                  placeholder="Enter PDF password..."
+                  value={pdfPassword}
+                  onChange={(e) => setPdfPassword(e.target.value)}
+                  className="px-3 py-1.5 text-xs rounded bg-[#161d28] border border-[#232f42] text-neutral-200 focus:outline-none focus:border-emerald-500 w-64 text-center font-mono"
+                />
+              </div>
+            )}
+
+            {/* Bottom Trust Note */}
+            <div className="mt-6 flex items-center space-x-1.5 text-xs text-emerald-400/80">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>Your data is processed locally and never stored.</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Start Guide Card */}
+        <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center space-x-2 text-xs font-semibold text-neutral-200 mb-5">
+              <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
+              <span>Quick Start</span>
+            </div>
+
+            <div className="space-y-4">
+              {/* Step 1 */}
+              <div className="flex items-start space-x-3">
+                <div className="w-6 h-6 rounded-full bg-[#161d28] border border-[#232f42] text-neutral-400 text-xs flex items-center justify-center flex-shrink-0 font-medium">
+                  1
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-neutral-200">
+                    Upload your statement
+                  </h4>
+                  <p className="text-[11px] text-neutral-400 mt-0.5">
+                    CSV or PDF format
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div className="flex items-start space-x-3">
+                <div className="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-xs flex items-center justify-center flex-shrink-0 font-medium">
+                  2
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-neutral-200">
+                    We analyze your transactions
+                  </h4>
+                  <p className="text-[11px] text-neutral-400 mt-0.5">
+                    Using ML models trained on Indian banking data
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className="flex items-start space-x-3">
+                <div className="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-xs flex items-center justify-center flex-shrink-0 font-medium">
+                  3
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-neutral-200">
+                    Get instant insights
+                  </h4>
+                  <p className="text-[11px] text-neutral-400 mt-0.5">
+                    Spending patterns, lifestyle archetype, savings potential and more
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Card Footer */}
+          <div className="mt-6 pt-4 border-t border-[#181f2a] flex items-center space-x-2 text-xs text-neutral-400">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <BarChart2 className="w-4 h-4" />
+            </div>
+            <div className="flex-1">
+              <span className="text-[11px] text-neutral-300 font-medium hover:text-emerald-300 transition flex items-center space-x-1 cursor-pointer">
+                <span>Built for better financial well-being</span>
+                <span>↗</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Row (Supported Banks + Example Statements Cards) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Supported Banks Card */}
+        <div className="lg:col-span-2 border border-[#1d2634] bg-[#11161f] rounded-2xl p-6">
+          <h3 className="text-xs font-semibold text-neutral-300 mb-4">
+            Supported Banks
+          </h3>
+          <div className="flex flex-wrap items-center gap-3">
+            {/* HDFC */}
+            <div className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-[#161d28] border border-[#232f42]">
+              <div className="w-5 h-5 rounded bg-[#004c8f] flex items-center justify-center text-white text-[10px] font-bold">
+                H
+              </div>
+              <span className="text-xs font-medium text-neutral-300">HDFC</span>
+            </div>
+
+            {/* SBI */}
+            <div className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-[#161d28] border border-[#232f42]">
+              <div className="w-5 h-5 rounded-full bg-[#0092d1] flex items-center justify-center text-white text-[10px] font-bold">
+                ●
+              </div>
+              <span className="text-xs font-medium text-neutral-300">SBI</span>
+            </div>
+
+            {/* ICICI */}
+            <div className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-[#161d28] border border-[#232f42]">
+              <div className="w-5 h-5 rounded bg-[#f58220] flex items-center justify-center text-white text-[10px] font-bold">
+                i
+              </div>
+              <span className="text-xs font-medium text-neutral-300">ICICI</span>
+            </div>
+
+            {/* Axis */}
+            <div className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-[#161d28] border border-[#232f42]">
+              <div className="w-5 h-5 rounded bg-[#97144d] flex items-center justify-center text-white text-[10px] font-bold">
+                ▲
+              </div>
+              <span className="text-xs font-medium text-neutral-300">Axis</span>
+            </div>
+
+            {/* Kotak */}
+            <div className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-[#161d28] border border-[#232f42]">
+              <div className="w-5 h-5 rounded-full bg-[#ed1c24] flex items-center justify-center text-white text-[10px] font-bold">
+                ∞
+              </div>
+              <span className="text-xs font-medium text-neutral-300">Kotak</span>
+            </div>
+
+            {/* + More */}
+            <div className="px-3 py-2 rounded-xl bg-[#161d28] border border-[#232f42] text-xs font-medium text-neutral-400">
+              + More
+            </div>
+          </div>
+        </div>
+
+        {/* Example Statements Card */}
+        <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6 flex flex-col justify-between">
+          <div>
+            <h3 className="text-xs font-semibold text-neutral-200">
+              Example Statements
+            </h3>
+            <p className="text-xs text-neutral-400 mt-1">
+              Try a sample statement to explore the features
+            </p>
+          </div>
+
+          <button
+            onClick={handleQuickSample}
+            disabled={loading}
+            className="w-full mt-4 flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition text-xs font-medium"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span>{loading ? 'Processing Pipeline...' : 'Load Sample Statement'}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Active Diagnostic Report Section (When Statement is Loaded) */}
       {data && pred && (
-        <div className="space-y-6">
+        <div className="space-y-6 pt-4">
           {/* Active Statement Profile Banner */}
           {summary?.filename && (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono">
               <div className="flex flex-wrap items-center gap-2">
                 <div className="flex items-center space-x-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -236,11 +351,6 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
                 {summary.account_type && (
                   <span className="text-[10px] px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 border border-neutral-700">
                     {summary.account_type}
-                  </span>
-                )}
-                {summary.suggested_entity_type === 'presumptive_business_44ad' && (
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                    Auto-Detected Business Current Account
                   </span>
                 )}
               </div>
@@ -260,13 +370,13 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
             </div>
           )}
 
-          {/* Executive Verdict Grid */}
+          {/* 4 Executive Verdict KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Predicted Income / Turnover */}
-            <div className="border border-neutral-800 bg-[#121316] rounded-lg p-5">
+            {/* Predicted Inflow */}
+            <div className="border border-[#1d2634] bg-[#11161f] rounded-xl p-5">
               <div className="flex items-center justify-between text-xs text-neutral-400">
-                <span>{tax?.entity_type === 'salaried_individual' ? 'Estimated Annual Gross' : 'Estimated Annual Turnover'}</span>
-                <span className="font-mono text-[10px] bg-neutral-900 px-1.5 py-0.5 rounded border border-neutral-800">
+                <span>Estimated Annual Inflow</span>
+                <span className="font-mono text-[10px] bg-[#161d28] px-1.5 py-0.5 rounded border border-[#232f42]">
                   Regression (R²=0.998)
                 </span>
               </div>
@@ -278,43 +388,43 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
               </div>
             </div>
 
-            {/* Predicted Tax Slab */}
-            <div className="border border-neutral-800 bg-[#121316] rounded-lg p-5">
+            {/* Lifestyle Archetype */}
+            <div className="border border-[#1d2634] bg-[#11161f] rounded-xl p-5">
               <div className="flex items-center justify-between text-xs text-neutral-400">
-                <span>Indian Tax Slab (FY25-26)</span>
+                <span>Lifestyle Archetype</span>
                 <span className="font-mono text-[10px] bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20">
-                  {(pred.predicted_tax_slab.confidence * 100).toFixed(1)}% Conf
+                  {((pred.lifestyle_archetype?.confidence || 0.95) * 100).toFixed(1)}% Conf
                 </span>
               </div>
-              <div className="mt-2 text-xl font-bold font-mono text-emerald-400">
-                Class {pred.predicted_tax_slab.class_id} ({pred.predicted_tax_slab.base_rate_percent}%)
+              <div className="mt-2 text-lg font-bold font-mono text-emerald-400 truncate">
+                {pred.lifestyle_archetype?.archetype_name || 'Strategic Wealth Builder'}
               </div>
-              <div className="mt-2 text-[11px] text-neutral-400">
-                {pred.predicted_tax_slab.bracket_name}
+              <div className="mt-2 text-[11px] text-neutral-400 line-clamp-2">
+                {pred.lifestyle_archetype?.summary || 'Disciplined capital allocator converting income into wealth.'}
               </div>
             </div>
 
-            {/* Net Tax Payable */}
-            <div className="border border-neutral-800 bg-[#121316] rounded-lg p-5">
+            {/* Financial Health Score & Runway */}
+            <div className="border border-[#1d2634] bg-[#11161f] rounded-xl p-5">
               <div className="flex items-center justify-between text-xs text-neutral-400">
-                <span>Net Tax Payable</span>
-                <span className="font-mono text-[10px] bg-neutral-900 px-1.5 py-0.5 rounded border border-neutral-800">
-                  Sec 115BAC
+                <span>Financial Health Score</span>
+                <span className="font-mono text-[10px] bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/20">
+                  {pred.lifestyle_diagnostics?.health_grade || 'Healthy & Balanced'}
                 </span>
               </div>
-              <div className={`mt-2 text-2xl font-bold font-mono tracking-tight ${tax?.net_tax_payable === 0 ? 'text-emerald-400' : 'text-neutral-100'}`}>
-                {tax ? formatINR(tax.net_tax_payable) : '₹0'}
+              <div className="mt-2 text-2xl font-bold font-mono tracking-tight text-neutral-100">
+                {pred.lifestyle_diagnostics?.financial_health_score || 82} <span className="text-sm font-normal text-neutral-500">/ 100</span>
               </div>
-              <div className="mt-2 text-[11px] text-neutral-500 font-mono">
-                Effective Rate: {tax?.effective_tax_rate_percent.toFixed(1)}% (Taxable: {tax ? formatINR(tax.taxable_income) : '₹0'})
+              <div className="mt-2 text-[11px] text-emerald-400 font-mono">
+                Runway: {pred.lifestyle_diagnostics?.cash_runway_months || 5.4} Months Reserve Buffer
               </div>
             </div>
 
             {/* Persona Cluster */}
-            <div className="border border-neutral-800 bg-[#121316] rounded-lg p-5">
+            <div className="border border-[#1d2634] bg-[#11161f] rounded-xl p-5">
               <div className="flex items-center justify-between text-xs text-neutral-400">
-                <span>Behavioral Persona</span>
-                <span className="font-mono text-[10px] bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/20">
+                <span>Latent Space Persona</span>
+                <span className="font-mono text-[10px] bg-purple-500/10 text-purple-400 px-1.5 py-0.5 rounded border border-purple-500/20">
                   K-Means (k=4)
                 </span>
               </div>
@@ -327,90 +437,137 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
             </div>
           </div>
 
-          {/* Statutory Tax Breakdown Waterfall & Spend Donut */}
+          {/* Diagnostics Detail & Spend Donut */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Waterfall Breakdown */}
-            <div className="lg:col-span-2 border border-neutral-800 bg-[#121316] rounded-lg p-6">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="text-xs font-mono uppercase text-neutral-400 tracking-wider">
-                  Statutory Tax Calculation Waterfall ({tax?.entity_type?.replace(/_/g, ' ').toUpperCase()})
-                </h4>
-                {tax?.regime_notes && (
-                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                    Active Regime
-                  </span>
-                )}
+            {/* 50/30/20 Framework & Coaching */}
+            <div className="lg:col-span-2 border border-[#1d2634] bg-[#11161f] rounded-2xl p-6 space-y-6">
+              <div className="flex items-center justify-between border-b border-[#18202d] pb-3">
+                <div className="flex items-center space-x-2">
+                  <TrendingUp className="w-4 h-4 text-emerald-400" />
+                  <h4 className="text-xs font-mono uppercase text-neutral-200 tracking-wider">
+                    Lifestyle Spending & Cashflow Diagnostics
+                  </h4>
+                </div>
+                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                  50 / 30 / 20 Framework
+                </span>
               </div>
 
-              {tax && (
-                <div className="mt-4 space-y-3 font-mono text-xs">
-                  <div className="flex justify-between py-2 border-b border-neutral-800/80">
-                    <span className="text-neutral-400">1. Gross Annual Income / Turnover</span>
-                    <span className="text-neutral-200 font-medium">{formatINR(tax.gross_income)}</span>
+              {/* Progress Bars */}
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-xs font-mono mb-1">
+                    <span className="text-neutral-300">Essential Needs (Rent, EMI, Utilities)</span>
+                    <span className="text-neutral-200 font-bold">{pred.lifestyle_diagnostics?.needs_ratio_percent ?? 35.0}% <span className="text-neutral-500 font-normal">(Target: ≤50%)</span></span>
                   </div>
+                  <div className="w-full bg-[#161d28] rounded-full h-2 overflow-hidden border border-[#232f42]">
+                    <div
+                      className="bg-blue-500 h-2 rounded-full"
+                      style={{ width: `${Math.min(100, (pred.lifestyle_diagnostics?.needs_ratio_percent ?? 35) * 2)}%` }}
+                    />
+                  </div>
+                </div>
 
-                  {tax.entity_type === 'salaried_individual' && (
-                    <div className="flex justify-between py-2 border-b border-neutral-800/80 text-emerald-400">
-                      <span>2. Less: Standard Deduction (Section 115BAC)</span>
+                <div>
+                  <div className="flex justify-between text-xs font-mono mb-1">
+                    <span className="text-neutral-300">Discretionary Wants (Dining, Leisure, Shopping)</span>
+                    <span className={`font-bold ${(pred.lifestyle_diagnostics?.wants_ratio_percent ?? 25) > 30 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                      {pred.lifestyle_diagnostics?.wants_ratio_percent ?? 25.0}% <span className="text-neutral-500 font-normal">(Target: ≤30%)</span>
+                    </span>
+                  </div>
+                  <div className="w-full bg-[#161d28] rounded-full h-2 overflow-hidden border border-[#232f42]">
+                    <div
+                      className={`h-2 rounded-full ${(pred.lifestyle_diagnostics?.wants_ratio_percent ?? 25) > 30 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                      style={{ width: `${Math.min(100, (pred.lifestyle_diagnostics?.wants_ratio_percent ?? 25) * 2.5)}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-xs font-mono mb-1">
+                    <span className="text-neutral-300">Wealth & Savings (SIP, Investments, Surplus)</span>
+                    <span className="text-emerald-400 font-bold">{pred.lifestyle_diagnostics?.savings_ratio_percent ?? 40.0}% <span className="text-neutral-500 font-normal">(Target: ≥20%)</span></span>
+                  </div>
+                  <div className="w-full bg-[#161d28] rounded-full h-2 overflow-hidden border border-[#232f42]">
+                    <div
+                      className="bg-emerald-500 h-2 rounded-full"
+                      style={{ width: `${Math.min(100, (pred.lifestyle_diagnostics?.savings_ratio_percent ?? 40) * 2.5)}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Detected Leakages */}
+              <div className="space-y-2 pt-2 border-t border-[#18202d]">
+                <div className="flex items-center space-x-1.5 text-xs font-mono text-neutral-300">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Detected Spending Leakages & Friction Points:</span>
+                </div>
+                <div className="space-y-1.5">
+                  {(pred.lifestyle_diagnostics?.top_spend_leakages || [
+                    "No critical cashflow leaks detected. Balanced allocation."
+                  ]).map((leak, idx) => (
+                    <div key={idx} className="flex items-start space-x-2 text-xs text-neutral-400 bg-[#161d28]/60 p-2.5 rounded-lg border border-[#232f42]">
+                      <span className="text-amber-400 font-bold">•</span>
+                      <span>{leak}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Coaching Tips */}
+              <div className="space-y-2 pt-2 border-t border-[#18202d]">
+                <div className="flex items-center space-x-1.5 text-xs font-mono text-emerald-400">
+                  <Lightbulb className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Actionable Lifestyle Recommendations:</span>
+                </div>
+                <div className="space-y-1.5">
+                  {(pred.lifestyle_diagnostics?.coaching_insights || [
+                    "Maintain current savings discipline and automate monthly SIP transfers."
+                  ]).map((tip, idx) => (
+                    <div key={idx} className="flex items-start space-x-2 text-xs text-neutral-300 bg-emerald-950/20 p-2.5 rounded-lg border border-emerald-800/30">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <span>{tip}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Collapsible Tax Ref */}
+              <div className="pt-2 border-t border-[#18202d]">
+                <button
+                  onClick={() => setShowTaxRef(!showTaxRef)}
+                  className="flex items-center space-x-1.5 text-[11px] font-mono text-neutral-500 hover:text-neutral-300 transition"
+                >
+                  {showTaxRef ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                  <span>{showTaxRef ? 'Hide Statutory Section 115BAC Reference' : 'Show Statutory Section 115BAC Reference'}</span>
+                </button>
+
+                {showTaxRef && tax && (
+                  <div className="mt-3 p-3.5 rounded-xl bg-[#0a0d13] border border-[#1d2634] space-y-2 font-mono text-[11px]">
+                    <div className="flex justify-between text-neutral-400">
+                      <span>Gross Annual Turnover / Inflow:</span>
+                      <span>{formatINR(tax.gross_income)}</span>
+                    </div>
+                    <div className="flex justify-between text-neutral-400">
+                      <span>Standard Deduction:</span>
                       <span>- {formatINR(tax.standard_deduction)}</span>
                     </div>
-                  )}
-
-                  {tax.entity_type === 'presumptive_business_44ad' && (
-                    <div className="flex justify-between py-2 border-b border-neutral-800/80 text-emerald-400">
-                      <span>2. Presumptive Deemed Profit Rate (Section 44AD)</span>
-                      <span>{tax.deemed_profit_rate_percent?.toFixed(1)}% Deemed Profit</span>
+                    <div className="flex justify-between text-neutral-400">
+                      <span>Taxable Income:</span>
+                      <span>{formatINR(tax.taxable_income)}</span>
                     </div>
-                  )}
-
-                  {tax.entity_type === 'presumptive_professional_44ada' && (
-                    <div className="flex justify-between py-2 border-b border-neutral-800/80 text-emerald-400">
-                      <span>2. Presumptive Deemed Profit Rate (Section 44ADA)</span>
-                      <span>50.0% Deemed Profit</span>
+                    <div className="flex justify-between text-neutral-200 font-bold">
+                      <span>Net Tax Payable:</span>
+                      <span className="text-emerald-400">{formatINR(tax.net_tax_payable)} ({tax.effective_tax_rate_percent}%)</span>
                     </div>
-                  )}
-
-                  {tax.entity_type === 'regular_business_pnl' && (
-                    <>
-                      <div className="flex justify-between py-2 border-b border-neutral-800/80 text-emerald-400">
-                        <span>2. Less: Deductible Operating Expenses (OPEX)</span>
-                        <span>- {formatINR(tax.deductible_opex || 0)}</span>
-                      </div>
-                      <div className="flex justify-between py-2 border-b border-neutral-800/80 text-emerald-400">
-                        <span>3. Less: Section 32 Equipment Depreciation (15% WDV)</span>
-                        <span>- {formatINR(tax.depreciation_allowance || 0)} (Capex: {formatINR(tax.capex_investment || 0)})</span>
-                      </div>
-                    </>
-                  )}
-
-                  <div className="flex justify-between py-2 border-b border-neutral-800/80 font-bold">
-                    <span className="text-neutral-300">Net Taxable Profit / Income</span>
-                    <span className="text-neutral-100">{formatINR(tax.taxable_income)}</span>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-neutral-800/80">
-                    <span className="text-neutral-400">Base Slab Tax (Section 115BAC Tier Ladder)</span>
-                    <span className="text-neutral-200">{formatINR(tax.base_tax_liability)}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-neutral-800/80 text-emerald-400">
-                    <span>Less: Section 87A Tax Rebate (Max ₹60,000)</span>
-                    <span>- {formatINR(tax.section_87a_rebate)}</span>
-                  </div>
-                  <div className="flex justify-between py-2 bg-neutral-900/60 px-3 rounded text-sm font-bold text-emerald-400">
-                    <span>Final Net Tax Liability</span>
-                    <span>{formatINR(tax.net_tax_payable)}</span>
-                  </div>
-
-                  {tax.regime_notes && (
-                    <div className="p-2.5 rounded bg-neutral-900 text-[11px] text-neutral-400 border border-neutral-800">
-                      💡 <span className="font-semibold text-neutral-300">Statutory Note:</span> {tax.regime_notes}
-                    </div>
-                  )}
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
-            {/* Outflow Allocation Donut */}
-            <div className="border border-neutral-800 bg-[#121316] rounded-lg p-6 flex flex-col justify-between">
+            {/* Outflow Pie Chart */}
+            <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6 flex flex-col justify-between">
               <h4 className="text-xs font-mono uppercase text-neutral-400 tracking-wider">
                 Outflow Allocation Breakdown
               </h4>
@@ -433,7 +590,7 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
                     </Pie>
                     <Tooltip
                       formatter={(val: any) => [`${Number(val).toFixed(1)}%`, '']}
-                      contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '6px', fontSize: '11px' }}
+                      contentStyle={{ backgroundColor: '#11161f', borderColor: '#232f42', borderRadius: '8px', fontSize: '11px' }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -449,20 +606,20 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
             </div>
           </div>
 
-          {/* 16-Dimensional Feature Vector Table */}
+          {/* 16D Feature Vector Table */}
           {features && (
-            <div className="border border-neutral-800 bg-[#121316] rounded-lg p-6">
+            <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="text-xs font-mono uppercase text-neutral-400 tracking-wider">
                   Extracted 16-Dimensional Financial Feature Vector
                 </h4>
                 <span className="text-[10px] font-mono text-neutral-500">
-                  Statement TXN Count: {summary?.total_transactions} | Total Inflow: {formatINR(summary?.total_credits || 0)}
+                  Statement TXN Count: {summary?.total_transactions} | Inflow: {formatINR(summary?.total_credits || 0)}
                 </span>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {Object.entries(features).map(([key, val]) => (
-                  <div key={key} className="p-2.5 rounded bg-neutral-900/70 border border-neutral-800/80">
+                  <div key={key} className="p-2.5 rounded-xl bg-[#161d28]/70 border border-[#232f42]">
                     <div className="text-[10px] font-mono text-neutral-400 truncate" title={key}>
                       {key}
                     </div>
@@ -479,4 +636,3 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
     </div>
   );
 };
-

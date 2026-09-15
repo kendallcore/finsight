@@ -11,7 +11,38 @@ from typing import Dict, List, Any, Tuple, Optional
 from pathlib import Path
 
 from app.config import settings
-from app.schemas import PredictionOutput, TaxSlabPrediction, AssignedCluster, TaxBreakdownSummary
+from app.schemas import (
+    PredictionOutput,
+    TaxSlabPrediction,
+    AssignedCluster,
+    TaxBreakdownSummary,
+    LifestyleArchetypePrediction,
+    LifestyleDiagnostics
+)
+
+
+LIFESTYLE_ARCHETYPES = {
+    0: {
+        "name": "Frugal Minimalist",
+        "summary": "Prioritizes high savings and minimal overhead over discretionary consumer spending.",
+        "traits": ["High net savings ratio", "Low digital impulse purchases", "Essentials-first cashflow allocation"]
+    },
+    1: {
+        "name": "Experiential Spender",
+        "summary": "High allocation to dining, leisure, and lifestyle experiences with an active digital transaction footprint.",
+        "traits": ["High discretionary dining/travel spend", "High UPI micro-transaction velocity", "Moderate savings cushion"]
+    },
+    2: {
+        "name": "High-Burn Consumer",
+        "summary": "High lifestyle burn rate with thin emergency reserves and vulnerability to subscription/impulse leaks.",
+        "traits": ["Discretionary spending above 35%", "Emergency runway under 2 months", "Paycheck-to-paycheck cashflow pressure"]
+    },
+    3: {
+        "name": "Strategic Wealth Builder",
+        "summary": "Disciplined capital allocator systematically converting recurring income into compounding investments.",
+        "traits": ["High SIP and investment allocation", "Balanced living obligations", "Robust emergency cash runway"]
+    }
+}
 
 
 TAX_SLAB_DEFINITIONS = [
@@ -174,6 +205,118 @@ class MLService:
             regime_notes=regime_notes
         )
 
+    def evaluate_lifestyle_diagnostics(
+        self,
+        features_dict: Dict[str, float]
+    ) -> Tuple[LifestyleArchetypePrediction, LifestyleDiagnostics]:
+        """Calculates lifestyle spending archetype and behavioral financial diagnostics."""
+        savings_ratio = float(features_dict.get("net_savings_ratio", 0.25))
+        discretionary_ratio = float(features_dict.get("discretionary_ratio", 0.25))
+        fixed_ratio = float(features_dict.get("fixed_obligation_ratio", 0.35))
+        investment_ratio = float(features_dict.get("investment_ratio", 0.15))
+        upi_velocity = float(features_dict.get("upi_velocity_index", 0.50))
+        burn_rate = float(features_dict.get("monthly_burn_rate", 0.75))
+        micro_density = float(features_dict.get("micro_spend_density", 0.08))
+
+        # Softmax scoring across 4 archetypes based on financial behavioral vectors
+        # 0: Frugal Minimalist, 1: Experiential Spender, 2: High-Burn Consumer, 3: Strategic Wealth Builder
+        excess_burn = max(0.0, burn_rate - 0.80)
+        excess_disc = max(0.0, discretionary_ratio - 0.28)
+        low_savings = max(0.0, 0.18 - savings_ratio)
+        low_disc = max(0.0, 0.20 - discretionary_ratio)
+
+        s0 = (savings_ratio * 5.0) + (low_disc * 6.0) - (upi_velocity * 2.0) - (excess_disc * 5.0)
+        s1 = (discretionary_ratio * 5.0) + (upi_velocity * 2.5) + (micro_density * 2.0) - (investment_ratio * 2.5) - (excess_burn * 5.0)
+        s2 = (excess_burn * 12.0) + (low_savings * 10.0) + (excess_disc * 4.0) + (micro_density * 2.0) - (investment_ratio * 3.0)
+        s3 = (investment_ratio * 8.0) + (savings_ratio * 4.0) - (excess_disc * 3.0) - (excess_burn * 5.0)
+
+        raw_scores = np.array([s0, s1, s2, s3], dtype=np.float64)
+        exp_scores = np.exp(raw_scores - np.max(raw_scores))
+        probs = (exp_scores / np.sum(exp_scores)).tolist()
+        best_id = int(np.argmax(probs))
+        arch_info = LIFESTYLE_ARCHETYPES[best_id]
+
+        archetype_pred = LifestyleArchetypePrediction(
+            archetype_id=best_id,
+            archetype_name=arch_info["name"],
+            confidence=round(float(probs[best_id]), 4),
+            probabilities=[round(float(p), 4) for p in probs],
+            summary=arch_info["summary"],
+            key_traits=arch_info["traits"]
+        )
+
+        # 50 / 30 / 20 Rule Breakdown
+        needs_pct = round(fixed_ratio * 100, 1)
+        wants_pct = round(discretionary_ratio * 100, 1)
+        savings_pct = round(max(0.0, (savings_ratio + investment_ratio) * 100), 1)
+
+        # Cash Runway (in months)
+        if burn_rate > 0.05 and savings_ratio > 0:
+            runway_months = round(max(0.5, (savings_ratio / burn_rate) * 12.0), 1)
+        else:
+            runway_months = round(max(0.2, savings_ratio * 6.0), 1)
+
+        # Financial Health Score (0-100)
+        score = 50
+        score += int(savings_ratio * 50)
+        score += int(investment_ratio * 40)
+        score += int(min(20, runway_months * 2.5))
+        if discretionary_ratio > 0.30:
+            score -= int((discretionary_ratio - 0.30) * 70)
+        if upi_velocity > 0.75:
+            score -= 10
+        health_score = max(15, min(98, score))
+
+        if health_score >= 80:
+            health_grade = "Prime Wealth Builder"
+        elif health_score >= 65:
+            health_grade = "Healthy & Balanced"
+        elif health_score >= 45:
+            health_grade = "Fair / Moderate Runway"
+        else:
+            health_grade = "Vulnerable Cashflow"
+
+        # Leakages detection
+        leakages = []
+        if discretionary_ratio > 0.30:
+            leakages.append(f"Discretionary spend ({wants_pct}%) exceeds the 30% healthy lifestyle ceiling.")
+        if upi_velocity > 0.70:
+            leakages.append(f"High digital velocity ({upi_velocity:.2f}): frequent micro-transactions create silent cashflow drain.")
+        if fixed_ratio > 0.50:
+            leakages.append(f"Fixed living obligations ({needs_pct}%) consume more than half of monthly inflows.")
+        if runway_months < 3.0:
+            leakages.append(f"Low emergency buffer: estimated runway covers only {runway_months} months of living expenses.")
+        if not leakages:
+            leakages.append("No critical cashflow leaks detected. Balanced allocation across essential and discretionary categories.")
+
+        # Actionable Coaching Insights
+        insights = []
+        if best_id == 2:  # High-Burn Consumer
+            insights.append("Implement a 48-hour cooling-off rule on non-essential online purchases to curb impulse checkouts.")
+            insights.append("Automate a dedicated emergency savings transfer immediately on salary credit day.")
+        elif best_id == 1:  # Experiential Spender
+            insights.append("Cap dining out and leisure delivery to a weekly fixed digital wallet allocation.")
+            insights.append("Pair high experiential spending with an automated 1:1 matching SIP contribution.")
+        elif best_id == 0:  # Frugal Minimalist
+            insights.append("Cash reserves are very healthy. Deploy idle cash into index mutual funds or SIPs to beat inflation.")
+            insights.append("Your low burn rate provides the financial safety to take calculated career or entrepreneurial risks.")
+        else:  # Strategic Wealth Builder
+            insights.append("Excellent capital discipline. Rebalance asset allocation annually between equity SIPs and debt cushions.")
+            insights.append("Ensure adequate term and health insurance so medical contingencies do not disrupt compounding.")
+
+        diagnostics = LifestyleDiagnostics(
+            financial_health_score=health_score,
+            health_grade=health_grade,
+            cash_runway_months=runway_months,
+            needs_ratio_percent=needs_pct,
+            wants_ratio_percent=wants_pct,
+            savings_ratio_percent=savings_pct,
+            top_spend_leakages=leakages,
+            coaching_insights=insights
+        )
+
+        return archetype_pred, diagnostics
+
     def predict(
         self,
         features_dict: Dict[str, float],
@@ -217,11 +360,14 @@ class MLService:
             probabilities=[round(p, 4) for p in probs]
         )
 
-        # 3. Persona Clustering (K-Means)
+        # 3. Lifestyle Archetype & Diagnostics
+        lifestyle_archetype, lifestyle_diagnostics = self.evaluate_lifestyle_diagnostics(features_dict)
+
+        # 4. Persona Clustering (K-Means)
         pred_cluster_id = int(self.kmeans.predict(scaled_vector)[0])
         persona_name = PERSONA_NAMES.get(pred_cluster_id, "Standard Professional")
 
-        # 4. Latent Space Projection (PCA)
+        # 5. Latent Space Projection (PCA)
         pca_3d = self.pca.transform(scaled_vector)[0].tolist()
         pca_2d = pca_3d[:2]
 
@@ -232,7 +378,7 @@ class MLService:
             pca_3d_coord=[round(c, 4) for c in pca_3d]
         )
 
-        # 5. Statutory Tax Calculation (uses actual turnover when available, else ML estimated gross)
+        # 6. Optional Statutory Tax Calculation
         is_salaried = (entity_type == "salaried_individual")
         tax_gross = actual_turnover if (actual_turnover is not None and actual_turnover > 0) else pred_income
         tax_breakdown = self.calculate_statutory_tax(
@@ -247,9 +393,11 @@ class MLService:
         return PredictionOutput(
             estimated_annual_income=pred_income,
             income_confidence_interval=[ci_lower, ci_upper],
+            lifestyle_archetype=lifestyle_archetype,
+            lifestyle_diagnostics=lifestyle_diagnostics,
+            assigned_cluster=assigned_cluster,
             predicted_tax_slab=tax_slab_pred,
-            tax_breakdown=tax_breakdown,
-            assigned_cluster=assigned_cluster
+            tax_breakdown=tax_breakdown
         )
 
 

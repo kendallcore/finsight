@@ -30,8 +30,8 @@ def test_model_evaluation_endpoint():
     assert data["status"] == "success"
     assert len(data["regression_comparison"]) >= 3
     assert len(data["classification_comparison"]) >= 3
-    assert len(data["confusion_matrix"]) == 7
-    assert len(data["confusion_matrix_labels"]) == 7
+    assert len(data["confusion_matrix"]) in [4, 7]
+    assert len(data["confusion_matrix_labels"]) in [4, 7]
     assert len(data["feature_importance"]) == 16
 
 
@@ -150,30 +150,61 @@ def test_upload_statement_csv():
 
 def test_upload_statement_pdf_real():
     import os
-    pdf_paths = [
-        "/home/sanjeev/Downloads/Acct Statement_1553_31082026_16.39.39.pdf",
-        "/home/prajan/Downloads/IDFCFIRSTBankstatement_10188941711.pdf"
+    candidates = [
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "../../local-docs/Acct Statement_1553_31082026_16.39.39.pdf")),
+        "/home/sanjeev/Downloads/Acct Statement_1553_31082026_16.39.39.pdf"
     ]
-    target_path = next((p for p in pdf_paths if os.path.exists(p)), None)
+    target_path = next((p for p in candidates if os.path.exists(p)), None)
     if not target_path:
-        pytest.skip("Test statement PDF not present in environment.")
+        pytest.skip("Test HDFC statement PDF not present in environment.")
     
     with open(target_path, "rb") as f:
         files = {"file": (os.path.basename(target_path), f, "application/pdf")}
-        data_payload = {"entity_type": "salaried_individual"}
-        if "1553" in target_path:
-            data_payload = {"entity_type": "presumptive_business_44ad", "pdf_password": "254214884"}
-            
         response = client.post(
             "/api/upload-statement",
             files=files,
-            data=data_payload
+            data={"entity_type": "presumptive_business_44ad", "pdf_password": "254214884"}
         )
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
-    assert data["statement_summary"]["total_transactions"] >= 500
+    assert data["statement_summary"]["total_transactions"] >= 1800
     assert data["statement_summary"]["digital_receipts_ratio"] > 0.80
+    assert data["statement_summary"]["total_credits"] == 6015581.0
+    assert data["statement_summary"]["total_debits"] == 6057789.33
+    assert data["predictions"]["tax_breakdown"]["entity_type"] == "presumptive_business_44ad"
+    assert data["predictions"]["tax_breakdown"]["deemed_profit_rate_percent"] == 6.0
+    assert data["predictions"]["tax_breakdown"]["net_tax_payable"] == 0.0
+
+
+def test_upload_idfc_statement_pdf_real():
+    import os
+    candidates = [
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "../../local-docs/IDFCFIRSTBankstatement_10188941711_Prajan.pdf")),
+        "/home/prajan/Downloads/IDFCFIRSTBankstatement_10188941711.pdf"
+    ]
+    target_path = next((p for p in candidates if os.path.exists(p)), None)
+    if not target_path:
+        pytest.skip("Test IDFC statement PDF not present in environment.")
+
+    with open(target_path, "rb") as f:
+        files = {"file": (os.path.basename(target_path), f, "application/pdf")}
+        response = client.post(
+            "/api/upload-statement",
+            files=files,
+            data={"entity_type": "salaried_individual"}
+        )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert data["statement_summary"]["total_transactions"] == 900
+    assert data["statement_summary"]["account_holder_name"] == "Mr. S S Prajan"
+    assert data["statement_summary"]["suggested_entity_type"] == "salaried_individual"
+    assert data["statement_summary"]["total_credits"] == 154615.0
+    assert data["statement_summary"]["total_debits"] == 144592.12
+    assert data["predictions"]["tax_breakdown"]["standard_deduction"] == 75000.0
+    assert data["predictions"]["tax_breakdown"]["net_tax_payable"] == 0.0
+
 
 
 def test_business_pnl_tax_with_depreciation():

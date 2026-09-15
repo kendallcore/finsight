@@ -37,6 +37,26 @@ export interface ExtractedFeatures {
   capital_gains_flux: number;
 }
 
+export interface LifestyleArchetypePrediction {
+  archetype_id: number;
+  archetype_name: string;
+  confidence: number;
+  probabilities: number[];
+  summary: string;
+  key_traits: string[];
+}
+
+export interface LifestyleDiagnostics {
+  financial_health_score: number;
+  health_grade: string;
+  cash_runway_months: number;
+  needs_ratio_percent: number;
+  wants_ratio_percent: number;
+  savings_ratio_percent: number;
+  top_spend_leakages: string[];
+  coaching_insights: string[];
+}
+
 export interface TaxSlabPrediction {
   class_id: number;
   bracket_name: string;
@@ -72,9 +92,11 @@ export interface TaxBreakdownSummary {
 export interface PredictionOutput {
   estimated_annual_income: number;
   income_confidence_interval: [number, number];
-  predicted_tax_slab: TaxSlabPrediction;
-  tax_breakdown: TaxBreakdownSummary;
+  lifestyle_archetype?: LifestyleArchetypePrediction;
+  lifestyle_diagnostics?: LifestyleDiagnostics;
   assigned_cluster: AssignedCluster;
+  predicted_tax_slab?: TaxSlabPrediction;
+  tax_breakdown?: TaxBreakdownSummary;
 }
 
 export interface UploadStatementResponse {
@@ -131,9 +153,15 @@ export interface ModelEvaluationResponse {
 export interface SampleProfileItem {
   profile_id: string;
   title: string;
+  subtitle?: string;
   category: string;
   description: string;
   annual_income_approx: number;
+  monthly_inflow?: string;
+  discretionary_ratio?: string;
+  savings_buffer?: string;
+  primary_channel?: string;
+  archetype_expected?: string;
   tax_slab_expected: string;
   persona_expected: string;
   transaction_count: number;

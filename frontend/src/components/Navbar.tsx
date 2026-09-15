@@ -27,11 +27,11 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, apiHeal
               <div className="flex items-center space-x-2">
                 <span className="font-semibold text-neutral-100 tracking-tight">FinSight</span>
                 <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                  FY 2025–26 (Sec 115BAC)
+                  Lifestyle Edition
                 </span>
               </div>
               <p className="text-xs text-neutral-400 hidden sm:block">
-                Machine Learning Financial Diagnostics & Indian Tax Estimator
+                Machine Learning Financial Diagnostics & Lifestyle Spending Analytics
               </p>
             </div>
           </div>

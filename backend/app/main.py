@@ -29,7 +29,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="Machine Learning-powered Financial Intelligence & Indian Tax Estimation System (Section 115BAC - FY 2025-26).",
+    description="Machine Learning-powered Financial Intelligence & Lifestyle Spending Analytics Engine.",
     lifespan=lifespan
 )
 
@@ -50,15 +50,17 @@ app.include_router(samples.router)
 
 @app.get("/api/health", status_code=status.HTTP_200_OK, tags=["Health"])
 async def health_check():
-    """Returns service health, loaded models, and tax regime version."""
+    """Returns service health, loaded models, and archetype version."""
     models_loaded = bool(ml_service.regressor and ml_service.classifier and ml_service.scaler)
     return {
         "status": "healthy",
         "service": settings.PROJECT_NAME,
         "version": settings.VERSION,
         "tax_regime_year": settings.TAX_REGIME_YEAR,
+        "edition": "Lifestyle & Financial Wellness Edition",
         "models_loaded": models_loaded,
         "features_dimension": 16,
+        "archetype_classes": 4,
         "tax_slab_classes": 7
     }
 

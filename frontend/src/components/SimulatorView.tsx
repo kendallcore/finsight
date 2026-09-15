@@ -1,20 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw } from 'lucide-react';
+import {
+  RotateCcw,
+  Building2,
+  PiggyBank,
+  TrendingUp,
+  Home,
+  Coffee,
+  Calendar,
+  Repeat,
+  Smartphone,
+  Crown,
+  Sparkles,
+  ArrowUpRight,
+  Loader2
+} from 'lucide-react';
 import { api } from '../services/api';
 import { ExtractedFeatures, UploadStatementResponse } from '../types';
 
 export const SimulatorView: React.FC = () => {
-  const [annualCreditRupees, setAnnualCreditRupees] = useState<number>(1450000);
-  const [savingsRatio, setSavingsRatio] = useState<number>(0.32);
-  const [salaryRatio, setSalaryRatio] = useState<number>(0.90);
-  const [investmentRatio, setInvestmentRatio] = useState<number>(0.18);
-  const [fixedRatio, setFixedRatio] = useState<number>(0.30);
-  const [discretionaryRatio, setDiscretionaryRatio] = useState<number>(0.20);
-  const [taxShieldRatio, setTaxShieldRatio] = useState<number>(0.08);
-  const [upiVelocity, setUpiVelocity] = useState<number>(0.75);
+  const defaultValues = {
+    annualCreditRupees: 1450000,
+    savingsRatio: 0.32,
+    investmentRatio: 0.18,
+    fixedRatio: 0.30,
+    discretionaryRatio: 0.20,
+    salaryRatio: 0.90,
+    subscriptionsRatio: 0.08,
+    upiVelocity: 0.75
+  };
+
+  const [annualCreditRupees, setAnnualCreditRupees] = useState<number>(defaultValues.annualCreditRupees);
+  const [savingsRatio, setSavingsRatio] = useState<number>(defaultValues.savingsRatio);
+  const [investmentRatio, setInvestmentRatio] = useState<number>(defaultValues.investmentRatio);
+  const [fixedRatio, setFixedRatio] = useState<number>(defaultValues.fixedRatio);
+  const [discretionaryRatio, setDiscretionaryRatio] = useState<number>(defaultValues.discretionaryRatio);
+  const [salaryRatio, setSalaryRatio] = useState<number>(defaultValues.salaryRatio);
+  const [subscriptionsRatio, setSubscriptionsRatio] = useState<number>(defaultValues.subscriptionsRatio);
+  const [upiVelocity, setUpiVelocity] = useState<number>(defaultValues.upiVelocity);
 
   const [simResult, setSimResult] = useState<UploadStatementResponse | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const handleReset = () => {
+    setAnnualCreditRupees(defaultValues.annualCreditRupees);
+    setSavingsRatio(defaultValues.savingsRatio);
+    setInvestmentRatio(defaultValues.investmentRatio);
+    setFixedRatio(defaultValues.fixedRatio);
+    setDiscretionaryRatio(defaultValues.discretionaryRatio);
+    setSalaryRatio(defaultValues.salaryRatio);
+    setSubscriptionsRatio(defaultValues.subscriptionsRatio);
+    setUpiVelocity(defaultValues.upiVelocity);
+  };
 
   const runSimulation = async () => {
     setLoading(true);
@@ -27,17 +63,17 @@ export const SimulatorView: React.FC = () => {
         log_annual_credit: logCredit,
         log_annual_debit: logDebit,
         net_savings_ratio: savingsRatio,
-        monthly_burn_rate: 1.0 - savingsRatio,
+        monthly_burn_rate: Math.max(0.1, 1.0 - savingsRatio),
         salary_inflow_ratio: salaryRatio,
         monthly_credit_cv: 0.08,
-        salary_regularity_score: 1.0,
+        salary_regularity_score: salaryRatio,
         bonus_lump_sum_ratio: 0.10,
         investment_ratio: investmentRatio,
         fixed_obligation_ratio: fixedRatio,
         discretionary_ratio: discretionaryRatio,
-        tax_shield_ratio: taxShieldRatio,
+        tax_shield_ratio: subscriptionsRatio,
         upi_velocity_index: upiVelocity,
-        micro_spend_density: 0.08,
+        micro_spend_density: 0.06,
         log_avg_ticket_size: Math.log1p((annualCreditRupees + debitRupees) / 450),
         capital_gains_flux: 0.0
       };
@@ -54,9 +90,9 @@ export const SimulatorView: React.FC = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       runSimulation();
-    }, 250);
+    }, 200);
     return () => clearTimeout(timer);
-  }, [annualCreditRupees, savingsRatio, salaryRatio, investmentRatio, fixedRatio, discretionaryRatio, taxShieldRatio, upiVelocity]);
+  }, [annualCreditRupees, savingsRatio, investmentRatio, fixedRatio, discretionaryRatio, salaryRatio, subscriptionsRatio, upiVelocity]);
 
   const formatINR = (val: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -67,36 +103,63 @@ export const SimulatorView: React.FC = () => {
   };
 
   const pred = simResult?.predictions;
-  const tax = pred?.tax_breakdown;
+  const archetype = pred?.lifestyle_archetype;
+  const diagnostics = pred?.lifestyle_diagnostics;
+
+  const healthScore = diagnostics?.financial_health_score ?? 87;
+  const runwayMonths = diagnostics?.cash_runway_months ?? 5.6;
+  const needsPct = Math.round(fixedRatio * 100);
+  const wantsPct = Math.round(discretionaryRatio * 100);
+  const savingsPct = Math.round((savingsRatio + investmentRatio) * 100);
+
+  // SVG circular gauge math
+  const radius = 32;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (healthScore / 100) * circumference;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold text-neutral-100">
-            Real-Time What-If Financial Simulator
-          </h2>
-          <p className="text-xs text-neutral-400 mt-0.5">
-            Adjust behavioral cashflow sliders to simulate ML tax slab transitions and Section 115BAC liabilities.
+          <h1 className="text-xl font-bold text-neutral-100 tracking-tight">
+            What-If Simulator
+          </h1>
+          <p className="text-xs text-neutral-400 mt-1">
+            Adjust your lifestyle choices and see the impact on your financial future.
           </p>
         </div>
+
         <button
-          onClick={runSimulation}
-          className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-mono rounded bg-neutral-800 border border-neutral-700 hover:bg-neutral-700 text-neutral-200 transition"
+          onClick={handleReset}
+          className="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-[#161d28] border border-[#232f42] text-neutral-300 hover:text-white hover:border-neutral-600 transition self-start sm:self-auto"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          <span>Recalculate</span>
+          {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" /> : <RotateCcw className="w-3.5 h-3.5" />}
+          <span>Reset</span>
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Sliders Control Panel */}
-        <div className="lg:col-span-2 border border-neutral-800 bg-[#121316] rounded-lg p-6 space-y-5">
-          {/* Slider 1: Annual Credits */}
-          <div>
-            <div className="flex justify-between text-xs font-mono mb-1.5">
-              <span className="text-neutral-300">Annual Deposit Magnitude (₹)</span>
-              <span className="text-emerald-400 font-bold">{formatINR(annualCreditRupees)}</span>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Column: Adjust Your Parameters (Col span 7) */}
+        <div className="lg:col-span-7 border border-[#1d2634] bg-[#11161f] rounded-2xl p-6 space-y-4">
+          <div className="text-sm font-semibold text-neutral-200 mb-2">
+            Adjust Your Parameters
+          </div>
+
+          {/* Parameter 1: Annual Inflow */}
+          <div className="p-3.5 rounded-xl bg-[#0a0d13] border border-[#18202d] space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-7 h-7 rounded-lg bg-[#161f2c] border border-[#233144] flex items-center justify-center text-neutral-300">
+                  <Building2 className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-xs font-medium text-neutral-200">
+                  Annual Inflow / Credit Magnitude
+                </span>
+              </div>
+              <span className="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+                {formatINR(annualCreditRupees)}
+              </span>
             </div>
             <input
               type="range"
@@ -105,37 +168,55 @@ export const SimulatorView: React.FC = () => {
               step="50000"
               value={annualCreditRupees}
               onChange={(e) => setAnnualCreditRupees(Number(e.target.value))}
-              className="w-full accent-emerald-500 bg-neutral-800 h-1.5 rounded-lg appearance-none cursor-pointer"
+              className="w-full accent-emerald-500 bg-[#1a2332] h-1.5 rounded-lg appearance-none cursor-pointer"
             />
-            <div className="flex justify-between text-[10px] text-neutral-500 font-mono mt-1">
+            <div className="flex justify-between text-[10px] text-neutral-500 font-mono">
               <span>₹2.0 Lakhs</span>
               <span>₹25.0 Lakhs</span>
               <span>₹50.0 Lakhs</span>
             </div>
           </div>
 
-          {/* Slider 2: Net Savings Ratio */}
-          <div>
-            <div className="flex justify-between text-xs font-mono mb-1.5">
-              <span className="text-neutral-300">Net Savings Ratio (Retained Cash)</span>
-              <span className="text-neutral-100 font-bold">{(savingsRatio * 100).toFixed(0)}%</span>
+          {/* Parameter 2: Net Savings Ratio */}
+          <div className="p-3.5 rounded-xl bg-[#0a0d13] border border-[#18202d] space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-7 h-7 rounded-lg bg-[#161f2c] border border-[#233144] flex items-center justify-center text-neutral-300">
+                  <PiggyBank className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-xs font-medium text-neutral-200">
+                  Net Savings Ratio (Retained Cash)
+                </span>
+              </div>
+              <span className="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+                {(savingsRatio * 100).toFixed(0)}%
+              </span>
             </div>
             <input
               type="range"
-              min="-0.10"
+              min="0.0"
               max="0.65"
               step="0.01"
               value={savingsRatio}
               onChange={(e) => setSavingsRatio(Number(e.target.value))}
-              className="w-full accent-emerald-500 bg-neutral-800 h-1.5 rounded-lg appearance-none cursor-pointer"
+              className="w-full accent-emerald-500 bg-[#1a2332] h-1.5 rounded-lg appearance-none cursor-pointer"
             />
           </div>
 
-          {/* Slider 3: Investment Ratio */}
-          <div>
-            <div className="flex justify-between text-xs font-mono mb-1.5">
-              <span className="text-neutral-300">Wealth Building Commitment (SIPs / MF)</span>
-              <span className="text-neutral-100 font-bold">{(investmentRatio * 100).toFixed(0)}%</span>
+          {/* Parameter 3: Wealth Building */}
+          <div className="p-3.5 rounded-xl bg-[#0a0d13] border border-[#18202d] space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-7 h-7 rounded-lg bg-[#161f2c] border border-[#233144] flex items-center justify-center text-neutral-300">
+                  <TrendingUp className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-xs font-medium text-neutral-200">
+                  Wealth Building Commitment (SIPs / MF)
+                </span>
+              </div>
+              <span className="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+                {(investmentRatio * 100).toFixed(0)}%
+              </span>
             </div>
             <input
               type="range"
@@ -144,15 +225,24 @@ export const SimulatorView: React.FC = () => {
               step="0.01"
               value={investmentRatio}
               onChange={(e) => setInvestmentRatio(Number(e.target.value))}
-              className="w-full accent-emerald-500 bg-neutral-800 h-1.5 rounded-lg appearance-none cursor-pointer"
+              className="w-full accent-emerald-500 bg-[#1a2332] h-1.5 rounded-lg appearance-none cursor-pointer"
             />
           </div>
 
-          {/* Slider 4: Fixed Obligations */}
-          <div>
-            <div className="flex justify-between text-xs font-mono mb-1.5">
-              <span className="text-neutral-300">Fixed Living Costs (Rent / EMIs)</span>
-              <span className="text-neutral-100 font-bold">{(fixedRatio * 100).toFixed(0)}%</span>
+          {/* Parameter 4: Fixed Living Costs */}
+          <div className="p-3.5 rounded-xl bg-[#0a0d13] border border-[#18202d] space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-7 h-7 rounded-lg bg-[#161f2c] border border-[#233144] flex items-center justify-center text-neutral-300">
+                  <Home className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-xs font-medium text-neutral-200">
+                  Fixed Living Costs (Rent / EMIs / Utilities)
+                </span>
+              </div>
+              <span className="text-xs font-mono font-bold text-neutral-300 px-2 py-0.5 rounded bg-[#161f2c] border border-[#233144]">
+                {(fixedRatio * 100).toFixed(0)}%
+              </span>
             </div>
             <input
               type="range"
@@ -161,15 +251,24 @@ export const SimulatorView: React.FC = () => {
               step="0.01"
               value={fixedRatio}
               onChange={(e) => setFixedRatio(Number(e.target.value))}
-              className="w-full accent-emerald-500 bg-neutral-800 h-1.5 rounded-lg appearance-none cursor-pointer"
+              className="w-full accent-emerald-500 bg-[#1a2332] h-1.5 rounded-lg appearance-none cursor-pointer"
             />
           </div>
 
-          {/* Slider 5: Discretionary Spend */}
-          <div>
-            <div className="flex justify-between text-xs font-mono mb-1.5">
-              <span className="text-neutral-300">Discretionary Spend (Dining / Travel)</span>
-              <span className="text-neutral-100 font-bold">{(discretionaryRatio * 100).toFixed(0)}%</span>
+          {/* Parameter 5: Discretionary Spend */}
+          <div className="p-3.5 rounded-xl bg-[#0a0d13] border border-[#18202d] space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-7 h-7 rounded-lg bg-[#161f2c] border border-[#233144] flex items-center justify-center text-neutral-300">
+                  <Coffee className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-xs font-medium text-neutral-200">
+                  Discretionary Lifestyle Spend (Dining / Travel / Shopping)
+                </span>
+              </div>
+              <span className="text-xs font-mono font-bold text-neutral-300 px-2 py-0.5 rounded bg-[#161f2c] border border-[#233144]">
+                {(discretionaryRatio * 100).toFixed(0)}%
+              </span>
             </div>
             <input
               type="range"
@@ -178,15 +277,24 @@ export const SimulatorView: React.FC = () => {
               step="0.01"
               value={discretionaryRatio}
               onChange={(e) => setDiscretionaryRatio(Number(e.target.value))}
-              className="w-full accent-emerald-500 bg-neutral-800 h-1.5 rounded-lg appearance-none cursor-pointer"
+              className="w-full accent-emerald-500 bg-[#1a2332] h-1.5 rounded-lg appearance-none cursor-pointer"
             />
           </div>
 
-          {/* Slider 6: Salary Regularity */}
-          <div>
-            <div className="flex justify-between text-xs font-mono mb-1.5">
-              <span className="text-neutral-300">Salary Payroll Share (vs Freelance/Gig)</span>
-              <span className="text-neutral-100 font-bold">{(salaryRatio * 100).toFixed(0)}%</span>
+          {/* Parameter 6: Salary Regularity */}
+          <div className="p-3.5 rounded-xl bg-[#0a0d13] border border-[#18202d] space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-7 h-7 rounded-lg bg-[#161f2c] border border-[#233144] flex items-center justify-center text-neutral-300">
+                  <Calendar className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-xs font-medium text-neutral-200">
+                  Salary Regularity Share
+                </span>
+              </div>
+              <span className="text-xs font-mono font-bold text-neutral-300 px-2 py-0.5 rounded bg-[#161f2c] border border-[#233144]">
+                {(salaryRatio * 100).toFixed(0)}%
+              </span>
             </div>
             <input
               type="range"
@@ -195,32 +303,50 @@ export const SimulatorView: React.FC = () => {
               step="0.02"
               value={salaryRatio}
               onChange={(e) => setSalaryRatio(Number(e.target.value))}
-              className="w-full accent-emerald-500 bg-neutral-800 h-1.5 rounded-lg appearance-none cursor-pointer"
+              className="w-full accent-emerald-500 bg-[#1a2332] h-1.5 rounded-lg appearance-none cursor-pointer"
             />
           </div>
 
-          {/* Slider 7: NPS / Tax Shield */}
-          <div>
-            <div className="flex justify-between text-xs font-mono mb-1.5">
-              <span className="text-neutral-300">Tax Shield (NPS 14% / PPF)</span>
-              <span className="text-neutral-100 font-bold">{(taxShieldRatio * 100).toFixed(0)}%</span>
+          {/* Parameter 7: Subscriptions */}
+          <div className="p-3.5 rounded-xl bg-[#0a0d13] border border-[#18202d] space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-7 h-7 rounded-lg bg-[#161f2c] border border-[#233144] flex items-center justify-center text-neutral-300">
+                  <Repeat className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-xs font-medium text-neutral-200">
+                  Recurring Subscriptions & Micro-Spend
+                </span>
+              </div>
+              <span className="text-xs font-mono font-bold text-neutral-300 px-2 py-0.5 rounded bg-[#161f2c] border border-[#233144]">
+                {(subscriptionsRatio * 100).toFixed(0)}%
+              </span>
             </div>
             <input
               type="range"
               min="0.0"
-              max="0.18"
+              max="0.20"
               step="0.01"
-              value={taxShieldRatio}
-              onChange={(e) => setTaxShieldRatio(Number(e.target.value))}
-              className="w-full accent-emerald-500 bg-neutral-800 h-1.5 rounded-lg appearance-none cursor-pointer"
+              value={subscriptionsRatio}
+              onChange={(e) => setSubscriptionsRatio(Number(e.target.value))}
+              className="w-full accent-emerald-500 bg-[#1a2332] h-1.5 rounded-lg appearance-none cursor-pointer"
             />
           </div>
 
-          {/* Slider 8: UPI Velocity */}
-          <div>
-            <div className="flex justify-between text-xs font-mono mb-1.5">
-              <span className="text-neutral-300">Instant UPI Channel Velocity</span>
-              <span className="text-neutral-100 font-bold">{(upiVelocity * 100).toFixed(0)}%</span>
+          {/* Parameter 8: UPI Velocity */}
+          <div className="p-3.5 rounded-xl bg-[#0a0d13] border border-[#18202d] space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-7 h-7 rounded-lg bg-[#161f2c] border border-[#233144] flex items-center justify-center text-neutral-300">
+                  <Smartphone className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-xs font-medium text-neutral-200">
+                  Instant UPI Channel Velocity
+                </span>
+              </div>
+              <span className="text-xs font-mono font-bold text-neutral-300 px-2 py-0.5 rounded bg-[#161f2c] border border-[#233144]">
+                {(upiVelocity * 100).toFixed(0)}%
+              </span>
             </div>
             <input
               type="range"
@@ -229,55 +355,137 @@ export const SimulatorView: React.FC = () => {
               step="0.01"
               value={upiVelocity}
               onChange={(e) => setUpiVelocity(Number(e.target.value))}
-              className="w-full accent-emerald-500 bg-neutral-800 h-1.5 rounded-lg appearance-none cursor-pointer"
+              className="w-full accent-emerald-500 bg-[#1a2332] h-1.5 rounded-lg appearance-none cursor-pointer"
             />
           </div>
         </div>
 
-        {/* Live Inferred Cards */}
-        <div className="space-y-4">
-          {/* Estimated Income */}
-          <div className="border border-neutral-800 bg-[#121316] rounded-lg p-5">
-            <span className="text-[10px] font-mono text-neutral-400 uppercase">Live Model Prediction</span>
-            <div className="mt-1 text-2xl font-bold font-mono text-neutral-100">
-              {pred ? formatINR(pred.estimated_annual_income) : '---'}
+        {/* Right Column: Live Preview (Col span 5) */}
+        <div className="lg:col-span-5 space-y-4">
+          <div className="text-sm font-semibold text-neutral-200">
+            Live Preview
+          </div>
+
+          {/* Predicted Annual Inflow Card */}
+          <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6">
+            <div className="flex items-baseline justify-between">
+              <div className="text-3xl font-bold font-mono text-neutral-100 tracking-tight">
+                {pred ? formatINR(pred.estimated_annual_income) : '₹14,29,569'}
+              </div>
+              <span className="inline-flex items-center text-xs font-mono font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
+                <ArrowUpRight className="w-3 h-3 mr-0.5" />
+                +12% vs base
+              </span>
             </div>
-            <div className="mt-1 text-xs text-neutral-400">
-              Target Gross Income
+            <div className="text-xs text-neutral-400 mt-1">
+              Predicted Annual Inflow
             </div>
           </div>
 
-          {/* Tax Slab */}
-          <div className="border border-neutral-800 bg-[#121316] rounded-lg p-5">
-            <span className="text-[10px] font-mono text-neutral-400 uppercase">FY 2025–26 Tax Slab</span>
-            <div className="mt-1 text-lg font-bold font-mono text-emerald-400">
-              {pred ? `Class ${pred.predicted_tax_slab.class_id} (${pred.predicted_tax_slab.base_rate_percent}%)` : '---'}
+          {/* Lifestyle Archetype Card */}
+          <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 mb-2">
+              Lifestyle Archetype
             </div>
-            <div className="mt-1 text-xs text-neutral-400">
-              {pred?.predicted_tax_slab.bracket_name}
+            <div className="flex items-center space-x-2.5">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                <Crown className="w-4 h-4 fill-amber-400/20" />
+              </div>
+              <h3 className="text-base font-bold text-neutral-100">
+                {archetype?.archetype_name || 'Strategic Wealth Builder'}
+              </h3>
+            </div>
+            <p className="text-xs text-neutral-400 mt-2.5 leading-relaxed">
+              {archetype?.summary || 'Disciplined capital allocator systematically converting recurring income into compounding investments.'}
+            </p>
+          </div>
+
+          {/* Financial Health & Budget Health Split Card */}
+          <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6">
+            <div className="grid grid-cols-2 gap-4">
+              {/* Financial Health Radial Meter */}
+              <div className="pr-4 border-r border-[#18202d]">
+                <div className="text-xs font-medium text-neutral-300 mb-3">
+                  Financial Health
+                </div>
+                <div className="flex flex-col items-center justify-center">
+                  <div className="relative w-20 h-20 flex items-center justify-center">
+                    <svg className="w-20 h-20 transform -rotate-90">
+                      <circle
+                        cx="40"
+                        cy="40"
+                        r={radius}
+                        stroke="#1a2332"
+                        strokeWidth="6"
+                        fill="transparent"
+                      />
+                      <circle
+                        cx="40"
+                        cy="40"
+                        r={radius}
+                        stroke="#10b981"
+                        strokeWidth="6"
+                        fill="transparent"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={strokeDashoffset}
+                        strokeLinecap="round"
+                        className="transition-all duration-500"
+                      />
+                    </svg>
+                    <div className="absolute flex flex-col items-center">
+                      <span className="text-xl font-bold font-mono text-neutral-100">{healthScore}</span>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-center">
+                    <div className="text-[11px] font-mono text-neutral-400">{healthScore} / 100</div>
+                    <div className="text-[11px] text-emerald-400 font-medium mt-0.5">
+                      {runwayMonths} Months
+                    </div>
+                    <div className="text-[10px] text-neutral-500">Reserve Runway</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Budget Health Dot Breakdown */}
+              <div className="pl-2 flex flex-col justify-center">
+                <div className="text-xs font-medium text-neutral-300 mb-3">
+                  Budget Health
+                </div>
+                <div className="space-y-2.5 text-xs font-mono">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <span className="w-2 h-2 rounded-full bg-blue-500" />
+                      <span className="text-neutral-400">Needs</span>
+                    </div>
+                    <span className="text-neutral-200 font-bold">{needsPct}%</span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <span className="w-2 h-2 rounded-full bg-amber-500" />
+                      <span className="text-neutral-400">Wants</span>
+                    </div>
+                    <span className="text-neutral-200 font-bold">{wantsPct}%</span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      <span className="text-neutral-400">Savings</span>
+                    </div>
+                    <span className="text-emerald-400 font-bold">{savingsPct}%</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Net Tax Liability */}
-          <div className="border border-neutral-800 bg-[#121316] rounded-lg p-5">
-            <span className="text-[10px] font-mono text-neutral-400 uppercase">Net Tax Payable (After 87A)</span>
-            <div className={`mt-1 text-2xl font-bold font-mono ${tax?.net_tax_payable === 0 ? 'text-emerald-400' : 'text-neutral-100'}`}>
-              {tax ? formatINR(tax.net_tax_payable) : '₹0'}
-            </div>
-            <div className="mt-1 text-xs text-neutral-400">
-              Effective Rate: {tax ? `${tax.effective_tax_rate_percent.toFixed(1)}%` : '0%'}
-            </div>
-          </div>
-
-          {/* Behavioral Persona */}
-          <div className="border border-neutral-800 bg-[#121316] rounded-lg p-5">
-            <span className="text-[10px] font-mono text-neutral-400 uppercase">Predicted Persona</span>
-            <div className="mt-1 text-sm font-semibold text-neutral-200">
-              {pred?.assigned_cluster.persona_name || '---'}
-            </div>
-            <div className="mt-1 text-xs text-neutral-500 font-mono">
-              PCA: [{pred?.assigned_cluster.pca_2d_coord.join(', ')}]
-            </div>
+          {/* Inspirational Quote Banner */}
+          <div className="border border-[#1d2634] bg-[#11161f] rounded-xl px-4 py-3 flex items-center space-x-2 text-xs text-neutral-300">
+            <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0" />
+            <span className="italic text-neutral-400">
+              "Small changes today, a wealthier tomorrow."
+            </span>
           </div>
         </div>
       </div>
