@@ -52,6 +52,9 @@ yarn-error.log*
 *.swp
 *.swo
 
+# Command Code local agent state (taste learnings, session data)
+.commandcode/
+
 # Large Raw Datasets & PDF archives
 data/huggingface_agami/
 data/kaggle_bank_customer_segmentation/
