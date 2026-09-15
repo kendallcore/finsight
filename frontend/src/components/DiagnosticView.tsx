@@ -12,17 +12,16 @@ import {
   Lock,
   Zap,
   BarChart2,
-  FolderOpen
+  FolderOpen,
+  ArrowRight
 } from 'lucide-react';
-import {
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip
-} from 'recharts';
+import { motion } from 'framer-motion';
 import { UploadStatementResponse } from '../types';
 import { api } from '../services/api';
+import { SpendingBreakdown } from './SpendingBreakdown';
+import { HeatCalendar } from './HeatCalendar';
+import { ConfidenceBadge, confidenceOpacity } from './ConfidenceBadge';
+import { formatINR, personaTheme } from '../lib/theme';
 
 interface DiagnosticViewProps {
   data: UploadStatementResponse | null;
@@ -71,34 +70,29 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
     }
   };
 
-  const formatINR = (val: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(val);
-  };
-
   const pred = data?.predictions;
   const tax = pred?.tax_breakdown;
   const features = data?.extracted_features;
   const summary = data?.statement_summary;
+  const diagnostics = pred?.lifestyle_diagnostics;
+  const archetype = pred?.lifestyle_archetype;
+  const insights = data?.insights;
 
-  const spendBreakdown = features ? [
-    { name: 'Fixed Living', value: Math.max(0, features.fixed_obligation_ratio * 100), color: '#3b82f6' },
-    { name: 'Discretionary', value: Math.max(0, features.discretionary_ratio * 100), color: '#f59e0b' },
-    { name: 'SIP & Wealth', value: Math.max(0, features.investment_ratio * 100), color: '#10b981' },
-    { name: 'Subscriptions', value: Math.max(0, features.tax_shield_ratio * 100), color: '#8b5cf6' },
-  ].filter(item => item.value > 0) : [];
+  const theme = personaTheme(archetype?.archetype_id);
+
+  /**
+   * One ranked action drives the persona-emphasis card, so the card's headline is always a real
+   * engine output rather than canned copy.
+   */
+  const emphasisInsight = insights?.insights[0] ?? null;
+  const isRunwayCritical = archetype?.archetype_id === 2;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-neutral-100 tracking-tight">
-            Statement Diagnostic
-          </h1>
+          <h1 className="text-xl font-bold text-neutral-100 tracking-tight">Statement Diagnostic</h1>
           <p className="text-xs text-neutral-400 mt-1">
             Upload your bank statement to get instant insights and lifestyle analysis.
           </p>
@@ -339,15 +333,32 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
       {/* Active Diagnostic Report Section (When Statement is Loaded) */}
       {data && pred && (
         <div className="space-y-6 pt-4">
-          {/* Active Statement Profile Banner */}
+          {/* Active Statement Profile Banner — tinted by the detected persona */}
           {summary?.filename && (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono">
+            <motion.div
+              layout
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-3.5 rounded-xl border text-xs font-mono"
+              style={{ borderColor: theme.border, backgroundColor: theme.wash }}
+            >
               <div className="flex flex-wrap items-center gap-2">
                 <div className="flex items-center space-x-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: theme.accent }} />
                   <span className="text-neutral-400">Statement:</span>
-                  <span className="font-semibold text-emerald-300">{summary.account_holder_name || summary.filename}</span>
+                  <span className="font-semibold" style={{ color: theme.accent }}>
+                    {summary.account_holder_name || summary.filename}
+                  </span>
                 </div>
+                {archetype && (
+                  <span
+                    className="text-[10px] px-2 py-0.5 rounded border"
+                    style={{ color: theme.accent, borderColor: theme.border, backgroundColor: 'rgba(10,12,16,0.35)' }}
+                  >
+                    {archetype.archetype_name}
+                  </span>
+                )}
                 {summary.account_type && (
                   <span className="text-[10px] px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 border border-neutral-700">
                     {summary.account_type}
@@ -367,8 +378,86 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
                   </>
                 )}
               </div>
-            </div>
+            </motion.div>
           )}
+
+          {/* Persona-emphasis card: what this archetype needs to see first */}
+          <motion.div
+            layout
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+            className={`rounded-2xl border p-6 ${isRunwayCritical ? 'md:p-8' : ''}`}
+            style={{ borderColor: theme.border, backgroundColor: '#11161f' }}
+          >
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center space-x-2">
+                  {isRunwayCritical ? (
+                    <AlertTriangle className="w-4 h-4" style={{ color: theme.accent }} />
+                  ) : (
+                    <Lightbulb className="w-4 h-4" style={{ color: theme.accent }} />
+                  )}
+                  <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: theme.accent }}>
+                    {theme.emphasisTitle}
+                  </h3>
+                </div>
+                <p className="text-[11px] text-neutral-500 mt-1">{theme.tagline}</p>
+
+                {emphasisInsight ? (
+                  <p className={`text-neutral-200 mt-3 leading-relaxed ${isRunwayCritical ? 'text-base' : 'text-sm'}`}>
+                    {emphasisInsight.insight}
+                  </p>
+                ) : (
+                  diagnostics?.top_spend_leakages?.[0] && (
+                    <p className="text-sm text-neutral-200 mt-3 leading-relaxed">
+                      {diagnostics.top_spend_leakages[0]}
+                    </p>
+                  )
+                )}
+              </div>
+
+              <div className="flex-shrink-0 text-right">
+                {emphasisInsight && (
+                  <>
+                    <div className="text-[10px] font-mono uppercase tracking-wider text-neutral-500">
+                      Recoverable
+                    </div>
+                    <div className={`font-bold font-mono text-emerald-400 ${isRunwayCritical ? 'text-3xl' : 'text-2xl'}`}>
+                      {formatINR(emphasisInsight.impact_rupees)}
+                    </div>
+                    <div className="text-[10px] font-mono text-neutral-500">per month</div>
+                  </>
+                )}
+                {diagnostics && (
+                  <div className="mt-3 text-[11px] font-mono">
+                    <span className="text-neutral-500">Runway </span>
+                    <span className={isRunwayCritical ? 'text-rose-400 font-bold' : 'text-neutral-200'}>
+                      {diagnostics.cash_runway_months} mo
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {archetype?.archetype_id === 3 && features && (
+              <div className="mt-5 pt-4 border-t border-[#18202d] grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  { label: 'Equity/SIP', value: features.investment_ratio },
+                  { label: 'Retained cash', value: Math.max(features.net_savings_ratio, 0) },
+                  { label: 'Tax shield', value: features.tax_shield_ratio },
+                  { label: 'Fixed costs', value: features.fixed_obligation_ratio }
+                ].map((slice) => (
+                  <div key={slice.label} className="p-3 rounded-xl bg-[#0a0d13] border border-[#18202d]">
+                    <div className="text-[10px] font-mono uppercase tracking-wider text-neutral-500">{slice.label}</div>
+                    <div className="text-lg font-bold font-mono text-neutral-100 mt-1">
+                      {(slice.value * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </motion.div>
 
           {/* 4 Executive Verdict KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -376,8 +465,8 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
             <div className="border border-[#1d2634] bg-[#11161f] rounded-xl p-5">
               <div className="flex items-center justify-between text-xs text-neutral-400">
                 <span>Estimated Annual Inflow</span>
-                <span className="font-mono text-[10px] bg-[#161d28] px-1.5 py-0.5 rounded border border-[#232f42]">
-                  Regression (R²=0.998)
+                <span className="font-mono text-[10px] bg-[#161d28] px-1.5 py-0.5 rounded border border-[#232f42] text-neutral-400">
+                  Regression
                 </span>
               </div>
               <div className="mt-2 text-2xl font-bold font-mono tracking-tight text-neutral-100">
@@ -389,18 +478,19 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
             </div>
 
             {/* Lifestyle Archetype */}
-            <div className="border border-[#1d2634] bg-[#11161f] rounded-xl p-5">
+            <div className="border rounded-xl p-5" style={{ borderColor: theme.border, backgroundColor: '#11161f' }}>
               <div className="flex items-center justify-between text-xs text-neutral-400">
                 <span>Lifestyle Archetype</span>
-                <span className="font-mono text-[10px] bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20">
-                  {((pred.lifestyle_archetype?.confidence || 0.95) * 100).toFixed(1)}% Conf
-                </span>
+                {archetype && <ConfidenceBadge confidence={archetype.confidence} />}
               </div>
-              <div className="mt-2 text-lg font-bold font-mono text-emerald-400 truncate">
-                {pred.lifestyle_archetype?.archetype_name || 'Strategic Wealth Builder'}
+              <div
+                className="mt-2 text-lg font-bold font-mono truncate"
+                style={{ color: theme.accent, opacity: confidenceOpacity(archetype?.confidence) }}
+              >
+                {archetype?.archetype_name ?? 'Not classified'}
               </div>
               <div className="mt-2 text-[11px] text-neutral-400 line-clamp-2">
-                {pred.lifestyle_archetype?.summary || 'Disciplined capital allocator converting income into wealth.'}
+                {archetype?.summary ?? 'The archetype classifier did not return a summary.'}
               </div>
             </div>
 
@@ -408,22 +498,31 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
             <div className="border border-[#1d2634] bg-[#11161f] rounded-xl p-5">
               <div className="flex items-center justify-between text-xs text-neutral-400">
                 <span>Financial Health Score</span>
-                <span className="font-mono text-[10px] bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/20">
-                  {pred.lifestyle_diagnostics?.health_grade || 'Healthy & Balanced'}
-                </span>
+                {diagnostics && (
+                  <span className="font-mono text-[10px] bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/20">
+                    {diagnostics.health_grade}
+                  </span>
+                )}
               </div>
-              <div className="mt-2 text-2xl font-bold font-mono tracking-tight text-neutral-100">
-                {pred.lifestyle_diagnostics?.financial_health_score || 82} <span className="text-sm font-normal text-neutral-500">/ 100</span>
-              </div>
-              <div className="mt-2 text-[11px] text-emerald-400 font-mono">
-                Runway: {pred.lifestyle_diagnostics?.cash_runway_months || 5.4} Months Reserve Buffer
-              </div>
+              {diagnostics ? (
+                <>
+                  <div className="mt-2 text-2xl font-bold font-mono tracking-tight text-neutral-100">
+                    {diagnostics.financial_health_score}{' '}
+                    <span className="text-sm font-normal text-neutral-500">/ 100</span>
+                  </div>
+                  <div className="mt-2 text-[11px] font-mono" style={{ color: theme.accent }}>
+                    Runway: {diagnostics.cash_runway_months} Months Reserve Buffer
+                  </div>
+                </>
+              ) : (
+                <div className="mt-2 text-[11px] font-mono text-neutral-500">Diagnostics unavailable</div>
+              )}
             </div>
 
             {/* Persona Cluster */}
             <div className="border border-[#1d2634] bg-[#11161f] rounded-xl p-5">
               <div className="flex items-center justify-between text-xs text-neutral-400">
-                <span>Latent Space Persona</span>
+                <span>Latent Space Cluster</span>
                 <span className="font-mono text-[10px] bg-purple-500/10 text-purple-400 px-1.5 py-0.5 rounded border border-purple-500/20">
                   K-Means (k=4)
                 </span>
@@ -432,178 +531,146 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
                 {pred.assigned_cluster.persona_name}
               </div>
               <div className="mt-2 text-[11px] text-neutral-500 font-mono">
-                PCA 2D: [{pred.assigned_cluster.pca_2d_coord.join(', ')}]
+                PCA 3D: [{pred.assigned_cluster.pca_3d_coord.join(', ')}]
               </div>
             </div>
           </div>
 
-          {/* Diagnostics Detail & Spend Donut */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* 50/30/20 Framework & Coaching */}
-            <div className="lg:col-span-2 border border-[#1d2634] bg-[#11161f] rounded-2xl p-6 space-y-6">
+          {/* Category / time-series breakdown from the parser */}
+          {features && (
+            <SpendingBreakdown
+              features={features}
+              categoryBreakdown={data.category_breakdown ?? summary?.category_breakdown ?? []}
+              monthlyBreakdown={data.monthly_category_breakdown ?? summary?.monthly_category_breakdown ?? []}
+              transactions={data.transactions ?? []}
+            />
+          )}
+
+          {/* Diagnostics Detail & Coaching */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6 space-y-6">
               <div className="flex items-center justify-between border-b border-[#18202d] pb-3">
                 <div className="flex items-center space-x-2">
-                  <TrendingUp className="w-4 h-4 text-emerald-400" />
+                  <TrendingUp className="w-4 h-4" style={{ color: theme.accent }} />
                   <h4 className="text-xs font-mono uppercase text-neutral-200 tracking-wider">
                     Lifestyle Spending & Cashflow Diagnostics
                   </h4>
                 </div>
-                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded border" style={{ color: theme.accent, borderColor: theme.border, backgroundColor: theme.wash }}>
                   50 / 30 / 20 Framework
                 </span>
               </div>
 
-              {/* Progress Bars */}
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-xs font-mono mb-1">
-                    <span className="text-neutral-300">Essential Needs (Rent, EMI, Utilities)</span>
-                    <span className="text-neutral-200 font-bold">{pred.lifestyle_diagnostics?.needs_ratio_percent ?? 35.0}% <span className="text-neutral-500 font-normal">(Target: ≤50%)</span></span>
-                  </div>
-                  <div className="w-full bg-[#161d28] rounded-full h-2 overflow-hidden border border-[#232f42]">
-                    <div
-                      className="bg-blue-500 h-2 rounded-full"
-                      style={{ width: `${Math.min(100, (pred.lifestyle_diagnostics?.needs_ratio_percent ?? 35) * 2)}%` }}
-                    />
-                  </div>
+              {diagnostics ? (
+                <div className="space-y-4">
+                  {[
+                    { label: 'Essential Needs (Rent, EMI, Utilities)', value: diagnostics.needs_ratio_percent, target: 'Target: ≤50%', ceiling: 50, color: '#3b82f6' },
+                    { label: 'Discretionary Wants (Dining, Leisure, Shopping)', value: diagnostics.wants_ratio_percent, target: 'Target: ≤30%', ceiling: 30, color: '#f59e0b' },
+                    { label: 'Wealth & Savings (SIP, Investments, Surplus)', value: diagnostics.savings_ratio_percent, target: 'Target: ≥20%', ceiling: 20, color: '#10b981' }
+                  ].map((bar) => {
+                    const breached = bar.label.startsWith('Wealth')
+                      ? bar.value < bar.ceiling
+                      : bar.value > bar.ceiling;
+                    return (
+                      <div key={bar.label}>
+                        <div className="flex justify-between text-xs font-mono mb-1">
+                          <span className="text-neutral-300">{bar.label}</span>
+                          <span className={breached ? 'text-amber-400 font-bold' : 'text-emerald-400 font-bold'}>
+                            {bar.value.toFixed(1)}%{' '}
+                            <span className="text-neutral-500 font-normal">({bar.target})</span>
+                          </span>
+                        </div>
+                        <div className="w-full bg-[#161d28] rounded-full h-2 overflow-hidden border border-[#232f42]">
+                          <motion.div
+                            className="h-2 rounded-full"
+                            style={{ backgroundColor: breached ? '#f59e0b' : bar.color }}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min(100, bar.value * 1.6)}%` }}
+                            transition={{ type: 'spring', stiffness: 55, damping: 15 }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-
-                <div>
-                  <div className="flex justify-between text-xs font-mono mb-1">
-                    <span className="text-neutral-300">Discretionary Wants (Dining, Leisure, Shopping)</span>
-                    <span className={`font-bold ${(pred.lifestyle_diagnostics?.wants_ratio_percent ?? 25) > 30 ? 'text-amber-400' : 'text-emerald-400'}`}>
-                      {pred.lifestyle_diagnostics?.wants_ratio_percent ?? 25.0}% <span className="text-neutral-500 font-normal">(Target: ≤30%)</span>
-                    </span>
-                  </div>
-                  <div className="w-full bg-[#161d28] rounded-full h-2 overflow-hidden border border-[#232f42]">
-                    <div
-                      className={`h-2 rounded-full ${(pred.lifestyle_diagnostics?.wants_ratio_percent ?? 25) > 30 ? 'bg-amber-500' : 'bg-emerald-500'}`}
-                      style={{ width: `${Math.min(100, (pred.lifestyle_diagnostics?.wants_ratio_percent ?? 25) * 2.5)}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs font-mono mb-1">
-                    <span className="text-neutral-300">Wealth & Savings (SIP, Investments, Surplus)</span>
-                    <span className="text-emerald-400 font-bold">{pred.lifestyle_diagnostics?.savings_ratio_percent ?? 40.0}% <span className="text-neutral-500 font-normal">(Target: ≥20%)</span></span>
-                  </div>
-                  <div className="w-full bg-[#161d28] rounded-full h-2 overflow-hidden border border-[#232f42]">
-                    <div
-                      className="bg-emerald-500 h-2 rounded-full"
-                      style={{ width: `${Math.min(100, (pred.lifestyle_diagnostics?.savings_ratio_percent ?? 40) * 2.5)}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
+              ) : (
+                <p className="text-xs text-neutral-500">
+                  Diagnostics were not returned for this statement.
+                </p>
+              )}
 
               {/* Detected Leakages */}
-              <div className="space-y-2 pt-2 border-t border-[#18202d]">
-                <div className="flex items-center space-x-1.5 text-xs font-mono text-neutral-300">
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Detected Spending Leakages & Friction Points:</span>
+              {diagnostics && (
+                <div className="space-y-2 pt-2 border-t border-[#18202d]">
+                  <div className="flex items-center space-x-1.5 text-xs font-mono text-neutral-300">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Detected Spending Leakages & Friction Points:</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {diagnostics.top_spend_leakages.map((leak, idx) => (
+                      <div key={`${leak}-${idx}`} className="flex items-start space-x-2 text-xs text-neutral-400 bg-[#161d28]/60 p-2.5 rounded-lg border border-[#232f42]">
+                        <span className="text-amber-400 font-bold">•</span>
+                        <span>{leak}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="space-y-1.5">
-                  {(pred.lifestyle_diagnostics?.top_spend_leakages || [
-                    "No critical cashflow leaks detected. Balanced allocation."
-                  ]).map((leak, idx) => (
-                    <div key={idx} className="flex items-start space-x-2 text-xs text-neutral-400 bg-[#161d28]/60 p-2.5 rounded-lg border border-[#232f42]">
-                      <span className="text-amber-400 font-bold">•</span>
-                      <span>{leak}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              )}
 
               {/* Coaching Tips */}
-              <div className="space-y-2 pt-2 border-t border-[#18202d]">
-                <div className="flex items-center space-x-1.5 text-xs font-mono text-emerald-400">
-                  <Lightbulb className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Actionable Lifestyle Recommendations:</span>
+              {diagnostics && (
+                <div className="space-y-2 pt-2 border-t border-[#18202d]">
+                  <div className="flex items-center space-x-1.5 text-xs font-mono" style={{ color: theme.accent }}>
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Persona Coaching Notes:</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {diagnostics.coaching_insights.map((tip, idx) => (
+                      <div key={`${tip}-${idx}`} className="flex items-start space-x-2 text-xs text-neutral-300 bg-[#0f141c] p-2.5 rounded-lg border" style={{ borderColor: theme.border }}>
+                        <ArrowRight className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: theme.accent }} />
+                        <span>{tip}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="space-y-1.5">
-                  {(pred.lifestyle_diagnostics?.coaching_insights || [
-                    "Maintain current savings discipline and automate monthly SIP transfers."
-                  ]).map((tip, idx) => (
-                    <div key={idx} className="flex items-start space-x-2 text-xs text-neutral-300 bg-emerald-950/20 p-2.5 rounded-lg border border-emerald-800/30">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                      <span>{tip}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              )}
 
               {/* Collapsible Tax Ref */}
-              <div className="pt-2 border-t border-[#18202d]">
-                <button
-                  onClick={() => setShowTaxRef(!showTaxRef)}
-                  className="flex items-center space-x-1.5 text-[11px] font-mono text-neutral-500 hover:text-neutral-300 transition"
-                >
-                  {showTaxRef ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                  <span>{showTaxRef ? 'Hide Statutory Section 115BAC Reference' : 'Show Statutory Section 115BAC Reference'}</span>
-                </button>
+              {tax && (
+                <div className="pt-2 border-t border-[#18202d]">
+                  <button
+                    onClick={() => setShowTaxRef(!showTaxRef)}
+                    className="flex items-center space-x-1.5 text-[11px] font-mono text-neutral-500 hover:text-neutral-300 transition"
+                  >
+                    {showTaxRef ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                    <span>{showTaxRef ? 'Hide Statutory Section 115BAC Reference' : 'Show Statutory Section 115BAC Reference'}</span>
+                  </button>
 
-                {showTaxRef && tax && (
-                  <div className="mt-3 p-3.5 rounded-xl bg-[#0a0d13] border border-[#1d2634] space-y-2 font-mono text-[11px]">
-                    <div className="flex justify-between text-neutral-400">
-                      <span>Gross Annual Turnover / Inflow:</span>
-                      <span>{formatINR(tax.gross_income)}</span>
+                  {showTaxRef && (
+                    <div className="mt-3 p-3.5 rounded-xl bg-[#0a0d13] border border-[#1d2634] space-y-2 font-mono text-[11px]">
+                      <div className="flex justify-between text-neutral-400">
+                        <span>Gross Annual Turnover / Inflow:</span>
+                        <span>{formatINR(tax.gross_income)}</span>
+                      </div>
+                      <div className="flex justify-between text-neutral-400">
+                        <span>Standard Deduction:</span>
+                        <span>- {formatINR(tax.standard_deduction)}</span>
+                      </div>
+                      <div className="flex justify-between text-neutral-400">
+                        <span>Taxable Income:</span>
+                        <span>{formatINR(tax.taxable_income)}</span>
+                      </div>
+                      <div className="flex justify-between text-neutral-200 font-bold">
+                        <span>Net Tax Payable:</span>
+                        <span className="text-emerald-400">{formatINR(tax.net_tax_payable)} ({tax.effective_tax_rate_percent}%)</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between text-neutral-400">
-                      <span>Standard Deduction:</span>
-                      <span>- {formatINR(tax.standard_deduction)}</span>
-                    </div>
-                    <div className="flex justify-between text-neutral-400">
-                      <span>Taxable Income:</span>
-                      <span>{formatINR(tax.taxable_income)}</span>
-                    </div>
-                    <div className="flex justify-between text-neutral-200 font-bold">
-                      <span>Net Tax Payable:</span>
-                      <span className="text-emerald-400">{formatINR(tax.net_tax_payable)} ({tax.effective_tax_rate_percent}%)</span>
-                    </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Outflow Pie Chart */}
-            <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6 flex flex-col justify-between">
-              <h4 className="text-xs font-mono uppercase text-neutral-400 tracking-wider">
-                Outflow Allocation Breakdown
-              </h4>
-              <div className="h-48 my-2">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={spendBreakdown}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={45}
-                      outerRadius={70}
-                      paddingAngle={3}
-                    >
-                      {spendBreakdown.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(val: any) => [`${Number(val).toFixed(1)}%`, '']}
-                      contentStyle={{ backgroundColor: '#11161f', borderColor: '#232f42', borderRadius: '8px', fontSize: '11px' }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
-                {spendBreakdown.map((item) => (
-                  <div key={item.name} className="flex items-center space-x-1.5">
-                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-                    <span className="text-neutral-400 truncate">{item.name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <HeatCalendar transactions={data.transactions ?? []} archetypeId={archetype?.archetype_id} />
           </div>
 
           {/* 16D Feature Vector Table */}
@@ -636,3 +703,5 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({ data, setData })
     </div>
   );
 };
+
+export default DiagnosticView;

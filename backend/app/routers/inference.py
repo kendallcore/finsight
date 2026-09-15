@@ -4,10 +4,11 @@ from sqlalchemy.orm import Session
 
 from app.schemas import (
     UploadStatementResponse, PredictFeaturesResponse, ManualFeatureInput,
-    ExtractedFeatures
+    ExtractedFeatures, InsightRequest
 )
 from app.services.statement_parser import statement_parser
 from app.services.ml_service import ml_service
+from app.services.insights_service import insights_service
 from app.database.db import get_db
 from app.database.models import StatementUploadRecord
 
@@ -38,8 +39,8 @@ async def upload_statement(
         if len(file_bytes) == 0:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Uploaded file is empty.")
 
-        # 1. Parse and extract features + business breakdown
-        summary, features, business_metrics = statement_parser.parse_and_extract(
+        # 1. Parse and extract features + business breakdown + categorized transactions
+        summary, features, business_metrics, transactions_df = statement_parser.parse_and_extract(
             file_bytes=file_bytes,
             filename=file.filename,
             password=pdf_password
@@ -60,7 +61,16 @@ async def upload_statement(
             actual_turnover=summary.total_credits
         )
 
-        # 3. Log to SQLite
+        # 3. Reason over the same transaction window we are about to publish
+        insight_request = insights_service.request_from_statement(
+            features=features.model_dump(),
+            transactions_df=transactions_df,
+            summary=summary,
+            archetype_prediction=predictions.lifestyle_archetype,
+        )
+        transaction_records = statement_parser.build_transaction_records(transactions_df)
+
+        # 4. Log to SQLite
         record = StatementUploadRecord(
             filename=file.filename,
             total_transactions=summary.total_transactions,
@@ -79,7 +89,11 @@ async def upload_statement(
             status="success",
             statement_summary=summary,
             extracted_features=features,
-            predictions=predictions
+            predictions=predictions,
+            transactions=transaction_records,
+            category_breakdown=summary.category_breakdown,
+            monthly_category_breakdown=summary.monthly_category_breakdown,
+            insights=insights_service.generate(insight_request)
         )
 
     except Exception as e:
@@ -110,10 +124,18 @@ async def predict_features(input_data: ManualFeatureInput):
         )
         features = ExtractedFeatures(**feat_dict)
 
+        insights = insights_service.generate(InsightRequest(
+            features=feat_dict,
+            archetype_id=predictions.lifestyle_archetype.archetype_id,
+            archetype_name=predictions.lifestyle_archetype.archetype_name,
+            archetype_confidence=predictions.lifestyle_archetype.confidence,
+        ))
+
         return PredictFeaturesResponse(
             status="success",
             extracted_features=features,
-            predictions=predictions
+            predictions=predictions,
+            insights=insights
         )
     except Exception as e:
         raise HTTPException(

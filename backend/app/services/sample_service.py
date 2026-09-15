@@ -103,8 +103,17 @@ class SampleService:
         return [SampleProfileItem(**p) for p in SAMPLE_PROFILES]
 
     @staticmethod
+    def is_known_profile(profile_id: str) -> bool:
+        return any(profile["profile_id"] == profile_id for profile in SAMPLE_PROFILES)
+
+    @staticmethod
     def get_sample_csv_bytes(profile_id: str) -> Optional[bytes]:
         """Generates or loads representative CSV bytes for the chosen preset."""
+        # Guard the synthetic-data fallback: without it any typo'd profile_id quietly served a
+        # different person's statement instead of 404ing.
+        if not SampleService.is_known_profile(profile_id):
+            return None
+
         preset_file = settings.SAMPLE_STATEMENTS_DIR / f"{profile_id}.csv"
         if preset_file.exists():
             with open(preset_file, "rb") as f:

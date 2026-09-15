@@ -1,33 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { TopHeader } from './components/TopHeader';
 import { DiagnosticView } from './components/DiagnosticView';
+import { InsightsView } from './components/InsightsView';
 import { SimulatorView } from './components/SimulatorView';
 import { EvaluationHub } from './components/EvaluationHub';
 import { VivaPresetsView } from './components/VivaPresetsView';
 import { ApiIntegrationsView } from './components/ApiIntegrationsView';
-import { api } from './services/api';
 import { UploadStatementResponse } from './types';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('diagnostic');
   const [analysisResult, setAnalysisResult] = useState<UploadStatementResponse | null>(null);
-  const [, setApiHealthy] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
-
-  useEffect(() => {
-    const checkApi = async () => {
-      try {
-        const res = await api.checkHealth();
-        setApiHealthy(res.models_loaded);
-      } catch {
-        setApiHealthy(false);
-      }
-    };
-    checkApi();
-    const interval = setInterval(checkApi, 10000);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleSelectSample = (data: UploadStatementResponse) => {
     setAnalysisResult(data);
@@ -51,8 +36,16 @@ export const App: React.FC = () => {
           {activeTab === 'diagnostic' && (
             <DiagnosticView data={analysisResult} setData={setAnalysisResult} />
           )}
+          {activeTab === 'insights' && (
+            <InsightsView data={analysisResult} onGoToDiagnostic={() => setActiveTab('diagnostic')} />
+          )}
           {activeTab === 'simulator' && <SimulatorView />}
-          {activeTab === 'evaluation' && <EvaluationHub />}
+          {activeTab === 'evaluation' && (
+            <EvaluationHub
+              userCoord={analysisResult?.predictions?.assigned_cluster?.pca_3d_coord ?? null}
+              userLabel={analysisResult?.statement_summary?.account_holder_name ?? analysisResult?.statement_summary?.filename}
+            />
+          )}
           {activeTab === 'viva' && (
             <VivaPresetsView
               onSelectSample={handleSelectSample}

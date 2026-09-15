@@ -5,7 +5,8 @@ import {
   BarChart3,
   Users,
   Code2,
-  Sprout
+  Sprout,
+  BrainCircuit
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -17,6 +18,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isOpen = true }) => {
   const navItems = [
     { id: 'diagnostic', label: 'Statement Diagnostic', icon: FileSpreadsheet },
+    { id: 'insights', label: 'Coaching Insights', icon: BrainCircuit },
     { id: 'simulator', label: 'What-If Simulator', icon: SlidersHorizontal },
     { id: 'evaluation', label: 'Model Evaluation', icon: BarChart3 },
     { id: 'viva', label: 'Profile Simulations', icon: Users },

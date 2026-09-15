@@ -11,14 +11,18 @@ import tempfile
 import subprocess
 import pandas as pd
 import numpy as np
-from typing import Tuple, Dict, Any, Optional
+from typing import Tuple, Dict, Any, List, Optional
 
 from app.services.feature_engineering import (
     FinancialFeatureExtractor,
     detect_payment_mode,
-    detect_category
+    detect_category,
+    parse_amount,
+    parse_transaction_dates
 )
 from app.schemas import StatementSummary, ExtractedFeatures
+
+MAX_TRANSACTION_RECORDS = 500
 
 
 HEADER_KEYWORDS = [
@@ -383,7 +387,7 @@ class StatementParser:
         credit_col = next((c for c, l in cols_lower.items() if "credit" in l or "deposit" in l or "cr" == l), None)
         debit_col = next((c for c, l in cols_lower.items() if "debit" in l or "withdrawal" in l or "dr" == l), None)
         amount_col = next((c for c, l in cols_lower.items() if "amount" in l or "txn_amount" in l), None)
-        type_col = next((c for c, l in cols_lower.items() if "type" in l or "cr/dr" in l or "d/c" in l), None)
+        type_col = next((c for c, l in cols_lower.items() if "type" in l or "cr/dr" in l or "cr_dr" in l or "dr_cr" in l or "d/c" in l), None)
         mode_col = next((c for c, l in cols_lower.items() if "mode" in l or "channel" in l or "rail" in l), None)
         cat_col = next((c for c, l in cols_lower.items() if "cat" in l), None)
 
@@ -394,8 +398,8 @@ class StatementParser:
             narration = str(row[desc_col]) if desc_col and pd.notna(row[desc_col]) else "TRANSACTION"
 
             if credit_col and debit_col:
-                cr_val = float(pd.to_numeric(row[credit_col], errors="coerce") or 0.0)
-                dr_val = float(pd.to_numeric(row[debit_col], errors="coerce") or 0.0)
+                cr_val = parse_amount(row[credit_col])
+                dr_val = parse_amount(row[debit_col])
                 if cr_val > 0:
                     txn_type = "CREDIT"
                     amount = cr_val
@@ -403,10 +407,15 @@ class StatementParser:
                     txn_type = "DEBIT"
                     amount = dr_val
             elif amount_col:
-                amount = abs(float(pd.to_numeric(row[amount_col], errors="coerce") or 0.0))
+                amount = parse_amount(row[amount_col])
                 if type_col and pd.notna(row[type_col]):
-                    t_str = str(row[type_col]).upper()
-                    txn_type = "CREDIT" if "CR" in t_str or "CREDIT" in t_str or "+" in t_str else "DEBIT"
+                    t_str = str(row[type_col]).upper().strip()
+                    # Indian exports use "C"/"D", "CR"/"DR", "CREDIT"/"DEBIT" and "+"/"-" interchangeably.
+                    txn_type = (
+                        "CREDIT"
+                        if t_str in {"C", "CR", "CREDIT", "DEPOSIT", "+"} or "CREDIT" in t_str
+                        else "DEBIT"
+                    )
                 else:
                     txn_type = "CREDIT" if any(w in narration.upper() for w in ["SALARY", "CR", "DEPOSIT", "DIVIDEND", "REFUND"]) else "DEBIT"
             else:
@@ -436,14 +445,149 @@ class StatementParser:
         }
         return pd.DataFrame(standardized_rows), metadata
 
+    @staticmethod
+    def standardize_frame(df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Coerces a raw standardized transaction frame into a numeric, upper-cased frame
+        with parsed `date`/`month` columns. Shared by the feature extractor and the
+        category/time-series aggregations so every view of the same statement agrees.
+        """
+        work = df.copy()
+        if work.empty:
+            return work
+
+        for column, fallback in (
+            ("type", "DEBIT"),
+            ("narration", "TRANSACTION"),
+            ("category", "GENERAL_DEBIT"),
+            ("payment_mode", "OTHER"),
+        ):
+            if column not in work.columns:
+                work[column] = fallback
+            else:
+                # A missing value stringifies to "None"/"nan", which would otherwise leak
+                # into the published category labels instead of collapsing to the fallback.
+                work[column] = work[column].where(work[column].notna(), fallback)
+
+        work["amount"] = work["amount"].apply(parse_amount)
+        work["type"] = work["type"].astype(str).str.upper().str.strip().replace({"NONE": "DEBIT", "NAN": "DEBIT", "": "DEBIT"})
+        work["narration"] = work["narration"].astype(str).str.strip().replace({"NONE": "TRANSACTION", "nan": "TRANSACTION", "": "TRANSACTION"})
+        work["payment_mode"] = (
+            work["payment_mode"].astype(str).str.upper().str.strip().replace({"NAN": "OTHER", "NONE": "OTHER", "": "OTHER"})
+        )
+        work["category"] = (
+            work["category"].astype(str).str.upper().str.strip().replace({"NAN": "GENERAL_DEBIT", "NONE": "GENERAL_DEBIT", "": "GENERAL_DEBIT"})
+        )
+
+        parsed_dates = parse_transaction_dates(work["date"])
+        work["parsed_date"] = parsed_dates
+        # Keep the original text when a date will not parse, but never publish an empty/NaN date.
+        work["date_str"] = (
+            parsed_dates.dt.strftime("%Y-%m-%d")
+            .fillna(work["date"].astype(str).str.strip())
+            .replace({"None": "", "nan": "", "NaT": ""})
+            .fillna("")
+        )
+        work["month"] = parsed_dates.dt.strftime("%Y-%m").fillna("")
+        return work
+
+    @staticmethod
+    def _debits(work: pd.DataFrame) -> pd.DataFrame:
+        return work[work["type"] == "DEBIT"] if not work.empty else work
+
+    @classmethod
+    def build_category_breakdown(cls, df: pd.DataFrame) -> List[Dict[str, Any]]:
+        """Aggregates debit outflow per category with share of total spend, largest first."""
+        debits = cls._debits(cls.standardize_frame(df))
+        if debits.empty:
+            return []
+
+        total_spend = float(debits["amount"].sum())
+        if total_spend <= 0:
+            return []
+
+        grouped = (
+            debits.groupby("category", as_index=False)
+            .agg(amount=("amount", "sum"), transaction_count=("amount", "size"))
+            .sort_values("amount", ascending=False)
+        )
+        return [
+            {
+                "category": row["category"],
+                "amount": round(float(row["amount"]), 2),
+                "transaction_count": int(row["transaction_count"]),
+                "percentage_of_total": round(float(row["amount"]) / total_spend * 100.0, 2),
+            }
+            for row in grouped.to_dict("records")
+        ]
+
+    @classmethod
+    def build_monthly_category_breakdown(cls, df: pd.DataFrame) -> List[Dict[str, Any]]:
+        """Groups debit outflow by (month, category) to power time-series charts."""
+        debits = cls._debits(cls.standardize_frame(df))
+        if debits.empty:
+            return []
+
+        debits = debits[debits["month"] != ""]
+        if debits.empty:
+            return []
+
+        grouped = (
+            debits.groupby(["month", "category"], as_index=False)["amount"].sum()
+            .sort_values(["month", "amount"], ascending=[True, False])
+        )
+        return [
+            {
+                "month": row["month"],
+                "category": row["category"],
+                "amount": round(float(row["amount"]), 2),
+            }
+            for row in grouped.to_dict("records")
+        ]
+
+    @classmethod
+    def build_transaction_records(cls, df: pd.DataFrame, limit: int = MAX_TRANSACTION_RECORDS) -> List[Dict[str, Any]]:
+        """Returns the most recent categorized transactions, newest first, capped for payload size."""
+        work = cls.standardize_frame(df)
+        if work.empty:
+            return []
+
+        work = work.sort_values(["parsed_date", "amount"], ascending=[False, False], na_position="last")
+        recent = work.head(limit)
+        return [
+            {
+                "date": str(row["date_str"]),
+                "narration": str(row["narration"]).strip() or "TRANSACTION",
+                "amount": round(float(row["amount"]), 2),
+                "type": str(row["type"]),
+                "category": str(row["category"]),
+                "payment_mode": str(row["payment_mode"]),
+            }
+            for row in recent.to_dict("records")
+        ]
+
+    @classmethod
+    def statement_month_span(cls, df: pd.DataFrame) -> float:
+        """Number of calendar months the statement covers (minimum 1) for monthly normalization."""
+        work = cls.standardize_frame(df)
+        if work.empty:
+            return 1.0
+        months = sorted({m for m in work["month"].tolist() if m})
+        if not months:
+            return 1.0
+        return float(len(months))
+
     @classmethod
     def parse_and_extract(
         cls,
         file_bytes: bytes,
         filename: str = "statement.csv",
         password: Optional[str] = None
-    ) -> Tuple[StatementSummary, ExtractedFeatures, Dict[str, float]]:
-        """Parses CSV/PDF and extracts statement summary + 16D feature vector + business metrics."""
+    ) -> Tuple[StatementSummary, ExtractedFeatures, Dict[str, float], pd.DataFrame]:
+        """
+        Parses CSV/PDF and extracts statement summary + 16D feature vector + business
+        metrics + the categorized transaction frame behind both.
+        """
         is_pdf = filename.lower().endswith(".pdf") or file_bytes.startswith(b"%PDF")
 
         if is_pdf:
@@ -463,7 +607,7 @@ class StatementParser:
             total_credits = float(credits_df["amount"].sum())
             total_debits = float(debits_df["amount"].sum())
 
-        dates = pd.to_datetime(df["date"], dayfirst=True, format="mixed", errors="coerce").dropna()
+        dates = parse_transaction_dates(df["date"]).dropna()
         if len(dates) > 0:
             date_from = dates.min().strftime("%Y-%m-%d")
             date_to = dates.max().strftime("%Y-%m-%d")
@@ -473,6 +617,8 @@ class StatementParser:
 
         extractor = FinancialFeatureExtractor()
         business_metrics = extractor.extract_business_breakdown(df)
+        category_breakdown = cls.build_category_breakdown(df)
+        monthly_category_breakdown = cls.build_monthly_category_breakdown(df)
 
         summary = StatementSummary(
             filename=filename,
@@ -488,13 +634,15 @@ class StatementParser:
             total_debits=round(total_debits, 2),
             detected_opex=business_metrics["detected_opex"],
             detected_capex=business_metrics["detected_capex"],
-            digital_receipts_ratio=business_metrics["digital_receipts_ratio"]
+            digital_receipts_ratio=business_metrics["digital_receipts_ratio"],
+            category_breakdown=category_breakdown,
+            monthly_category_breakdown=monthly_category_breakdown
         )
 
         features_dict = extractor.extract_from_dataframe(df)
         features = ExtractedFeatures(**features_dict)
 
-        return summary, features, business_metrics
+        return summary, features, business_metrics, df
 
 
 statement_parser = StatementParser()

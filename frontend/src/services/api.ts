@@ -1,11 +1,20 @@
 import {
   UploadStatementResponse,
+  PredictFeaturesResponse,
   ModelEvaluationResponse,
+  PCAPointsResponse,
   SampleProfileItem,
-  ExtractedFeatures
+  ExtractedFeatures,
+  InsightRequest,
+  InsightResponse
 } from '../types';
 
 const API_BASE = '/api';
+
+async function readError(res: Response, fallback: string): Promise<string> {
+  const err = await res.json().catch(() => ({ detail: fallback }));
+  return err.detail || fallback;
+}
 
 export const api = {
   async checkHealth(): Promise<{ status: string; tax_regime_year: string; models_loaded: boolean }> {
@@ -26,29 +35,52 @@ export const api = {
       body: formData,
     });
     if (!res.ok) {
-      const err = await res.json().catch(() => ({ detail: 'Failed to upload statement' }));
-      throw new Error(err.detail || 'Upload failed');
+      throw new Error(await readError(res, 'Upload failed'));
     }
     return res.json();
   },
 
-
-  async predictFeatures(features: ExtractedFeatures): Promise<UploadStatementResponse> {
+  async predictFeatures(features: ExtractedFeatures): Promise<PredictFeaturesResponse> {
     const res = await fetch(`${API_BASE}/predict-features`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(features),
     });
     if (!res.ok) {
-      const err = await res.json().catch(() => ({ detail: 'Prediction failed' }));
-      throw new Error(err.detail || 'Prediction failed');
+      throw new Error(await readError(res, 'Prediction failed'));
+    }
+    return res.json();
+  },
+
+  async getInsights(profileId: string): Promise<InsightResponse> {
+    const res = await fetch(`${API_BASE}/insights/${encodeURIComponent(profileId)}`);
+    if (!res.ok) {
+      throw new Error(await readError(res, 'Failed to fetch insights'));
+    }
+    return res.json();
+  },
+
+  async createInsights(body: InsightRequest): Promise<InsightResponse> {
+    const res = await fetch(`${API_BASE}/insights`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      throw new Error(await readError(res, 'Failed to generate insights'));
     }
     return res.json();
   },
 
   async getEvaluation(): Promise<ModelEvaluationResponse> {
     const res = await fetch(`${API_BASE}/models/evaluation`);
-    if (!res.ok) throw new Error('Failed to fetch model evaluations');
+    if (!res.ok) throw new Error(await readError(res, 'Failed to fetch model evaluations'));
+    return res.json();
+  },
+
+  async getPCAPoints(): Promise<PCAPointsResponse> {
+    const res = await fetch(`${API_BASE}/clusters/pca-points`);
+    if (!res.ok) throw new Error(await readError(res, 'Failed to fetch PCA cluster points'));
     return res.json();
   },
 
@@ -62,7 +94,7 @@ export const api = {
     const res = await fetch(`${API_BASE}/samples/${profileId}/analyze`, {
       method: 'POST',
     });
-    if (!res.ok) throw new Error(`Failed to analyze sample ${profileId}`);
+    if (!res.ok) throw new Error(await readError(res, `Failed to analyze sample ${profileId}`));
     return res.json();
   }
 };

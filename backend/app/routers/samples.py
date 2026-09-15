@@ -8,6 +8,7 @@ from fastapi import APIRouter, HTTPException, Response
 from app.schemas import SampleProfileItem, UploadStatementResponse
 from app.services.sample_service import sample_service
 from app.services.statement_parser import statement_parser
+from app.services.insights_service import insights_service
 from app.services.ml_service import ml_service
 
 router = APIRouter(prefix="/api/samples", tags=["Samples"])
@@ -43,7 +44,7 @@ async def analyze_sample_profile(profile_id: str):
     preset_meta = next((p for p in sample_service.get_all_samples() if p.profile_id == profile_id), None)
     display_name = preset_meta.title if preset_meta else f"{profile_id}.csv"
 
-    summary, features, business_metrics = statement_parser.parse_and_extract(
+    summary, features, business_metrics, transactions_df = statement_parser.parse_and_extract(
         file_bytes=csv_bytes,
         filename=display_name
     )
@@ -55,10 +56,21 @@ async def analyze_sample_profile(profile_id: str):
         digital_ratio=business_metrics.get("digital_receipts_ratio", 1.0)
     )
 
+    insight_request = insights_service.request_from_statement(
+        features=features.model_dump(),
+        transactions_df=transactions_df,
+        summary=summary,
+        archetype_prediction=predictions.lifestyle_archetype,
+    )
+
     return UploadStatementResponse(
         status="success",
         statement_summary=summary,
         extracted_features=features,
-        predictions=predictions
+        predictions=predictions,
+        transactions=statement_parser.build_transaction_records(transactions_df),
+        category_breakdown=summary.category_breakdown,
+        monthly_category_breakdown=summary.monthly_category_breakdown,
+        insights=insights_service.generate(insight_request)
     )
 

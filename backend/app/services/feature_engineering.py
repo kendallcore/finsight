@@ -7,9 +7,48 @@ Optimized for FY 2025-26 Indian Income Tax Regime (Section 115BAC).
 import numpy as np
 import pandas as pd
 import re
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional, Sequence, Tuple
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import StandardScaler, PowerTransformer
+
+
+# Date shapes: an explicit YYYY-MM-DD prefix must never be re-read with dayfirst semantics,
+# while ambiguous dd/mm/yyyy (the Indian default) still needs dayfirst=True.
+ISO_DATE_PREFIX = re.compile(r"^\s*\d{4}[-/.]\d{1,2}[-/.]\d{1,2}")
+
+
+def parse_transaction_dates(series: pd.Series) -> pd.Series:
+    """
+    Parses statement dates per row rather than per column, so a single file containing both
+    "2025-04-01" and "01/04/2025" resolves both to 1 April instead of shuffling one of them.
+    """
+    text = pd.Series(series).astype(str).str.strip()
+    result = pd.Series(pd.NaT, index=text.index, dtype="datetime64[ns]")
+
+    is_iso = text.str.match(ISO_DATE_PREFIX)
+    if is_iso.any():
+        result.loc[is_iso] = pd.to_datetime(text[is_iso], format="mixed", errors="coerce", dayfirst=False)
+    remainder = ~is_iso & text.ne("") & text.str.lower().ne("nan") & text.str.lower().ne("none")
+    if remainder.any():
+        result.loc[remainder] = pd.to_datetime(
+            text[remainder], format="mixed", errors="coerce", dayfirst=True
+        )
+    return result
+
+
+def contains_token(text: str, tokens: Sequence[str]) -> bool:
+    """
+    Substring matching is right for merchant names but wrong for short acronyms: "EMI" is
+    inside "PREMIUM" and "SAL" is inside "REVERSAL", which mislabelled those transactions.
+    Tokens of three characters or fewer are therefore matched on word boundaries.
+    """
+    for token in tokens:
+        if len(token) <= 3:
+            if re.search(rf"\b{re.escape(token)}\b", text):
+                return True
+        elif token in text:
+            return True
+    return False
 
 
 # Regular expressions for Indian Banking Narrations
@@ -46,6 +85,36 @@ FEATURE_NAMES = [
 ]
 
 
+def parse_amount(value: Any, default: float = 0.0) -> float:
+    """
+    Coerces a statement amount to a positive magnitude.
+
+    Indian bank exports routinely group thousands ("1,500.00"), prefix the rupee sign and use
+    accounting parentheses for debits. A bare pd.to_numeric turns those into NaN, which then
+    silently zeroes the row in every downstream sum, so the cleaning happens here instead.
+    """
+    if value is None:
+        return default
+    try:
+        if pd.isna(value):
+            return default
+    except (TypeError, ValueError):
+        pass
+    if isinstance(value, (int, float, np.floating)):
+        return float(abs(value))
+
+    text = str(value).strip()
+    if not text:
+        return default
+    text = re.sub(r"[₹,\s()]", "", text)
+    if not text:
+        return default
+    try:
+        return float(abs(float(text)))
+    except ValueError:
+        return default
+
+
 def detect_payment_mode(narration: str) -> str:
     s = str(narration).upper()
     if "UPI" in s or "VPA" in s or "@" in s:
@@ -68,38 +137,38 @@ def detect_category(narration: str, txn_type: str) -> str:
     s = str(narration).upper()
     if txn_type == "CREDIT":
         # Merchant QR settlements like Google Pay, Paytm, etc. are business receipts, not personal salary
-        if any(w in s for w in ["GOOGLE INDIA DIGITAL", "PAYTM", "BHARATPE", "RAZORPAY", "PINELABS", "POS", "QR", "MERCHANT"]):
+        if contains_token(s, ["GOOGLE INDIA DIGITAL", "PAYTM", "BHARATPE", "RAZORPAY", "PINELABS", "POS", "QR", "MERCHANT"]):
             return "BUSINESS_MERCHANT_RECEIPT"
-        elif any(w in s for w in ["SALARY", "SAL ", "PAYROLL", "STIPEND", "REMUNERATION"]):
-            return "SALARY"
-        elif any(w in s for w in ["DIVIDEND", "REDEMPTION", "ZERODHA", "GROWW", "INTEREST"]):
-            return "REDEMPTION"
-        elif "REFUND" in s or "REVERSAL" in s:
+        elif contains_token(s, ["REFUND", "REVERSAL"]):
             return "REFUND"
+        elif contains_token(s, ["SALARY", "SAL", "PAYROLL", "STIPEND", "REMUNERATION"]):
+            return "SALARY"
+        elif contains_token(s, ["DIVIDEND", "REDEMPTION", "ZERODHA", "GROWW", "INTEREST"]):
+            return "REDEMPTION"
         else:
             return "GENERAL_CREDIT"
     else:
         if bool(CAPEX_PATTERNS.search(s)):
             return "CAPEX_EQUIPMENT"
-        elif any(w in s for w in ["RENT", "LANDLORD", "NOBROKER"]):
+        elif contains_token(s, ["RENT", "LANDLORD", "NOBROKER"]):
             return "RENT"
-        elif any(w in s for w in ["ELECTRICITY", "BESCOM", "TNEB", "AIRTEL", "JIO", "GAS", "BBPS", "BILL"]):
+        elif contains_token(s, ["ELECTRICITY", "BESCOM", "TNEB", "AIRTEL", "JIO", "GAS", "BBPS", "BILL"]):
             return "UTILITIES"
-        elif any(w in s for w in ["STAFF", "WAGES", "TRAINER", "SALARY PAID"]):
+        elif contains_token(s, ["STAFF", "WAGES", "TRAINER", "SALARY PAID"]):
             return "STAFF_SALARY"
-        elif any(w in s for w in ["VENDOR", "SUPPLIER", "WHOLESALE", "MATERIALS", "MAINTENANCE", "AGENCY", "MANUFACTURER", "TRADERS", "STORES"]):
+        elif contains_token(s, ["VENDOR", "SUPPLIER", "WHOLESALE", "MATERIALS", "MAINTENANCE", "AGENCY", "MANUFACTURER", "TRADERS", "STORES"]):
             return "VENDOR_PAYOUT"
-        elif any(w in s for w in ["EMI", "LOAN", "HOUSING", "AUTO", "MANAPPURAM", "INDIFI", "BAJAJ", "CHOLAMANDALAM"]):
+        elif contains_token(s, ["EMI", "LOAN", "HOUSING", "AUTO", "MANAPPURAM", "INDIFI", "BAJAJ", "CHOLAMANDALAM"]):
             return "EMI"
-        elif any(w in s for w in ["SWIGGY", "ZOMATO", "BLINKIT", "ZEPTO", "RESTAURANT", "CAFE", "FOOD"]):
+        elif contains_token(s, ["SWIGGY", "ZOMATO", "BLINKIT", "ZEPTO", "RESTAURANT", "CAFE", "FOOD"]):
             return "FOOD"
-        elif any(w in s for w in ["AMAZON", "FLIPKART", "MYNTRA", "SHOPPING", "RETAIL"]):
+        elif contains_token(s, ["AMAZON", "FLIPKART", "MYNTRA", "SHOPPING", "RETAIL"]):
             return "SHOPPING"
-        elif any(w in s for w in ["UBER", "OLA", "FASTAG", "PETROL", "FUEL", "IRCTC", "MAKEMYTRIP"]):
+        elif contains_token(s, ["UBER", "OLA", "FASTAG", "PETROL", "FUEL", "IRCTC", "MAKEMYTRIP"]):
             return "TRAVEL"
-        elif any(w in s for w in ["ZERODHA", "GROWW", "MUTUAL FUND", "SIP", "STOCKS", "MF"]):
+        elif contains_token(s, ["ZERODHA", "GROWW", "MUTUAL FUND", "SIP", "STOCKS", "MF"]):
             return "INVESTMENT"
-        elif any(w in s for w in ["NPS", "PPF", "INSURANCE", "LIC", "MAX LIFE", "HDFC ERGO"]):
+        elif contains_token(s, ["NPS", "PPF", "INSURANCE", "LIC", "MAX LIFE", "HDFC ERGO"]):
             return "TAX_SHIELD"
         elif bool(OPEX_PATTERNS.search(s)):
             return "OPERATIONAL_EXPENSE"
@@ -125,9 +194,9 @@ class FinancialFeatureExtractor:
             return {feat: 0.0 for feat in FEATURE_NAMES}
 
         df = df.copy()
-        df["date"] = pd.to_datetime(df["date"], dayfirst=True, format="mixed")
+        df["date"] = parse_transaction_dates(df["date"])
         df["month"] = df["date"].dt.to_period("M")
-        df["amount"] = pd.to_numeric(df["amount"], errors="coerce").fillna(0.0).abs()
+        df["amount"] = df["amount"].apply(parse_amount)
         df["type"] = df["type"].astype(str).str.upper()
         df["payment_mode"] = df["payment_mode"].astype(str).str.upper()
         df["narration"] = df["narration"].astype(str)
@@ -225,7 +294,7 @@ class FinancialFeatureExtractor:
             return {"detected_opex": 0.0, "detected_capex": 0.0, "digital_receipts_ratio": 1.0}
 
         df = df.copy()
-        df["amount"] = pd.to_numeric(df["amount"], errors="coerce").fillna(0.0).abs()
+        df["amount"] = df["amount"].apply(parse_amount)
         df["type"] = df["type"].astype(str).str.upper()
         df["payment_mode"] = df["payment_mode"].astype(str).str.upper()
         df["narration"] = df["narration"].astype(str)

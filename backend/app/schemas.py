@@ -7,6 +7,28 @@ from typing import List, Dict, Any, Optional, Tuple
 from pydantic import BaseModel, Field
 
 
+class CategorySpendItem(BaseModel):
+    category: str
+    amount: float
+    transaction_count: int
+    percentage_of_total: float
+
+
+class TransactionRecord(BaseModel):
+    date: str
+    narration: str
+    amount: float
+    type: str
+    category: str
+    payment_mode: str
+
+
+class MonthlyCategorySpend(BaseModel):
+    month: str
+    category: str
+    amount: float
+
+
 class StatementSummary(BaseModel):
     filename: Optional[str] = None
     account_holder_name: Optional[str] = None
@@ -22,6 +44,8 @@ class StatementSummary(BaseModel):
     detected_opex: float = 0.0
     detected_capex: float = 0.0
     digital_receipts_ratio: float = 1.0
+    category_breakdown: List[CategorySpendItem] = Field(default_factory=list)
+    monthly_category_breakdown: List[MonthlyCategorySpend] = Field(default_factory=list)
 
 
 class ExtractedFeatures(BaseModel):
@@ -104,11 +128,83 @@ class PredictionOutput(BaseModel):
     tax_breakdown: Optional[TaxBreakdownSummary] = None
 
 
+class InsightItem(BaseModel):
+    rule_id: str
+    category: str
+    insight: str
+    impact_rupees: float
+    confidence: float
+    effort: int
+
+
+class AnomalyItem(BaseModel):
+    transaction_date: str
+    narration: str
+    amount: float
+    category: str
+    z_score: float
+    narrative: str
+    confidence: float
+
+
+class SimulationPath(BaseModel):
+    path_id: str
+    name: str
+    description: str
+    required_changes: List[str]
+    projected_health_delta: float
+    projected_runway_delta: float
+    projected_features: Dict[str, float] = Field(
+        default_factory=dict,
+        description="Full 16D vector at the end of this path, so a client can replay the projection exactly."
+    )
+    baseline_health_score: int = 0
+    baseline_runway_months: float = 0.0
+
+
+class PersonaComparison(BaseModel):
+    user_archetype: str
+    user_scores: Dict[str, float]
+    benchmark_scores: Dict[str, Dict[str, float]]
+
+
+class InsightRequest(BaseModel):
+    features: Dict[str, float] = Field(default_factory=dict, description="16D behavioral feature vector")
+    category_breakdown: List[CategorySpendItem] = Field(default_factory=list)
+    monthly_category_breakdown: List[MonthlyCategorySpend] = Field(default_factory=list)
+    transactions: List[TransactionRecord] = Field(default_factory=list)
+    archetype_id: Optional[int] = Field(None, ge=0, le=3, description="Detected lifestyle archetype (0-3)")
+    archetype_name: Optional[str] = None
+    archetype_confidence: Optional[float] = Field(None, ge=0.0, le=1.0)
+    statement_months: Optional[float] = Field(None, gt=0.0, description="Months of history the statement covers")
+    total_credits: Optional[float] = Field(None, ge=0.0)
+    total_debits: Optional[float] = Field(None, ge=0.0)
+
+
+class InsightResponse(BaseModel):
+    status: str = "success"
+    persona_critique: str
+    user_archetype: str
+    archetype_id: int
+    archetype_confidence: float
+    monthly_income: float = 0.0
+    monthly_spend: float = 0.0
+    insights: List[InsightItem] = Field(default_factory=list)
+    anomalies: List[AnomalyItem] = Field(default_factory=list)
+    simulation_paths: List[SimulationPath] = Field(default_factory=list)
+    persona_comparison: PersonaComparison
+    tracked_savings_potential: float = 0.0
+
+
 class UploadStatementResponse(BaseModel):
     status: str = "success"
     statement_summary: StatementSummary
     extracted_features: ExtractedFeatures
     predictions: PredictionOutput
+    transactions: List[TransactionRecord] = Field(default_factory=list)
+    category_breakdown: List[CategorySpendItem] = Field(default_factory=list)
+    monthly_category_breakdown: List[MonthlyCategorySpend] = Field(default_factory=list)
+    insights: Optional[InsightResponse] = None
 
 
 class ManualFeatureInput(BaseModel):
@@ -138,6 +234,7 @@ class PredictFeaturesResponse(BaseModel):
     status: str = "success"
     extracted_features: ExtractedFeatures
     predictions: PredictionOutput
+    insights: Optional[InsightResponse] = None
 
 
 class RegressionBenchmarkItem(BaseModel):

@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse
 from app.config import settings
 from app.database.db import init_db
 from app.services.ml_service import ml_service
-from app.routers import inference, evaluation, samples
+from app.routers import inference, evaluation, samples, insights
 
 
 @asynccontextmanager
@@ -46,6 +46,7 @@ app.add_middleware(
 app.include_router(inference.router)
 app.include_router(evaluation.router)
 app.include_router(samples.router)
+app.include_router(insights.router)
 
 
 @app.get("/api/health", status_code=status.HTTP_200_OK, tags=["Health"])
