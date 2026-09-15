@@ -44,7 +44,9 @@ fi
 if [ ! -d "frontend/dist" ]; then
     echo "Building Vite React frontend..."
     cd frontend
-    npm install
+    # --include=dev is required, not cosmetic: npm omits devDependencies when
+    # NODE_ENV=production is exported, which leaves this build with no vite or tsc.
+    npm install --include=dev
     npm run build
     cd ..
 fi
