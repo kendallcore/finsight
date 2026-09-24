@@ -23,8 +23,8 @@ export const ConfidenceBadge: React.FC<ConfidenceBadgeProps> = ({ confidence, la
     <span
       className={`inline-flex items-center space-x-1 text-[10px] font-mono px-1.5 py-0.5 rounded border ${
         low
-          ? 'bg-neutral-800/60 text-neutral-400 border-neutral-700'
-          : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25'
+          ? 'bg-neutral-100 dark:bg-neutral-800/60 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700'
+          : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/25'
       }`}
       title={
         low
@@ -54,10 +54,10 @@ export const ConfidenceBar: React.FC<ConfidenceBarProps> = ({ confidence, label,
   return (
     <div>
       <div className="flex items-baseline justify-between text-[11px] font-mono mb-1">
-        <span className={low ? 'text-neutral-500' : 'text-neutral-300'}>{label}</span>
-        <span className={low ? 'text-neutral-500' : 'text-neutral-100 font-semibold'}>{percent.toFixed(0)}%</span>
+        <span className={low ? 'text-neutral-500' : 'text-neutral-700 dark:text-neutral-300'}>{label}</span>
+        <span className={low ? 'text-neutral-500' : 'text-neutral-900 dark:text-neutral-100 font-semibold'}>{percent.toFixed(0)}%</span>
       </div>
-      <div className="relative h-1.5 rounded-full bg-[#161d28] border border-[#232f42] overflow-hidden">
+      <div className="relative h-1.5 rounded-full bg-neutral-100 dark:bg-[#161d28] border border-neutral-200 dark:border-[#232f42] overflow-hidden">
         <motion.div
           className="absolute inset-y-0 left-0 rounded-full"
           style={{ backgroundColor: low ? '#52525b' : color }}

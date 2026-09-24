@@ -77,20 +77,20 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ data, onGoToDiagnost
   if (!data) {
     return (
       <div className="space-y-6 max-w-3xl mx-auto pt-12">
-        <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-12 text-center space-y-4">
+        <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-12 text-center space-y-4 shadow-sm">
           <div className="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center" style={{ backgroundColor: theme.wash, color: theme.accent }}>
             <BrainCircuit className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-neutral-100">No statement analysed yet</h2>
-            <p className="text-xs text-neutral-400 mt-1.5 max-w-md mx-auto leading-relaxed">
+            <h2 className="text-base font-bold text-neutral-900 dark:text-neutral-100">No statement analysed yet</h2>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1.5 max-w-md mx-auto leading-relaxed">
               The coaching timeline ranks every threshold your own transactions cross, with the monthly
               rupee impact and effort for each. Upload a statement or load a preset to populate it.
             </p>
           </div>
           <button
             onClick={onGoToDiagnostic}
-            className="inline-flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-medium bg-[#10b981] hover:bg-[#059669] text-white transition"
+            className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[#0C4A34] hover:bg-[#083626] text-white transition shadow-xs"
           >
             <Download className="w-4 h-4" />
             <span>Go to Statement Diagnostic</span>
@@ -104,10 +104,10 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ data, onGoToDiagnost
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-xl font-bold text-neutral-100 tracking-tight">Coaching Insights</h1>
-          <p className="text-xs text-neutral-400 mt-1 truncate">
+          <h1 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 tracking-tight">Coaching Insights</h1>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 truncate">
             Ranked recommendations from{' '}
-            <span className="font-mono text-neutral-300">{statementsLabel}</span>
+            <span className="font-mono text-neutral-700 dark:text-neutral-300">{statementsLabel}</span>
             {insights && (
               <>
                 {' '}· {insights.insights.length} triggered rules · {insights.anomalies.length} anomalies
@@ -120,7 +120,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ data, onGoToDiagnost
           {insights && (
             <div className="text-right">
               <div className="text-[10px] font-mono uppercase tracking-wider text-neutral-500">Addressable</div>
-              <div className="text-sm font-bold font-mono text-emerald-400">
+              <div className="text-sm font-bold font-mono text-emerald-600 dark:text-emerald-400">
                 {formatINR(insights.tracked_savings_potential)}/mo
               </div>
             </div>
@@ -128,7 +128,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ data, onGoToDiagnost
           <button
             onClick={refresh}
             disabled={refreshing}
-            className="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-[#161d28] border border-[#232f42] text-neutral-300 hover:text-white hover:border-neutral-600 transition disabled:opacity-50"
+            className="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-white dark:bg-[#161d28] border border-neutral-200 dark:border-[#232f42] text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:border-neutral-300 dark:hover:border-neutral-600 transition disabled:opacity-50 shadow-2xs"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
             <span>Re-run engine</span>
@@ -137,7 +137,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ data, onGoToDiagnost
       </div>
 
       {error && (
-        <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-800/60 text-rose-300 text-xs flex items-center space-x-2">
+        <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 text-rose-700 dark:text-rose-300 text-xs flex items-center space-x-2 shadow-xs">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
@@ -149,7 +149,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ data, onGoToDiagnost
           layout
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border p-5 flex flex-col md:flex-row md:items-center gap-4"
+          className="rounded-2xl border p-5 flex flex-col md:flex-row md:items-center gap-4 shadow-sm"
           style={{ borderColor: theme.border, backgroundColor: theme.wash }}
         >
           <div className="flex items-start space-x-3 min-w-0 flex-1">
@@ -161,10 +161,10 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ data, onGoToDiagnost
             </div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-sm font-bold text-neutral-100">{insights.user_archetype}</h3>
+                <h3 className="text-sm font-bold text-neutral-900 dark:text-neutral-100">{insights.user_archetype}</h3>
                 <ConfidenceBadge confidence={insights.archetype_confidence} label="persona" />
               </div>
-              <p className="text-xs text-neutral-300 mt-1.5 leading-relaxed">{insights.persona_critique}</p>
+              <p className="text-xs text-neutral-700 dark:text-neutral-300 mt-1.5 leading-relaxed">{insights.persona_critique}</p>
               <p className="text-[10px] font-mono text-neutral-500 mt-2">
                 {formatINR(insights.monthly_income)}/mo inflow · {formatINR(insights.monthly_spend)}/mo outflow
               </p>
@@ -184,7 +184,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ data, onGoToDiagnost
               archetypeName={insights.user_archetype}
             />
           ) : (
-            <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-12 text-center text-xs font-mono text-neutral-500">
+            <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-12 text-center text-xs font-mono text-neutral-500 shadow-sm">
               This statement was analysed before the insights engine was attached. Re-run the engine or
               re-upload to build the timeline.
             </div>

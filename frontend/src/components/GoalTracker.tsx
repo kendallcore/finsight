@@ -127,15 +127,15 @@ export const GoalTracker: React.FC<GoalTrackerProps> = ({
   }, [current, projected, theme.accent]);
 
   return (
-    <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6 space-y-5">
+    <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 space-y-5 shadow-sm">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <PiggyBank className="w-4 h-4" style={{ color: theme.accent }} />
-          <h3 className="text-xs font-bold text-neutral-200 uppercase tracking-wider">Goal Tracker</h3>
+          <h3 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">Goal Tracker</h3>
         </div>
         {projected && (
           <span className="text-[10px] font-mono text-neutral-500">
-            <span className="text-neutral-300">{projectionLabel}</span> shown in brackets
+            <span className="text-neutral-700 dark:text-neutral-300 font-medium">{projectionLabel}</span> shown in brackets
           </span>
         )}
       </div>
@@ -158,16 +158,16 @@ export const GoalTracker: React.FC<GoalTrackerProps> = ({
               className="space-y-1.5"
             >
               <div className="flex items-baseline justify-between text-xs">
-                <span className="flex items-center space-x-2 text-neutral-300">
+                <span className="flex items-center space-x-2 text-neutral-800 dark:text-neutral-300">
                   <span style={{ color: goal.accent }}>{goal.icon}</span>
                   <span className="font-medium">{goal.label}</span>
                 </span>
                 <span className="font-mono text-[11px]">
-                  <span className={reachable ? 'text-neutral-200 font-semibold' : 'text-rose-400 font-semibold'}>
+                  <span className={reachable ? 'text-neutral-900 dark:text-neutral-200 font-semibold' : 'text-rose-600 dark:text-rose-400 font-semibold'}>
                     {describeMonths(goal.months)}
                   </span>
                   {goal.projectedMonths !== undefined && (
-                    <span className={improved ? 'text-emerald-400' : 'text-neutral-500'}>
+                    <span className={improved ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-neutral-500'}>
                       {' '}
                       [{describeMonths(goal.projectedMonths)}]
                     </span>
@@ -175,7 +175,7 @@ export const GoalTracker: React.FC<GoalTrackerProps> = ({
                 </span>
               </div>
 
-              <div className="relative w-full h-2.5 rounded-full bg-[#161d28] border border-[#232f42] overflow-hidden">
+              <div className="relative w-full h-2.5 rounded-full bg-neutral-100 dark:bg-[#161d28] border border-neutral-200 dark:border-[#232f42] overflow-hidden">
                 <motion.div
                   className="absolute inset-y-0 left-0 rounded-full"
                   style={{ backgroundColor: goal.accent }}
@@ -185,7 +185,7 @@ export const GoalTracker: React.FC<GoalTrackerProps> = ({
                 />
                 {goal.projectedMonths !== undefined && goal.projectedMonths < goal.months && (
                   <motion.div
-                    className="absolute inset-y-0 left-0 rounded-full bg-white/25"
+                    className="absolute inset-y-0 left-0 rounded-full bg-neutral-400/30 dark:bg-white/25"
                     initial={{ width: `${progress}%` }}
                     animate={{
                       width: `${Math.min(
@@ -201,11 +201,11 @@ export const GoalTracker: React.FC<GoalTrackerProps> = ({
               <div className="flex items-center justify-between text-[10px] font-mono text-neutral-500">
                 <span className="truncate pr-3">{goal.caption}</span>
                 {improved ? (
-                  <span className="text-emerald-400 flex-shrink-0">
+                  <span className="text-emerald-600 dark:text-emerald-400 flex-shrink-0 font-medium">
                     {accelerated} months sooner
                   </span>
                 ) : (
-                  !reachable && <span className="text-rose-400 flex-shrink-0">no monthly surplus to fund this</span>
+                  !reachable && <span className="text-rose-600 dark:text-rose-400 flex-shrink-0">no monthly surplus to fund this</span>
                 )}
               </div>
             </motion.div>

@@ -178,18 +178,18 @@ export const SpendingBreakdown: React.FC<SpendingBreakdownProps> = ({
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6"
+          className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 shadow-sm"
         >
           <div className="flex items-center space-x-2 mb-2">
-            <PieIcon className="w-4 h-4 text-emerald-400" />
-            <h3 className="text-xs font-bold text-neutral-200 uppercase tracking-wider">Needs / Wants / Savings</h3>
+            <PieIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <h3 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">Needs / Wants / Savings</h3>
           </div>
           <div className="h-52">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie data={allocationData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={52} outerRadius={80} paddingAngle={3}>
                   {allocationData.map((slice) => (
-                    <Cell key={slice.name} fill={slice.fill} stroke="#0a0c10" strokeWidth={2} />
+                    <Cell key={slice.name} fill={slice.fill} stroke="transparent" strokeWidth={2} />
                   ))}
                 </Pie>
                 <Tooltip
@@ -202,11 +202,11 @@ export const SpendingBreakdown: React.FC<SpendingBreakdownProps> = ({
           <div className="space-y-1.5 mt-2">
             {allocationData.map((slice) => (
               <div key={slice.name} className="flex items-center justify-between text-[11px] font-mono">
-                <span className="flex items-center space-x-2 text-neutral-400 truncate">
+                <span className="flex items-center space-x-2 text-neutral-600 dark:text-neutral-400 truncate">
                   <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: slice.fill }} />
                   <span className="truncate">{slice.name}</span>
                 </span>
-                <span className="text-neutral-200 font-semibold ml-2">{slice.value.toFixed(1)}%</span>
+                <span className="text-neutral-900 dark:text-neutral-200 font-semibold ml-2">{slice.value.toFixed(1)}%</span>
               </div>
             ))}
           </div>
@@ -217,12 +217,12 @@ export const SpendingBreakdown: React.FC<SpendingBreakdownProps> = ({
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.06 }}
-          className="lg:col-span-2 border border-[#1d2634] bg-[#11161f] rounded-2xl p-6"
+          className="lg:col-span-2 border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
-              <Layers className="w-4 h-4 text-emerald-400" />
-              <h3 className="text-xs font-bold text-neutral-200 uppercase tracking-wider">
+              <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <h3 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">
                 Where The Money Went — {selectedCategory ? 'Drill-down' : 'By category'}
               </h3>
             </div>
@@ -234,7 +234,7 @@ export const SpendingBreakdown: React.FC<SpendingBreakdownProps> = ({
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   onClick={() => setSelectedCategory(null)}
-                  className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-[#161d28] border border-[#232f42] text-[11px] text-neutral-300 hover:text-white hover:border-neutral-600 transition"
+                  className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-white dark:bg-[#161d28] border border-neutral-200 dark:border-[#232f42] text-[11px] text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:border-neutral-300 dark:hover:border-neutral-600 transition shadow-2xs"
                 >
                   <ArrowLeft className="w-3 h-3" />
                   <span>All categories</span>
@@ -253,7 +253,6 @@ export const SpendingBreakdown: React.FC<SpendingBreakdownProps> = ({
             </AnimatePresence>
           </div>
 
-          {/* Keyboard/SR-reachable alternative to the SVG-only treemap tiles. */}
           {categoryBreakdown.length === 0 && (
             <p className="text-xs text-neutral-500 py-8 text-center">
               Category tagging returned no rows for this statement.
@@ -271,12 +270,11 @@ export const SpendingBreakdown: React.FC<SpendingBreakdownProps> = ({
                   aria-label={`Drill down: ${entry.category}`}
                   aria-pressed={isActive}
                   onClick={() => setSelectedCategory(isActive ? null : entry.category)}
-                  className="inline-flex items-center space-x-1.5 px-2 py-1 rounded-lg text-[10px] font-mono border transition"
-                  style={{
-                    borderColor: isActive ? color : '#232f42',
-                    backgroundColor: isActive ? 'rgba(255,255,255,0.05)' : '#0f141c',
-                    color: isActive ? '#f5f5f5' : '#a1a1aa'
-                  }}
+                  className={`inline-flex items-center space-x-1.5 px-2 py-1 rounded-lg text-[10px] font-mono border transition ${
+                    isActive
+                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300 font-semibold'
+                      : 'border-neutral-200 dark:border-[#232f42] bg-neutral-50 dark:bg-[#0f141c] text-neutral-700 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-[#161d28]'
+                  }`}
                 >
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
                   <span>{entry.category}</span>
@@ -311,14 +309,14 @@ export const SpendingBreakdown: React.FC<SpendingBreakdownProps> = ({
               className="pt-2 space-y-3"
             >
               {selectedEntry && (
-                <div className="flex flex-wrap items-baseline justify-between gap-2 p-4 rounded-xl bg-[#0a0d13] border border-[#18202d]">
+                <div className="flex flex-wrap items-baseline justify-between gap-2 p-4 rounded-xl bg-neutral-50 dark:bg-[#0a0d13] border border-neutral-200 dark:border-[#18202d]">
                   <div>
                     <div className="text-[10px] font-mono uppercase tracking-wider text-neutral-500">Category</div>
-                    <div className="text-lg font-bold text-neutral-100 font-mono">{selectedEntry.category}</div>
+                    <div className="text-lg font-bold text-neutral-900 dark:text-neutral-100 font-mono">{selectedEntry.category}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-lg font-bold text-emerald-400 font-mono">{formatINR(selectedEntry.amount)}</div>
-                    <div className="text-[11px] text-neutral-400 font-mono">
+                    <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400 font-mono">{formatINR(selectedEntry.amount)}</div>
+                    <div className="text-[11px] text-neutral-500 dark:text-neutral-400 font-mono">
                       {selectedEntry.percentage_of_total.toFixed(1)}% of outflow · {selectedEntry.transaction_count} transactions
                     </div>
                   </div>
@@ -333,12 +331,12 @@ export const SpendingBreakdown: React.FC<SpendingBreakdownProps> = ({
                   {topMerchants.map((merchant) => (
                     <div
                       key={merchant.narration}
-                      className="flex items-center justify-between text-[11px] font-mono px-3 py-2 rounded-lg bg-[#161d28]/60 border border-[#232f42]"
+                      className="flex items-center justify-between text-[11px] font-mono px-3 py-2 rounded-lg bg-neutral-50 dark:bg-[#161d28]/60 border border-neutral-200 dark:border-[#232f42]"
                     >
-                      <span className="text-neutral-300 truncate pr-3">{merchant.narration}</span>
-                      <span className="text-neutral-400 flex-shrink-0">
+                      <span className="text-neutral-800 dark:text-neutral-300 truncate pr-3">{merchant.narration}</span>
+                      <span className="text-neutral-600 dark:text-neutral-400 flex-shrink-0">
                         {formatINR(merchant.total)}{' '}
-                        <span className="text-neutral-600">× {merchant.count}</span>
+                        <span className="text-neutral-400 dark:text-neutral-600">× {merchant.count}</span>
                       </span>
                     </div>
                   ))}
@@ -358,11 +356,11 @@ export const SpendingBreakdown: React.FC<SpendingBreakdownProps> = ({
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.12 }}
-        className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6"
+        className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 shadow-sm"
       >
         <div className="flex items-center space-x-2 mb-4">
-          <TrendingDown className="w-4 h-4 text-emerald-400" />
-          <h3 className="text-xs font-bold text-neutral-200 uppercase tracking-wider">Monthly Outflow By Category</h3>
+          <TrendingDown className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          <h3 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">Monthly Outflow By Category</h3>
         </div>
 
         {monthlySeries.rows.length === 0 ? (
@@ -373,18 +371,18 @@ export const SpendingBreakdown: React.FC<SpendingBreakdownProps> = ({
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlySeries.rows} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#18202d" vertical={false} />
-                <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#71717a' }} stroke="#232f42" tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(150,150,150,0.15)" vertical={false} />
+                <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#71717a' }} stroke="#cbd5e1" tickLine={false} />
                 <YAxis
                   tick={{ fontSize: 10, fill: '#71717a' }}
-                  stroke="#232f42"
+                  stroke="#cbd5e1"
                   tickLine={false}
                   tickFormatter={(value: number) => formatCompactINR(value)}
                   width={62}
                 />
                 <Tooltip
                   contentStyle={tooltipStyle}
-                  cursor={{ fill: 'rgba(255,255,255,0.03)' }}
+                  cursor={{ fill: 'rgba(0,0,0,0.03)' }}
                   formatter={(value: number | string, name: string) => [formatINR(Number(value)), name]}
                 />
                 <Legend wrapperStyle={{ fontSize: 10, fontFamily: 'ui-monospace, monospace' }} />

@@ -83,23 +83,23 @@ export const PersonaComparison: React.FC<PersonaComparisonProps> = ({
   const visibleBenchmarks = Object.keys(comparison.benchmark_scores);
 
   return (
-    <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6 space-y-4">
+    <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 space-y-4 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center space-x-2">
           <GitCompareArrows className="w-4 h-4" style={{ color: theme.accent }} />
-          <h3 className="text-xs font-bold text-neutral-200 uppercase tracking-wider">
+          <h3 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">
             You vs. the Four Archetypes
           </h3>
         </div>
         <button
           onClick={() => setShowBars((prev) => !prev)}
-          className="text-[10px] font-mono px-2.5 py-1 rounded-lg bg-[#161d28] border border-[#232f42] text-neutral-400 hover:text-neutral-200 hover:border-neutral-600 transition"
+          className="text-[10px] font-mono px-2.5 py-1 rounded-lg bg-white dark:bg-[#161d28] border border-neutral-200 dark:border-[#232f42] text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:border-neutral-300 dark:hover:border-neutral-600 transition shadow-2xs"
         >
           {showBars ? 'Show radar' : 'Show bars'}
         </button>
       </div>
 
-      <p className="text-[11px] text-neutral-400">
+      <p className="text-[11px] text-neutral-600 dark:text-neutral-400">
         Your position (solid) against the behavioural prototype for each archetype. Sitting inside a
         polygon means the classifier reads you that way.
       </p>
@@ -108,9 +108,9 @@ export const PersonaComparison: React.FC<PersonaComparisonProps> = ({
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart data={radarData} outerRadius="72%">
-              <PolarGrid stroke="#1d2634" />
-              <PolarAngleAxis dataKey="axis" tick={{ fontSize: 10, fill: '#a1a1aa', fontFamily: 'ui-monospace, monospace' }} />
-              <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 9, fill: '#52525b' }} stroke="#232f42" />
+              <PolarGrid stroke="rgba(150,150,150,0.2)" />
+              <PolarAngleAxis dataKey="axis" tick={{ fontSize: 10, fill: '#71717a', fontFamily: 'ui-monospace, monospace' }} />
+              <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 9, fill: '#71717a' }} stroke="#cbd5e1" />
               {visibleBenchmarks.map((name) => {
                 const index = ARCHETYPE_NAMES.indexOf(name as (typeof ARCHETYPE_NAMES)[number]);
                 const color = index >= 0 ? personaTheme(index).accent : '#71717a';
@@ -145,9 +145,9 @@ export const PersonaComparison: React.FC<PersonaComparisonProps> = ({
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={radarData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#18202d" vertical={false} />
-              <XAxis dataKey="axis" tick={{ fontSize: 9, fill: '#a1a1aa' }} stroke="#232f42" tickLine={false} interval={0} />
-              <YAxis tick={{ fontSize: 9, fill: '#71717a' }} stroke="#232f42" tickLine={false} unit="%" width={44} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(150,150,150,0.15)" vertical={false} />
+              <XAxis dataKey="axis" tick={{ fontSize: 9, fill: '#71717a' }} stroke="#cbd5e1" tickLine={false} interval={0} />
+              <YAxis tick={{ fontSize: 9, fill: '#71717a' }} stroke="#cbd5e1" tickLine={false} unit="%" width={44} />
               <Tooltip contentStyle={tooltipStyle} formatter={(value: number | string) => [`${Number(value).toFixed(1)}%`]} />
               <Legend wrapperStyle={{ fontSize: 10, fontFamily: 'ui-monospace, monospace' }} />
               {visibleBenchmarks.map((name) => {
@@ -162,10 +162,10 @@ export const PersonaComparison: React.FC<PersonaComparisonProps> = ({
       )}
 
       {/* Path to the strategic profile */}
-      <div className="pt-4 border-t border-[#18202d]">
+      <div className="pt-4 border-t border-neutral-100 dark:border-[#18202d]">
         <div className="flex items-center space-x-2 mb-3">
-          <Route className="w-4 h-4 text-amber-400" />
-          <h4 className="text-[11px] font-bold text-neutral-200 uppercase tracking-wider">
+          <Route className="w-4 h-4 text-amber-500" />
+          <h4 className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">
             Shortest path to {TARGET_LABEL}
           </h4>
         </div>
@@ -182,7 +182,7 @@ export const PersonaComparison: React.FC<PersonaComparisonProps> = ({
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.07 }}
-                className="flex items-center justify-between text-[11px] font-mono px-3 py-2 rounded-lg bg-[#0a0d13] border border-[#18202d]"
+                className="flex items-center justify-between text-[11px] font-mono px-3 py-2 rounded-lg bg-neutral-50 dark:bg-[#0a0d13] border border-neutral-200 dark:border-[#18202d]"
               >
                 <span className="flex items-center space-x-2 min-w-0">
                   <span
@@ -191,15 +191,15 @@ export const PersonaComparison: React.FC<PersonaComparisonProps> = ({
                   >
                     {index + 1}
                   </span>
-                  <span className="text-neutral-300 truncate">{move.axis}</span>
+                  <span className="text-neutral-800 dark:text-neutral-300 truncate">{move.axis}</span>
                 </span>
                 <span className="flex items-center space-x-2 flex-shrink-0">
                   <span className="text-neutral-500">{move.from.toFixed(0)}%</span>
-                  <ArrowRight className="w-3 h-3 text-neutral-600" />
-                  <span className="font-bold" style={{ color: move.delta > 0 ? '#34d399' : '#fb7185' }}>
+                  <ArrowRight className="w-3 h-3 text-neutral-400" />
+                  <span className="font-bold" style={{ color: move.delta > 0 ? '#10b981' : '#f43f5e' }}>
                     {move.to.toFixed(0)}%
                   </span>
-                  <span className="text-neutral-600 w-12 text-right">
+                  <span className="text-neutral-500 w-12 text-right">
                     {move.delta > 0 ? '+' : ''}
                     {move.delta.toFixed(0)}pp
                   </span>

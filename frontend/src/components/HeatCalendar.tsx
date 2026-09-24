@@ -106,10 +106,10 @@ export const HeatCalendar: React.FC<HeatCalendarProps> = ({ transactions, archet
 
   if (!weeks.length) {
     return (
-      <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6">
+      <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 shadow-sm">
         <div className="flex items-center space-x-2 mb-3">
           <CalendarDays className="w-4 h-4" style={{ color: theme.accent }} />
-          <h3 className="text-xs font-bold text-neutral-200 uppercase tracking-wider">Spending Heat Calendar</h3>
+          <h3 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">Spending Heat Calendar</h3>
         </div>
         <p className="text-xs text-neutral-500 py-8 text-center">
           No dated debit transactions were returned for this statement.
@@ -126,14 +126,14 @@ export const HeatCalendar: React.FC<HeatCalendarProps> = ({ transactions, archet
   let lastMonthLabel = '';
 
   return (
-    <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6 space-y-4">
+    <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 space-y-4 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center space-x-2">
           <CalendarDays className="w-4 h-4" style={{ color: theme.accent }} />
-          <h3 className="text-xs font-bold text-neutral-200 uppercase tracking-wider">Spending Heat Calendar</h3>
+          <h3 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">Spending Heat Calendar</h3>
         </div>
-        <div className="text-[11px] font-mono text-neutral-400">
-          <span className="text-neutral-200 font-semibold">{formatINR(totalSpend)}</span> across{' '}
+        <div className="text-[11px] font-mono text-neutral-500 dark:text-neutral-400">
+          <span className="text-neutral-900 dark:text-neutral-200 font-semibold">{formatINR(totalSpend)}</span> across{' '}
           {activeDays} active day{activeDays === 1 ? '' : 's'}
         </div>
       </div>
@@ -210,12 +210,12 @@ export const HeatCalendar: React.FC<HeatCalendarProps> = ({ transactions, archet
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden pt-3 border-t border-[#18202d]"
+            className="overflow-hidden pt-3 border-t border-neutral-100 dark:border-[#18202d]"
           >
             <div className="flex items-baseline justify-between mb-2">
               <div>
                 <div className="text-[10px] font-mono uppercase tracking-wider text-neutral-500">Day detail</div>
-                <div className="text-sm font-bold text-neutral-100 font-mono">
+                <div className="text-sm font-bold text-neutral-900 dark:text-neutral-100 font-mono">
                   {new Date(`${selected.iso}T00:00:00`).toLocaleDateString('en-IN', {
                     weekday: 'short',
                     day: 'numeric',
@@ -236,8 +236,8 @@ export const HeatCalendar: React.FC<HeatCalendarProps> = ({ transactions, archet
             <div className="space-y-1.5">
               {selectedCategories.map(([category, amount]) => (
                 <div key={category} className="flex items-center space-x-2">
-                  <span className="w-28 text-[10px] font-mono text-neutral-400 truncate">{category}</span>
-                  <div className="flex-1 h-1.5 rounded-full bg-[#161d28] overflow-hidden">
+                  <span className="w-28 text-[10px] font-mono text-neutral-600 dark:text-neutral-400 truncate">{category}</span>
+                  <div className="flex-1 h-1.5 rounded-full bg-neutral-100 dark:bg-[#161d28] overflow-hidden">
                     <motion.div
                       className="h-1.5 rounded-full"
                       style={{ backgroundColor: theme.accent }}
@@ -246,14 +246,14 @@ export const HeatCalendar: React.FC<HeatCalendarProps> = ({ transactions, archet
                       transition={{ duration: 0.35 }}
                     />
                   </div>
-                  <span className="w-20 text-right text-[10px] font-mono text-neutral-300">{formatINR(amount)}</span>
+                  <span className="w-20 text-right text-[10px] font-mono text-neutral-800 dark:text-neutral-300 font-medium">{formatINR(amount)}</span>
                 </div>
               ))}
             </div>
 
             {selected.topNarration && (
               <p className="text-[10px] font-mono text-neutral-500 mt-2">
-                Largest payment: <span className="text-neutral-300">{selected.topNarration}</span>{' '}
+                Largest payment: <span className="text-neutral-800 dark:text-neutral-300 font-medium">{selected.topNarration}</span>{' '}
                 {formatINR(selected.topAmount)}
               </p>
             )}

@@ -115,26 +115,26 @@ export const EvaluationHub: React.FC<EvaluationHubProps> = ({ userCoord = null, 
 
   if (loading) {
     return (
-      <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-12 text-center">
+      <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-12 text-center shadow-sm">
         <motion.div
-          className="w-8 h-8 mx-auto rounded-full border-2 border-[#232f42] border-t-emerald-400"
+          className="w-8 h-8 mx-auto rounded-full border-2 border-neutral-200 dark:border-[#232f42] border-t-emerald-500"
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
         />
-        <p className="text-xs font-mono text-neutral-400 mt-4">Loading ML cross-validation benchmarks…</p>
+        <p className="text-xs font-mono text-neutral-500 dark:text-neutral-400 mt-4">Loading ML cross-validation benchmarks…</p>
       </div>
     );
   }
 
   if (error || !evalData) {
     return (
-      <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-12 text-center space-y-3">
-        <AlertCircle className="w-6 h-6 mx-auto text-amber-400/70" />
-        <p className="text-xs text-neutral-300 max-w-md mx-auto">
+      <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-12 text-center space-y-3 shadow-sm">
+        <AlertCircle className="w-6 h-6 mx-auto text-amber-500" />
+        <p className="text-xs text-neutral-700 dark:text-neutral-300 max-w-md mx-auto">
           {error ?? 'No evaluation metrics were returned by the API.'}
         </p>
         <p className="text-[11px] font-mono text-neutral-500">
-          Run <span className="text-neutral-300">PYTHONPATH=scripts python scripts/train_models.py</span> to produce
+          Run <span className="text-neutral-700 dark:text-neutral-300">PYTHONPATH=scripts python scripts/train_models.py</span> to produce
           models/evaluation_metrics.json, then reload.
         </p>
       </div>
@@ -148,72 +148,72 @@ export const EvaluationHub: React.FC<EvaluationHubProps> = ({ userCoord = null, 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-neutral-100 tracking-tight">Model Evaluation Hub</h1>
-          <p className="text-xs text-neutral-400 mt-1">
+          <h1 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 tracking-tight">Model Evaluation Hub</h1>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
             Cross-validation benchmarks served live from{' '}
-            <span className="font-mono text-neutral-300">/api/models/evaluation</span> — {evalData.feature_count} features,{' '}
+            <span className="font-mono text-neutral-700 dark:text-neutral-300">/api/models/evaluation</span> — {evalData.feature_count} features,{' '}
             {evalData.clustering.n_clusters} persona clusters.
           </p>
         </div>
-        <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-[#161d28] border border-[#232f42] text-xs font-mono text-neutral-300 self-start sm:self-auto">
-          <Crosshair className="w-3.5 h-3.5 text-emerald-400" />
+        <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-white dark:bg-[#161d28] border border-neutral-200 dark:border-[#232f42] text-xs font-mono text-neutral-700 dark:text-neutral-300 self-start sm:self-auto shadow-2xs">
+          <Crosshair className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
           <span>{evalData.tax_regime_year}</span>
         </div>
       </div>
 
       {/* KPI summary, all derived from the API payload */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
-        <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-5 flex items-center space-x-4">
-          <div className="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+        <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-5 flex items-center space-x-4 shadow-sm">
+          <div className="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200 dark:border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-2xs">
             <Layers className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-2xl font-bold font-mono text-neutral-100">{evaluatedModels}</div>
-            <div className="text-xs text-neutral-400">Models Benchmarked</div>
+            <div className="text-2xl font-bold font-mono text-neutral-900 dark:text-neutral-100">{evaluatedModels}</div>
+            <div className="text-xs text-neutral-500 dark:text-neutral-400">Models Benchmarked</div>
           </div>
         </div>
 
-        <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-5 flex items-center space-x-4">
-          <div className="w-11 h-11 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400">
+        <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-5 flex items-center space-x-4 shadow-sm">
+          <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-500/15 border border-blue-200 dark:border-blue-500/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-2xs">
             <BarChart3 className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-2xl font-bold font-mono text-neutral-100">{evalData.feature_count}</div>
-            <div className="text-xs text-neutral-400">Behavioral Dimensions</div>
+            <div className="text-2xl font-bold font-mono text-neutral-900 dark:text-neutral-100">{evalData.feature_count}</div>
+            <div className="text-xs text-neutral-500 dark:text-neutral-400">Behavioral Dimensions</div>
           </div>
         </div>
 
-        <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-5 flex items-center space-x-4">
-          <div className="w-11 h-11 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
+        <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-5 flex items-center space-x-4 shadow-sm">
+          <div className="w-11 h-11 rounded-xl bg-purple-50 dark:bg-purple-500/15 border border-purple-200 dark:border-purple-500/30 flex items-center justify-center text-purple-600 dark:text-purple-400 shadow-2xs">
             <Boxes className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-2xl font-bold font-mono text-neutral-100">
+            <div className="text-2xl font-bold font-mono text-neutral-900 dark:text-neutral-100">
               {evalData.clustering.silhouette_score.toFixed(3)}
             </div>
-            <div className="text-xs text-neutral-400">K-Means Silhouette</div>
+            <div className="text-xs text-neutral-500 dark:text-neutral-400">K-Means Silhouette</div>
           </div>
         </div>
 
-        <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-5 flex items-center space-x-4">
-          <div className="w-11 h-11 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
-            <Star className="w-5 h-5 fill-amber-400/20" />
+        <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-5 flex items-center space-x-4 shadow-sm">
+          <div className="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-500/15 border border-amber-200 dark:border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shadow-2xs">
+            <Star className="w-5 h-5 fill-amber-500/20" />
           </div>
           <div className="min-w-0">
             <div className="text-[11px] font-mono text-neutral-500 uppercase tracking-wider">PCA retains</div>
-            <div className="text-2xl font-bold font-mono text-neutral-100">
+            <div className="text-2xl font-bold font-mono text-neutral-900 dark:text-neutral-100">
               {(evalData.pca_variance.total_explained_variance * 100).toFixed(1)}%
             </div>
-            <div className="text-xs text-neutral-400">variance in 3 components</div>
+            <div className="text-xs text-neutral-500 dark:text-neutral-400">variance in 3 components</div>
           </div>
         </div>
       </div>
 
       {/* Leaderboards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6">
+        <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-bold text-neutral-200 uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">
               Task 1: Income Regression Leaderboard
             </h3>
             <span className="text-[10px] font-mono text-neutral-500">Target: Annual Income (₹)</span>
@@ -221,7 +221,7 @@ export const EvaluationHub: React.FC<EvaluationHubProps> = ({ userCoord = null, 
           <div className="overflow-x-auto">
             <table className="w-full text-left font-mono text-xs">
               <thead>
-                <tr className="border-b border-[#18202d] text-neutral-400 text-[11px]">
+                <tr className="border-b border-neutral-200 dark:border-[#18202d] text-neutral-500 dark:text-neutral-400 text-[11px]">
                   <th className="pb-3 w-8">#</th>
                   <th className="pb-3">Algorithm</th>
                   <th className="pb-3 text-right">R² Score</th>
@@ -229,25 +229,25 @@ export const EvaluationHub: React.FC<EvaluationHubProps> = ({ userCoord = null, 
                   <th className="pb-3 text-right">MAPE</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#18202d]">
+              <tbody className="divide-y divide-neutral-100 dark:divide-[#18202d]">
                 {regressionModels.map((row) => (
-                  <tr key={row.model_name} className={row.isBest ? 'text-emerald-300' : 'text-neutral-300'}>
+                  <tr key={row.model_name} className={row.isBest ? 'text-emerald-700 dark:text-emerald-300 font-medium' : 'text-neutral-700 dark:text-neutral-300'}>
                     <td className="py-3">
                       <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] ${
                         row.isBest
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                          : 'bg-[#161d28] text-neutral-500'
+                          ? 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/40 font-bold'
+                          : 'bg-neutral-100 dark:bg-[#161d28] text-neutral-600 dark:text-neutral-500'
                       }`}>
                         {row.rank}
                       </span>
                     </td>
                     <td className="py-3 font-medium">
                       {row.model_name}
-                      {row.isBest && <Trophy className="w-3 h-3 inline ml-1.5 text-emerald-400" />}
+                      {row.isBest && <Trophy className="w-3 h-3 inline ml-1.5 text-emerald-600 dark:text-emerald-400" />}
                     </td>
                     <td className="py-3 text-right font-bold">{row.r2_score.toFixed(4)}</td>
-                    <td className="py-3 text-right text-neutral-400">{formatINR(row.rmse)}</td>
-                    <td className="py-3 text-right text-neutral-400">{row.mape_percent.toFixed(2)}%</td>
+                    <td className="py-3 text-right text-neutral-500 dark:text-neutral-400">{formatINR(row.rmse)}</td>
+                    <td className="py-3 text-right text-neutral-500 dark:text-neutral-400">{row.mape_percent.toFixed(2)}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -255,9 +255,9 @@ export const EvaluationHub: React.FC<EvaluationHubProps> = ({ userCoord = null, 
           </div>
         </div>
 
-        <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6">
+        <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-bold text-neutral-200 uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">
               Task 2: Classification Leaderboard
             </h3>
             <span className="text-[10px] font-mono text-neutral-500">
@@ -267,7 +267,7 @@ export const EvaluationHub: React.FC<EvaluationHubProps> = ({ userCoord = null, 
           <div className="overflow-x-auto">
             <table className="w-full text-left font-mono text-xs">
               <thead>
-                <tr className="border-b border-[#18202d] text-neutral-400 text-[11px]">
+                <tr className="border-b border-neutral-200 dark:border-[#18202d] text-neutral-500 dark:text-neutral-400 text-[11px]">
                   <th className="pb-3 w-8">#</th>
                   <th className="pb-3">Algorithm</th>
                   <th className="pb-3 text-right">Accuracy</th>
@@ -275,25 +275,25 @@ export const EvaluationHub: React.FC<EvaluationHubProps> = ({ userCoord = null, 
                   <th className="pb-3 text-right">Weighted F1</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#18202d]">
+              <tbody className="divide-y divide-neutral-100 dark:divide-[#18202d]">
                 {classificationModels.map((row) => (
-                  <tr key={row.model_name} className={row.isBest ? 'text-emerald-300' : 'text-neutral-300'}>
+                  <tr key={row.model_name} className={row.isBest ? 'text-emerald-700 dark:text-emerald-300 font-medium' : 'text-neutral-700 dark:text-neutral-300'}>
                     <td className="py-3">
                       <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] ${
                         row.isBest
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                          : 'bg-[#161d28] text-neutral-500'
+                          ? 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/40 font-bold'
+                          : 'bg-neutral-100 dark:bg-[#161d28] text-neutral-600 dark:text-neutral-500'
                       }`}>
                         {row.rank}
                       </span>
                     </td>
                     <td className="py-3 font-medium">
                       {row.model_name}
-                      {row.isBest && <Trophy className="w-3 h-3 inline ml-1.5 text-emerald-400" />}
+                      {row.isBest && <Trophy className="w-3 h-3 inline ml-1.5 text-emerald-600 dark:text-emerald-400" />}
                     </td>
                     <td className="py-3 text-right font-bold">{(row.accuracy * 100).toFixed(2)}%</td>
-                    <td className="py-3 text-right text-neutral-400">{row.macro_f1.toFixed(4)}</td>
-                    <td className="py-3 text-right text-neutral-400">{row.weighted_f1.toFixed(4)}</td>
+                    <td className="py-3 text-right text-neutral-500 dark:text-neutral-400">{row.macro_f1.toFixed(4)}</td>
+                    <td className="py-3 text-right text-neutral-500 dark:text-neutral-400">{row.weighted_f1.toFixed(4)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -305,7 +305,7 @@ export const EvaluationHub: React.FC<EvaluationHubProps> = ({ userCoord = null, 
       {/* 3D latent space */}
       <Suspense
         fallback={
-          <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-12 text-center text-xs font-mono text-neutral-500">
+          <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-12 text-center text-xs font-mono text-neutral-500 shadow-sm">
             Loading 3D projection engine…
           </div>
         }
@@ -322,9 +322,9 @@ export const EvaluationHub: React.FC<EvaluationHubProps> = ({ userCoord = null, 
 
       {/* Confusion matrix + explained variance */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6">
+        <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-bold text-neutral-200 uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">
               {matrixLabels.length} × {matrixLabels.length} Confusion Matrix
             </h3>
             <span className="text-[10px] font-mono text-neutral-500">best model: {evalData.best_models.classification}</span>
@@ -335,7 +335,7 @@ export const EvaluationHub: React.FC<EvaluationHubProps> = ({ userCoord = null, 
           ) : (
             <div className="flex">
               <div className="flex items-center justify-center mr-2">
-                <span className="transform -rotate-90 text-[10px] font-mono font-bold tracking-widest text-neutral-500 uppercase">
+                <span className="transform -rotate-90 text-[10px] font-mono font-bold tracking-widest text-neutral-400 dark:text-neutral-500 uppercase">
                   Actual
                 </span>
               </div>
@@ -346,7 +346,7 @@ export const EvaluationHub: React.FC<EvaluationHubProps> = ({ userCoord = null, 
                 >
                   <div />
                   {matrixLabels.map((label) => (
-                    <div key={label} className="p-1 text-neutral-400 font-semibold truncate" title={label}>
+                    <div key={label} className="p-1 text-neutral-500 dark:text-neutral-400 font-semibold truncate" title={label}>
                       {label}
                     </div>
                   ))}
@@ -361,7 +361,7 @@ export const EvaluationHub: React.FC<EvaluationHubProps> = ({ userCoord = null, 
                       style={{ gridTemplateColumns: `minmax(64px, 84px) repeat(${matrixLabels.length}, minmax(0, 1fr))` }}
                     >
                       <div
-                        className="flex items-center justify-end pr-2 text-neutral-400 font-semibold text-[9px] truncate"
+                        className="flex items-center justify-end pr-2 text-neutral-500 dark:text-neutral-400 font-semibold text-[9px] truncate"
                         title={matrixLabels[rowIdx]}
                       >
                         {matrixLabels[rowIdx]}
@@ -379,7 +379,7 @@ export const EvaluationHub: React.FC<EvaluationHubProps> = ({ userCoord = null, 
                                 ? `rgba(16, 185, 129, ${opacity * 0.55})`
                                 : `rgba(244, 63, 94, ${opacity * 0.5})`,
                               borderColor: isDiagonal ? 'rgba(6,95,70,0.6)' : 'rgba(127,29,29,0.45)',
-                              color: isDiagonal ? '#a7f3d0' : '#fecdd3',
+                              color: isDiagonal ? '#065f46' : '#9f1239',
                               visibility: value === 0 && !isDiagonal ? 'hidden' : 'visible'
                             }}
                           >
@@ -391,28 +391,28 @@ export const EvaluationHub: React.FC<EvaluationHubProps> = ({ userCoord = null, 
                   );
                 })}
 
-                <div className="text-center text-[10px] font-mono font-bold tracking-widest text-neutral-500 uppercase mt-3">
+                <div className="text-center text-[10px] font-mono font-bold tracking-widest text-neutral-400 dark:text-neutral-500 uppercase mt-3">
                   Predicted
                 </div>
               </div>
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-[#18202d]">
+          <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-neutral-100 dark:border-[#18202d]">
             {Object.entries(evalData.clustering.personas).map(([id, name]) => (
               <div key={id} className="flex items-center space-x-2 text-[11px] font-mono">
                 <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: MATRIX_PALETTE[Number(id) % MATRIX_PALETTE.length] }} />
                 <span className="text-neutral-500">Cluster {id}</span>
-                <span className="text-neutral-300 truncate">{name}</span>
+                <span className="text-neutral-700 dark:text-neutral-300 truncate">{name}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Feature importance, all dimensions from the API */}
-        <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6">
+        <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-bold text-neutral-200 uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">
               Feature Importance ({featureImportance.length} dimensions)
             </h3>
             <span className="text-[10px] font-mono text-neutral-500">Random Forest gain</span>
@@ -421,24 +421,24 @@ export const EvaluationHub: React.FC<EvaluationHubProps> = ({ userCoord = null, 
           <div className="h-[420px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={featureImportance} layout="vertical" margin={{ top: 0, right: 16, left: 8, bottom: 0 }}>
-                <CartesianGrid horizontal={false} stroke="#18202d" />
-                <XAxis type="number" tick={{ fontSize: 10, fill: '#71717a' }} stroke="#232f42" tickLine={false} />
+                <CartesianGrid horizontal={false} stroke="rgba(150,150,150,0.15)" />
+                <XAxis type="number" tick={{ fontSize: 10, fill: '#71717a' }} stroke="#cbd5e1" tickLine={false} />
                 <YAxis
                   type="category"
                   dataKey="feature"
                   width={150}
-                  tick={{ fontSize: 10, fill: '#a1a1aa', fontFamily: 'ui-monospace, monospace' }}
-                  stroke="#232f42"
+                  tick={{ fontSize: 10, fill: '#71717a', fontFamily: 'ui-monospace, monospace' }}
+                  stroke="#cbd5e1"
                   tickLine={false}
                 />
                 <Tooltip
                   contentStyle={tooltipStyle}
-                  cursor={{ fill: 'rgba(255,255,255,0.03)' }}
+                  cursor={{ fill: 'rgba(0,0,0,0.03)' }}
                   formatter={(value: number | string) => [Number(value).toFixed(4), 'importance']}
                 />
                 <Bar dataKey="importance" radius={[0, 4, 4, 0]} isAnimationActive={false}>
                   {featureImportance.map((row, index) => (
-                    <Cell key={row.feature} fill={index < 4 ? '#14b8a6' : '#1d3b45'} />
+                    <Cell key={row.feature} fill={index < 4 ? '#059669' : '#94a3b8'} />
                   ))}
                 </Bar>
               </BarChart>
@@ -446,8 +446,8 @@ export const EvaluationHub: React.FC<EvaluationHubProps> = ({ userCoord = null, 
           </div>
 
           <p className="text-[11px] text-neutral-500 mt-2">
-            Top driver: <span className="text-neutral-300 font-mono">{featureImportance[0]?.feature}</span> at{' '}
-            <span className="text-neutral-300 font-mono">{featureImportance[0]?.importance.toFixed(4)}</span>, the
+            Top driver: <span className="text-neutral-800 dark:text-neutral-300 font-mono">{featureImportance[0]?.feature}</span> at{' '}
+            <span className="text-neutral-800 dark:text-neutral-300 font-mono">{featureImportance[0]?.importance.toFixed(4)}</span>, the
             strongest single signal in the {featureImportance.length}-dimensional vector.
           </p>
         </div>

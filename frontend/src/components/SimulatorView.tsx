@@ -309,15 +309,15 @@ export const SimulatorView: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-neutral-100 tracking-tight">What-If Simulator</h1>
-          <p className="text-xs text-neutral-400 mt-1">
+          <h1 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 tracking-tight">What-If Simulator</h1>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
             Adjust your lifestyle choices and see the impact on your financial future.
           </p>
         </div>
 
         <button
           onClick={handleReset}
-          className="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-[#161d28] border border-[#232f42] text-neutral-300 hover:text-white hover:border-neutral-600 transition self-start sm:self-auto"
+          className="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-white dark:bg-[#161d28] border border-neutral-200 dark:border-[#232f42] text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:border-neutral-300 dark:hover:border-neutral-600 transition self-start sm:self-auto shadow-2xs"
         >
           {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" /> : <RotateCcw className="w-3.5 h-3.5" />}
           <span>Reset &amp; rebaseline</span>
@@ -325,17 +325,17 @@ export const SimulatorView: React.FC = () => {
       </div>
 
       {error && (
-        <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-800/60 text-rose-300 text-xs flex items-center space-x-2">
+        <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 text-rose-700 dark:text-rose-300 text-xs flex items-center space-x-2 shadow-xs">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Improvement path picker */}
-      <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-4 flex flex-col lg:flex-row lg:items-center gap-3">
+      <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-4 flex flex-col lg:flex-row lg:items-center gap-3 shadow-sm">
         <div className="flex items-center space-x-2 flex-shrink-0">
-          <Compass className="w-4 h-4 text-amber-400" />
-          <span className="text-xs font-semibold text-neutral-200">Improvement path</span>
+          <Compass className="w-4 h-4 text-amber-500" />
+          <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">Improvement path</span>
         </div>
 
         <select
@@ -345,7 +345,7 @@ export const SimulatorView: React.FC = () => {
             if (path) applyScenario(path);
             else setActiveScenario('');
           }}
-          className="flex-1 px-3 py-2 text-xs rounded-lg bg-[#0a0d13] border border-[#232f42] text-neutral-200 focus:outline-none focus:border-emerald-500 font-mono"
+          className="flex-1 px-3 py-2 text-xs rounded-lg bg-neutral-50 dark:bg-[#0a0d13] border border-neutral-200 dark:border-[#232f42] text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-emerald-500 font-mono shadow-2xs"
         >
           <option value="">
             {paths.length ? 'Manual — no path applied' : 'Loading improvement paths…'}
@@ -362,7 +362,7 @@ export const SimulatorView: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, x: 8 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-[11px] font-mono text-neutral-400 lg:max-w-md lg:text-right"
+            className="text-[11px] font-mono text-neutral-600 dark:text-neutral-400 lg:max-w-md lg:text-right"
           >
             {activePath.description}
           </motion.div>
@@ -378,7 +378,7 @@ export const SimulatorView: React.FC = () => {
           {activePath.required_changes.map((change, index) => (
             <div
               key={change}
-              className="flex items-start space-x-2 p-3 rounded-xl bg-[#0f141c] border border-[#1d2634]"
+              className="flex items-start space-x-2 p-3 rounded-xl bg-neutral-50 dark:bg-[#0f141c] border border-neutral-200 dark:border-[#1d2634] shadow-2xs"
             >
               <span
                 className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
@@ -386,7 +386,7 @@ export const SimulatorView: React.FC = () => {
               >
                 {index + 1}
               </span>
-              <span className="text-[11px] text-neutral-300 leading-snug">{change}</span>
+              <span className="text-[11px] text-neutral-700 dark:text-neutral-300 leading-snug">{change}</span>
             </div>
           ))}
         </motion.div>
@@ -394,23 +394,23 @@ export const SimulatorView: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Sliders */}
-        <div className="lg:col-span-7 border border-[#1d2634] bg-[#11161f] rounded-2xl p-6 space-y-4">
-          <div className="text-sm font-semibold text-neutral-200 mb-2">Adjust Your Parameters</div>
+        <div className="lg:col-span-7 border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 space-y-4 shadow-sm">
+          <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-200 mb-2">Adjust Your Parameters</div>
 
           {SLIDER_DEFS.map((slider) => (
-            <div key={slider.key} className="p-3.5 rounded-xl bg-[#0a0d13] border border-[#18202d] space-y-2">
+            <div key={slider.key} className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#0a0d13] border border-neutral-200 dark:border-[#18202d] space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2.5">
-                  <div className="w-7 h-7 rounded-lg bg-[#161f2c] border border-[#233144] flex items-center justify-center text-neutral-300">
+                  <div className="w-7 h-7 rounded-lg bg-white dark:bg-[#161f2c] border border-neutral-200 dark:border-[#233144] flex items-center justify-center text-neutral-600 dark:text-neutral-300 shadow-2xs">
                     {slider.icon}
                   </div>
-                  <span className="text-xs font-medium text-neutral-200">{slider.label}</span>
+                  <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">{slider.label}</span>
                 </div>
                 <span
                   className={`text-xs font-mono font-bold px-2 py-0.5 rounded border ${
                     slider.accent === 'emerald'
-                      ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
-                      : 'text-neutral-300 bg-[#161f2c] border-[#233144]'
+                      ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20'
+                      : 'text-neutral-700 dark:text-neutral-300 bg-white dark:bg-[#161f2c] border-neutral-200 dark:border-[#233144]'
                   }`}
                 >
                   {slider.display(values[slider.key])}
@@ -423,7 +423,7 @@ export const SimulatorView: React.FC = () => {
                 step={slider.step}
                 value={values[slider.key]}
                 onChange={(event) => updateSlider(slider.key, Number(event.target.value))}
-                className="w-full accent-emerald-500 bg-[#1a2332] h-1.5 rounded-lg appearance-none cursor-pointer"
+                className="w-full accent-emerald-600 bg-neutral-200 dark:bg-[#1a2332] h-1.5 rounded-lg appearance-none cursor-pointer"
               />
               {slider.key === 'annualCreditRupees' && (
                 <div className="flex justify-between text-[10px] text-neutral-500 font-mono">
@@ -438,14 +438,14 @@ export const SimulatorView: React.FC = () => {
 
         {/* Live preview */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="text-sm font-semibold text-neutral-200 flex items-center space-x-2">
+          <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-200 flex items-center space-x-2">
             <span>Live Preview</span>
-            {loading && <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />}
+            {loading && <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-500" />}
           </div>
 
-          <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6">
+          <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 shadow-sm">
             <div className="flex items-baseline justify-between">
-              <div className="text-3xl font-bold font-mono text-neutral-100 tracking-tight">
+              <div className="text-3xl font-bold font-mono text-neutral-900 dark:text-neutral-100 tracking-tight">
                 {pred ? formatINR(pred.estimated_annual_income) : '—'}
               </div>
               {pred && baseline && (
@@ -455,8 +455,8 @@ export const SimulatorView: React.FC = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   className={`inline-flex items-center text-xs font-mono font-semibold px-2 py-0.5 rounded-md border ${
                     pred.estimated_annual_income >= baseline.metrics.annualIncome
-                      ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
-                      : 'text-rose-400 bg-rose-500/10 border-rose-500/20'
+                      ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20'
+                      : 'text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20'
                   }`}
                 >
                   {pred.estimated_annual_income >= baseline.metrics.annualIncome ? '↑' : '↓'}
@@ -464,7 +464,7 @@ export const SimulatorView: React.FC = () => {
                 </motion.span>
               )}
             </div>
-            <div className="text-xs text-neutral-400 mt-1">Predicted Annual Inflow (regression)</div>
+            <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Predicted Annual Inflow (regression)</div>
             {pred && (
               <div className="mt-2 text-[11px] text-neutral-500 font-mono">
                 95% CI: {formatINR(pred.income_confidence_interval[0])} –{' '}
@@ -475,11 +475,11 @@ export const SimulatorView: React.FC = () => {
 
           {/* Archetype with confidence */}
           <div
-            className="border rounded-2xl p-6 transition-colors"
+            className="border rounded-2xl p-6 transition-colors shadow-sm"
             style={{ borderColor: theme.border, backgroundColor: theme.wash }}
           >
             <div className="flex items-center justify-between mb-2">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-neutral-500">Lifestyle Archetype</div>
+              <div className="text-[10px] font-mono uppercase tracking-wider text-neutral-600 dark:text-neutral-400">Lifestyle Archetype</div>
               {archetype && <ConfidenceBadge confidence={archetype.confidence} label="persona" />}
             </div>
             <div className="flex items-center space-x-2.5" style={{ opacity: confidenceOpacity(archetype?.confidence) }}>
@@ -489,9 +489,9 @@ export const SimulatorView: React.FC = () => {
               >
                 <Crown className="w-4 h-4" />
               </div>
-              <h3 className="text-base font-bold text-neutral-100">{archetype?.archetype_name ?? '—'}</h3>
+              <h3 className="text-base font-bold text-neutral-900 dark:text-neutral-100">{archetype?.archetype_name ?? '—'}</h3>
             </div>
-            <p className="text-xs text-neutral-300 mt-2.5 leading-relaxed">{archetype?.summary}</p>
+            <p className="text-xs text-neutral-700 dark:text-neutral-300 mt-2.5 leading-relaxed">{archetype?.summary}</p>
             {archetype && archetype.confidence < 0.7 && (
               <p className="text-[10px] font-mono text-neutral-500 mt-2">
                 Borderline read — the next two archetypes are within a few points of each other.
@@ -500,14 +500,14 @@ export const SimulatorView: React.FC = () => {
           </div>
 
           {/* Health gauge + budget split */}
-          <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6">
+          <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 shadow-sm">
             <div className="grid grid-cols-2 gap-4">
-              <div className="pr-4 border-r border-[#18202d]">
-                <div className="text-xs font-medium text-neutral-300 mb-3">Financial Health</div>
+              <div className="pr-4 border-r border-neutral-100 dark:border-[#18202d]">
+                <div className="text-xs font-medium text-neutral-800 dark:text-neutral-300 mb-3">Financial Health</div>
                 <div className="flex flex-col items-center justify-center">
                   <div className="relative w-20 h-20 flex items-center justify-center">
                     <svg className="w-20 h-20 transform -rotate-90">
-                      <circle cx="40" cy="40" r={radius} stroke="#1a2332" strokeWidth="6" fill="transparent" />
+                      <circle cx="40" cy="40" r={radius} className="stroke-neutral-200 dark:stroke-[#1a2332]" strokeWidth="6" fill="transparent" />
                       <motion.circle
                         cx="40"
                         cy="40"
@@ -527,14 +527,14 @@ export const SimulatorView: React.FC = () => {
                         key={healthScore}
                         initial={{ opacity: 0.3, y: 4 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-xl font-bold font-mono text-neutral-100"
+                        className="text-xl font-bold font-mono text-neutral-900 dark:text-neutral-100"
                       >
                         {diagnostics ? healthScore : '—'}
                       </motion.span>
                     </div>
                   </div>
                   <div className="mt-2 text-center">
-                    <div className="text-[11px] font-mono text-neutral-400">{healthScore} / 100</div>
+                    <div className="text-[11px] font-mono text-neutral-600 dark:text-neutral-400">{healthScore} / 100</div>
                     <div className="text-[11px] font-medium mt-0.5" style={{ color: theme.accent }}>
                       {diagnostics ? `${diagnostics.cash_runway_months} Months` : '—'}
                     </div>
@@ -544,7 +544,7 @@ export const SimulatorView: React.FC = () => {
               </div>
 
               <div className="pl-2 flex flex-col justify-center">
-                <div className="text-xs font-medium text-neutral-300 mb-3">Budget Health</div>
+                <div className="text-xs font-medium text-neutral-800 dark:text-neutral-300 mb-3">Budget Health</div>
                 <div className="space-y-2.5 text-xs font-mono">
                   {[
                     { label: 'Needs', value: diagnostics?.needs_ratio_percent, dot: '#3b82f6' },
@@ -554,20 +554,20 @@ export const SimulatorView: React.FC = () => {
                     <div key={row.label} className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <span className="w-2 h-2 rounded-full" style={{ backgroundColor: row.dot }} />
-                        <span className="text-neutral-400">{row.label}</span>
+                        <span className="text-neutral-600 dark:text-neutral-400">{row.label}</span>
                       </div>
                       <motion.span
                         key={row.value}
                         initial={{ opacity: 0.4 }}
                         animate={{ opacity: 1 }}
-                        className="text-neutral-200 font-bold"
+                        className="text-neutral-900 dark:text-neutral-200 font-bold"
                       >
                         {row.value === undefined ? '—' : `${row.value.toFixed(0)}%`}
                       </motion.span>
                     </div>
                   ))}
                 </div>
-                <div className="mt-3 pt-3 border-t border-[#18202d] text-[10px] font-mono text-neutral-500">
+                <div className="mt-3 pt-3 border-t border-neutral-100 dark:border-[#18202d] text-[10px] font-mono text-neutral-500">
                   {formatINR(monthlySpend)}/mo outflow
                 </div>
               </div>
@@ -576,19 +576,19 @@ export const SimulatorView: React.FC = () => {
 
           {pred?.predicted_tax_slab && (
             <div
-              className="border border-[#1d2634] bg-[#11161f] rounded-xl px-4 py-3 flex items-center justify-between text-xs"
+              className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-xl px-4 py-3 flex items-center justify-between text-xs shadow-2xs"
               style={{ opacity: confidenceOpacity(pred.predicted_tax_slab.confidence) }}
             >
-              <span className="text-neutral-300">
-                Tax slab: <span className="font-mono text-neutral-100">{pred.predicted_tax_slab.bracket_name}</span>
+              <span className="text-neutral-700 dark:text-neutral-300">
+                Tax slab: <span className="font-mono text-neutral-900 dark:text-neutral-100">{pred.predicted_tax_slab.bracket_name}</span>
               </span>
               <ConfidenceBadge confidence={pred.predicted_tax_slab.confidence} label="slab" compact />
             </div>
           )}
 
-          <div className="border border-[#1d2634] bg-[#11161f] rounded-xl px-4 py-3 flex items-center space-x-2 text-xs text-neutral-300">
-            <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0" />
-            <span className="italic text-neutral-400">
+          <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-xl px-4 py-3 flex items-center space-x-2 text-xs text-neutral-700 dark:text-neutral-300 shadow-2xs">
+            <Sparkles className="w-4 h-4 text-amber-500 flex-shrink-0" />
+            <span className="italic text-neutral-500 dark:text-neutral-400">
               {insights?.persona_critique
                 ? insights.persona_critique
                 : 'Pick an improvement path to project the outcome.'}
@@ -618,19 +618,19 @@ export const SimulatorView: React.FC = () => {
           />
 
           {insights?.persona_comparison && (
-            <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6">
-              <h3 className="text-xs font-bold text-neutral-200 uppercase tracking-wider mb-4">
+            <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 shadow-sm">
+              <h3 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider mb-4">
                 Ranked actions at these settings
               </h3>
               <div className="space-y-2">
                 {insights.insights.slice(0, 5).map((item) => (
                   <div
                     key={item.rule_id}
-                    className="flex items-start justify-between gap-3 p-3 rounded-xl bg-[#0f141c] border border-[#1d2634]"
+                    className="flex items-start justify-between gap-3 p-3 rounded-xl bg-neutral-50 dark:bg-[#0f141c] border border-neutral-200 dark:border-[#1d2634] shadow-2xs"
                     style={{ opacity: confidenceOpacity(item.confidence) }}
                   >
-                    <span className="text-[11px] text-neutral-300 leading-snug min-w-0">{item.insight}</span>
-                    <span className="text-[11px] font-mono font-bold text-emerald-400 flex-shrink-0">
+                    <span className="text-[11px] text-neutral-800 dark:text-neutral-300 leading-snug min-w-0">{item.insight}</span>
+                    <span className="text-[11px] font-mono font-bold text-emerald-600 dark:text-emerald-400 flex-shrink-0">
                       +{formatINR(item.impact_rupees)}
                     </span>
                   </div>

@@ -86,11 +86,11 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
   const netImprovement = verdict > 0;
 
   return (
-    <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6 space-y-4">
+    <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 space-y-4 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center space-x-2">
           <Columns2 className="w-4 h-4" style={{ color: theme.accent }} />
-          <h3 className="text-xs font-bold text-neutral-200 uppercase tracking-wider">Before / After</h3>
+          <h3 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">Before / After</h3>
         </div>
 
         <div className="flex items-center gap-3">
@@ -100,10 +100,10 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
             animate={{ opacity: 1, scale: 1 }}
             className={`text-[11px] font-mono px-2 py-1 rounded-lg border ${
               netImprovement
-                ? 'text-emerald-300 bg-emerald-500/10 border-emerald-500/25'
+                ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/25'
                 : verdict === 0
-                ? 'text-neutral-400 bg-neutral-800/40 border-neutral-700'
-                : 'text-rose-300 bg-rose-500/10 border-rose-500/25'
+                ? 'text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800/40 border-neutral-200 dark:border-neutral-700'
+                : 'text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/25'
             }`}
           >
             {verdict === 0
@@ -112,7 +112,7 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
           </motion.span>
           <button
             onClick={() => setExpanded((prev) => !prev)}
-            className="text-[10px] font-mono px-2 py-1 rounded-lg bg-[#161d28] border border-[#232f42] text-neutral-400 hover:text-neutral-200 transition"
+            className="text-[10px] font-mono px-2.5 py-1 rounded-lg bg-white dark:bg-[#161d28] border border-neutral-200 dark:border-[#232f42] text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 transition shadow-2xs"
           >
             {expanded ? 'collapse' : 'expand'}
           </button>
@@ -132,19 +132,19 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
             transition={{ delay: columnIndex * 0.08 }}
             className="rounded-xl border p-4 space-y-3"
             style={{
-              borderColor: columnIndex === 1 ? theme.border : '#1d2634',
-              backgroundColor: columnIndex === 1 ? theme.wash : '#0f141c'
+              borderColor: columnIndex === 1 ? theme.border : undefined,
+              backgroundColor: columnIndex === 1 ? theme.wash : undefined
             }}
           >
             <div className="flex items-center space-x-2">
               <span className="w-2 h-2 rounded-full" style={{ backgroundColor: column.accent }} />
-              <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400">{column.label}</span>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-400">{column.label}</span>
             </div>
-            <div className="text-2xl font-bold font-mono text-neutral-100 leading-none">
+            <div className="text-2xl font-bold font-mono text-neutral-900 dark:text-neutral-100 leading-none">
               <AnimatedNumber value={column.metrics.healthScore} format={(v) => v.toFixed(0)} />
               <span className="text-sm text-neutral-500 font-normal"> /100 health</span>
             </div>
-            <div className="text-[11px] font-mono text-neutral-400">
+            <div className="text-[11px] font-mono text-neutral-500 dark:text-neutral-400">
               <AnimatedNumber value={column.metrics.runwayMonths} format={(v) => v.toFixed(1)} /> months runway ·{' '}
               <AnimatedNumber value={column.metrics.annualIncome} format={formatINR} />
             </div>
@@ -170,20 +170,20 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
           return (
             <div key={spec.key} className="px-1">
               <div className="flex items-baseline justify-between text-[11px] font-mono mb-1">
-                <span className="text-neutral-400">{spec.label}</span>
+                <span className="text-neutral-600 dark:text-neutral-400">{spec.label}</span>
                 <span className="flex items-baseline space-x-2">
                   <span className="text-neutral-500">
                     <AnimatedNumber value={from} format={spec.format} />
                     {spec.unit}
                   </span>
-                  <span className="text-neutral-700">→</span>
-                  <span className="text-neutral-100 font-semibold">
+                  <span className="text-neutral-400">→</span>
+                  <span className="text-neutral-900 dark:text-neutral-100 font-semibold">
                     <AnimatedNumber value={to} format={spec.format} />
                     {spec.unit}
                   </span>
                   <span
                     className={`inline-flex items-center w-16 justify-end ${
-                      !meaningful ? 'text-neutral-600' : improves ? 'text-emerald-400' : 'text-rose-400'
+                      !meaningful ? 'text-neutral-400 dark:text-neutral-600' : improves ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
                     }`}
                   >
                     {meaningful &&
@@ -200,9 +200,9 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
                 </span>
               </div>
 
-              <div className="relative h-1.5 rounded-full bg-[#161d28] border border-[#232f42] overflow-hidden">
+              <div className="relative h-1.5 rounded-full bg-neutral-100 dark:bg-[#161d28] border border-neutral-200 dark:border-[#232f42] overflow-hidden">
                 <motion.div
-                  className="absolute inset-y-0 left-0 rounded-full bg-neutral-700"
+                  className="absolute inset-y-0 left-0 rounded-full bg-neutral-300 dark:bg-neutral-700"
                   animate={{ width: `${fromPosition}%` }}
                   transition={{ duration: 0.4 }}
                 />

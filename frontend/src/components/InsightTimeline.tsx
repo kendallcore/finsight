@@ -98,9 +98,9 @@ export const InsightTimeline: React.FC<InsightTimelineProps> = ({
 
   if (!insights.length && !anomalies.length) {
     return (
-      <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-10 text-center space-y-2">
-        <BadgeCheck className="w-6 h-6 mx-auto text-emerald-400/70" />
-        <p className="text-xs text-neutral-300">No spending triggers fired on this statement.</p>
+      <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-10 text-center space-y-2 shadow-sm">
+        <BadgeCheck className="w-6 h-6 mx-auto text-emerald-600 dark:text-emerald-400/70" />
+        <p className="text-xs text-neutral-800 dark:text-neutral-300">No spending triggers fired on this statement.</p>
         <p className="text-[11px] text-neutral-500">
           Every ratio you track is inside its healthy band — the timeline populates as soon as a
           threshold is crossed.
@@ -110,36 +110,36 @@ export const InsightTimeline: React.FC<InsightTimelineProps> = ({
   }
 
   return (
-    <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6 space-y-5">
+    <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 space-y-5 shadow-sm">
       {/* Header + trackable savings meter */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex items-center space-x-2">
             <Lightbulb className="w-4 h-4" style={{ color: theme.accent }} />
-            <h3 className="text-xs font-bold text-neutral-200 uppercase tracking-wider">Coaching Timeline</h3>
+            <h3 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">Coaching Timeline</h3>
             {accentLabel && (
               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border" style={{ color: theme.accent, borderColor: theme.border, backgroundColor: theme.wash }}>
                 {accentLabel}
               </span>
             )}
           </div>
-          <p className="text-[11px] text-neutral-400 mt-1.5 max-w-2xl leading-relaxed">
+          <p className="text-[11px] text-neutral-600 dark:text-neutral-400 mt-1.5 max-w-2xl leading-relaxed">
             {personaCritique ?? `Recommendations ranked by monthly rupee impact for ${archetypeName ?? 'your profile'}.`}
           </p>
         </div>
 
         <div className="flex-shrink-0 text-right">
           <div className="text-[10px] font-mono uppercase tracking-wider text-neutral-500">Identified upside</div>
-          <div className="text-xl font-bold font-mono text-neutral-100">{formatINR(totalPotential)}<span className="text-xs text-neutral-500 font-normal">/mo</span></div>
+          <div className="text-xl font-bold font-mono text-neutral-900 dark:text-neutral-100">{formatINR(totalPotential)}<span className="text-xs text-neutral-500 font-normal">/mo</span></div>
         </div>
       </div>
 
       <div>
         <div className="flex items-center justify-between text-[11px] font-mono mb-1.5">
-          <span className="text-neutral-400">Savings you have banked</span>
-          <span className="text-emerald-400 font-semibold">{formatINR(bankedSavings)}</span>
+          <span className="text-neutral-600 dark:text-neutral-400">Savings you have banked</span>
+          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{formatINR(bankedSavings)}</span>
         </div>
-        <div className="w-full h-2 rounded-full bg-[#161d28] border border-[#232f42] overflow-hidden">
+        <div className="w-full h-2 rounded-full bg-neutral-100 dark:bg-[#161d28] border border-neutral-200 dark:border-[#232f42] overflow-hidden">
           <motion.div
             className="h-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400"
             initial={{ width: 0 }}
@@ -176,13 +176,13 @@ export const InsightTimeline: React.FC<InsightTimelineProps> = ({
                 className="relative"
               >
                 <span
-                  className="absolute -left-[19px] top-4 w-2 h-2 rounded-full ring-2 ring-[#11161f]"
+                  className="absolute -left-[19px] top-4 w-2 h-2 rounded-full ring-2 ring-white dark:ring-[#11161f]"
                   style={{ backgroundColor: low ? '#52525b' : theme.accent }}
                   aria-hidden
                 />
                 <div
-                  className="group rounded-xl border bg-[#0f141c] p-4 transition-colors"
-                  style={{ borderColor: low ? '#232f42' : theme.border }}
+                  className="group rounded-xl border bg-neutral-50/80 dark:bg-[#0f141c] p-4 transition-colors"
+                  style={{ borderColor: low ? '#e5e7eb' : theme.border }}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
@@ -200,7 +200,7 @@ export const InsightTimeline: React.FC<InsightTimelineProps> = ({
                         <span className="text-[10px] font-mono text-neutral-500">effort {item.effort}/3</span>
                       </div>
 
-                      <p className="text-xs text-neutral-200 leading-relaxed">{item.insight}</p>
+                      <p className="text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed">{item.insight}</p>
 
                       {low && (
                         <p className="text-[10px] font-mono text-neutral-500 mt-2">
@@ -211,7 +211,7 @@ export const InsightTimeline: React.FC<InsightTimelineProps> = ({
 
                     <div className="flex-shrink-0 text-right">
                       <div className="text-[10px] font-mono uppercase tracking-wider text-neutral-500">ROI</div>
-                      <div className="text-sm font-bold font-mono text-emerald-400">{formatINR(item.impact_rupees)}</div>
+                      <div className="text-sm font-bold font-mono text-emerald-600 dark:text-emerald-400">{formatINR(item.impact_rupees)}</div>
                       <div className="text-[10px] font-mono text-neutral-500">per month</div>
                     </div>
                   </div>
@@ -219,7 +219,7 @@ export const InsightTimeline: React.FC<InsightTimelineProps> = ({
                   <div className="flex justify-end mt-2">
                     <button
                       onClick={() => dismiss(item.rule_id, item.impact_rupees)}
-                      className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono bg-[#161d28] border border-[#232f42] text-neutral-400 hover:text-emerald-300 hover:border-emerald-700 transition"
+                      className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono bg-white dark:bg-[#161d28] border border-neutral-200 dark:border-[#232f42] text-neutral-600 dark:text-neutral-400 hover:text-emerald-600 dark:hover:text-emerald-300 hover:border-emerald-300 dark:hover:border-emerald-700 transition shadow-2xs"
                     >
                       <Check className="w-3 h-3" />
                       <span>Mark as done</span>
@@ -242,18 +242,18 @@ export const InsightTimeline: React.FC<InsightTimelineProps> = ({
               exit={{ opacity: 0, x: 24 }}
               className="relative"
             >
-              <span className="absolute -left-[19px] top-4 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-[#11161f]" aria-hidden />
-              <div className="rounded-xl border-l-2 border-l-amber-500 border border-[#3a2a12] bg-[#15100c] p-4">
+              <span className="absolute -left-[19px] top-4 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-white dark:ring-[#11161f]" aria-hidden />
+              <div className="rounded-xl border-l-2 border-l-amber-500 border border-amber-200 dark:border-[#3a2a12] bg-amber-50/50 dark:bg-[#15100c] p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center space-x-2 mb-2">
-                      <AlertTriangle className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400">
+                      <AlertTriangle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-amber-600 dark:text-amber-400 font-semibold">
                         Anomalous payment · {anomaly.category}
                       </span>
                       <ConfidenceBadge confidence={anomaly.confidence} />
                     </div>
-                    <p className="text-xs text-neutral-200 leading-relaxed">{anomaly.narrative}</p>
+                    <p className="text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed">{anomaly.narrative}</p>
                     <p className="text-[10px] font-mono text-neutral-500 mt-2">
                       z-score {anomaly.z_score.toFixed(2)} on {anomaly.transaction_date}
                     </p>

@@ -124,11 +124,11 @@ export const PcaScatter3D: React.FC<PcaScatter3DProps> = ({
   const empty = !loading && !error && points.length === 0;
 
   return (
-    <div className="border border-[#1d2634] bg-[#11161f] rounded-2xl p-6">
+    <div className="border border-neutral-200 dark:border-[#1d2634] bg-white dark:bg-[#11161f] rounded-2xl p-6 shadow-sm">
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center space-x-2">
-          <Box className="w-4 h-4 text-emerald-400" />
-          <h3 className="text-xs font-bold text-neutral-200 uppercase tracking-wider">
+          <Box className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          <h3 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">
             3D Latent Space &mdash; PCA Projection
           </h3>
         </div>
@@ -137,7 +137,7 @@ export const PcaScatter3D: React.FC<PcaScatter3DProps> = ({
           <span>drag to rotate &middot; scroll to zoom</span>
         </span>
       </div>
-      <p className="text-[11px] text-neutral-400 mb-4">
+      <p className="text-[11px] text-neutral-600 dark:text-neutral-400 mb-4">
         {points.length > 0
           ? `${points.length.toLocaleString('en-IN')} real training profiles projected from 16 dimensions to 3.`
           : 'Projected cluster cloud.'}
@@ -146,7 +146,7 @@ export const PcaScatter3D: React.FC<PcaScatter3DProps> = ({
       {loading && (
         <div className="h-[380px] flex flex-col items-center justify-center text-xs font-mono text-neutral-500 space-y-3">
           <motion.div
-            className="w-8 h-8 rounded-full border-2 border-[#232f42] border-t-emerald-400"
+            className="w-8 h-8 rounded-full border-2 border-neutral-200 dark:border-[#232f42] border-t-emerald-500"
             animate={{ rotate: 360 }}
             transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
           />
@@ -156,8 +156,8 @@ export const PcaScatter3D: React.FC<PcaScatter3DProps> = ({
 
       {error && !loading && (
         <div className="h-[380px] flex flex-col items-center justify-center text-center px-6">
-          <Users className="w-6 h-6 text-neutral-600 mb-3" />
-          <p className="text-xs text-neutral-400 max-w-sm">{error}</p>
+          <Users className="w-6 h-6 text-neutral-400 dark:text-neutral-600 mb-3" />
+          <p className="text-xs text-neutral-600 dark:text-neutral-400 max-w-sm">{error}</p>
         </div>
       )}
 
@@ -173,14 +173,14 @@ export const PcaScatter3D: React.FC<PcaScatter3DProps> = ({
             <Plot data={data as never} layout={layout as never} config={config as never} style={{ width: '100%', height: '100%' }} />
           </div>
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-4 pt-4 border-t border-[#18202d]">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-4 pt-4 border-t border-neutral-100 dark:border-[#18202d]">
             {Array.from(grouped.entries()).map(([clusterId, members]) => (
               <div key={clusterId} className="flex items-center space-x-1.5 text-[11px] font-mono">
                 <span
                   className="w-2.5 h-2.5 rounded-full"
                   style={{ backgroundColor: ARCHETYPE_COLORS[clusterId % ARCHETYPE_COLORS.length] }}
                 />
-                <span className="text-neutral-300">
+                <span className="text-neutral-700 dark:text-neutral-300">
                   {clusterNames?.[String(clusterId)] ?? `Cluster ${clusterId}`}
                 </span>
                 <span className="text-neutral-600">({members.length})</span>
