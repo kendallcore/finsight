@@ -205,6 +205,7 @@ export interface UploadStatementResponse {
   category_breakdown?: CategorySpendItem[];
   monthly_category_breakdown?: MonthlyCategorySpend[];
   insights?: InsightResponse | null;
+  persona_emphasis?: InsightItem | null;
 }
 
 export interface PredictFeaturesResponse {
