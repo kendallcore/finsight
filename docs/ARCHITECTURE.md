@@ -64,7 +64,7 @@
 - **Key Modules**:
   - **Overview Dashboard**: High-level financial telemetry, balance trends, monthly outflow distributions, and recent transaction feeds.
   - **Statement Diagnostic & Outflow Lab**: Drag-and-drop ingestion of multi-bank CSV and PDF statements; extracts and visualizes the 16-dimensional behavioral vector, computes 50/30/20 budget adherence, and determines emergency cash runway.
-  - **What-If Counterfactual Simulator**: 16 real-time slider controls enabling examiners to simulate behavioral shifts (e.g., reallocating discretionary dining into SIP investments) with live archetype re-classification and manifold preservation (`Savings Ratio + Burn Rate = 1.0`).
+  - **What-If Counterfactual Simulator**: 16 real-time slider controls enabling users to simulate behavioral shifts (e.g., reallocating discretionary dining into SIP investments) with live archetype re-classification and manifold preservation (`Savings Ratio + Burn Rate = 1.0`).
   - **Model Evaluation Hub**: Algorithm benchmark leaderboard comparing Gradient Boosting, Random Forest, SVM, and linear baselines; features interactive confusion matrices, Gini feature importance rankings, and an interactive WebGL 3D PCA scatter plot.
   - **Profile Simulations Lab**: Pre-calibrated presets across all four behavioral archetypes and real accounts for one-click testing and demonstration.
 

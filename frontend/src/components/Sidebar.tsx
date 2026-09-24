@@ -22,7 +22,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isOpe
     { id: 'diagnostic', label: 'Statement Analysis', icon: FileText },
     { id: 'simulator', label: 'What-If Simulator', icon: SlidersHorizontal },
     { id: 'evaluation', label: 'Model Evaluation', icon: BarChart3 },
-    { id: 'viva', label: 'Profile Simulations', icon: Users },
+    { id: 'profiles', label: 'Profile Simulations', icon: Users },
     { id: 'api', label: 'API & Integrations', icon: Code2 },
   ];
 

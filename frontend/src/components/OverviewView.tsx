@@ -284,7 +284,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
           {/* More */}
           <button
-            onClick={() => onNavigate('viva')}
+            onClick={() => onNavigate('profiles')}
             className="bg-white dark:bg-[#11161f] border border-[#E5E7EB] dark:border-[#1d2634] hover:border-emerald-500/60 dark:hover:border-emerald-500/60 rounded-xl p-3.5 flex items-center space-x-3 shadow-sm hover:shadow transition group text-left"
           >
             <div className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center flex-shrink-0 text-neutral-600 dark:text-neutral-300">

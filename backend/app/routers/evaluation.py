@@ -14,7 +14,7 @@ router = APIRouter(prefix="/api", tags=["Evaluation"])
 async def get_model_evaluation():
     """
     Returns cross-validation metrics, confusion matrix, and feature importances
-    for academic viva defense and model comparison.
+    for model comparison, benchmarking, and algorithm evaluation.
     """
     if not ml_service.metrics:
         raise HTTPException(

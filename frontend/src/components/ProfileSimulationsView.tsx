@@ -12,7 +12,7 @@ import {
 import { api } from '../services/api';
 import { SampleProfileItem, UploadStatementResponse } from '../types';
 
-interface VivaPresetsViewProps {
+interface ProfileSimulationsViewProps {
   onSelectSample: (data: UploadStatementResponse) => void;
   onGoToSimulator?: () => void;
 }
@@ -105,7 +105,7 @@ const FALLBACK_SAMPLES: SampleProfileItem[] = [
   }
 ];
 
-export const VivaPresetsView: React.FC<VivaPresetsViewProps> = ({
+export const ProfileSimulationsView: React.FC<ProfileSimulationsViewProps> = ({
   onSelectSample,
   onGoToSimulator
 }) => {
@@ -216,7 +216,7 @@ export const VivaPresetsView: React.FC<VivaPresetsViewProps> = ({
           Profile-Based Financial Simulations
         </h2>
         <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 max-w-4xl leading-relaxed">
-          Pre-loaded profiles designed for your academic defense and live evaluation. Click any profile to inspect raw telemetry, simulate behavioral shocks, or run full diagnostics.
+          Pre-loaded reference profiles for instant evaluation and behavioral modeling. Click any profile to inspect raw telemetry, simulate behavioral shifts, or run full diagnostics.
         </p>
       </div>
 
@@ -419,4 +419,4 @@ export const VivaPresetsView: React.FC<VivaPresetsViewProps> = ({
   );
 };
 
-export default VivaPresetsView;
+export default ProfileSimulationsView;

@@ -1,6 +1,5 @@
 # GitHub Linguist Language Override
-# Treat frontend dashboard UI and external generator scripts as vendored
+# Treat frontend dashboard UI as vendored
 # so repository language statistics accurately reflect Python as the primary machine learning codebase.
 
 frontend/** linguist-vendored
-scripts/generate_pitch_deck.js linguist-vendored

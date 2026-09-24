@@ -1,6 +1,6 @@
 """
-FinSight Viva Defense Presets Generator
-Generates realistic, distinct banking statement CSVs for 5 academic viva presets:
+FinSight Sample Statement Profiles Generator
+Generates realistic, distinct banking statement CSVs for 5 demonstration profiles:
 1. student_entry: Aarav Sharma — Student Intern & Entry Saver (~₹3.2L, Class 0 Nil)
 2. balanced_pro: Priya Nair — Software Engineer at TCS (~₹12.5L, Class 2, Sec 87A rebate)
 3. wealth_builder: Vikram Malhotra — Senior Tech Lead at Google India (~₹26.0L, Class 6, 30%)
@@ -300,7 +300,7 @@ def get_real_agami_account():
 
 
 def main():
-    print("Generating FinSight Viva Presets...")
+    print("Generating FinSight Sample Profiles...")
     profiles = {
         "student_entry": generate_student(),
         "balanced_pro": generate_balanced_pro(),

@@ -34,7 +34,7 @@ Developed as a term project for an Intro to Machine Learning course, FinSight de
 - **Backend**: FastAPI (Python 3.12), Pydantic v2, SQLAlchemy, Uvicorn
 - **Machine Learning**: scikit-learn, NumPy, pandas, joblib, SciPy
 - **Frontend**: React 19, TypeScript, Vite 6, Tailwind CSS, Recharts, Plotly.js (WebGL 3D)
-- **Quality Assurance**: Pytest (125 specs), Vitest (31 specs), 100% pass rate
+- **Verification**: Pytest (125 specs), Vitest (31 specs), 100% pass rate
 
 ---
 

@@ -6,7 +6,7 @@ import { DiagnosticView } from './components/DiagnosticView';
 import { InsightsView } from './components/InsightsView';
 import { SimulatorView } from './components/SimulatorView';
 import { EvaluationHub } from './components/EvaluationHub';
-import { VivaPresetsView } from './components/VivaPresetsView';
+import { ProfileSimulationsView } from './components/ProfileSimulationsView';
 import { ApiIntegrationsView } from './components/ApiIntegrationsView';
 import { UploadStatementResponse } from './types';
 
@@ -87,8 +87,8 @@ export const App: React.FC = () => {
               userLabel={analysisResult?.statement_summary?.account_holder_name ?? analysisResult?.statement_summary?.filename}
             />
           )}
-          {activeTab === 'viva' && (
-            <VivaPresetsView
+          {activeTab === 'profiles' && (
+            <ProfileSimulationsView
               onSelectSample={handleSelectSample}
               onGoToSimulator={() => setActiveTab('simulator')}
             />
