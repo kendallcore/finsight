@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-[#0c0d0e] text-neutral-200 font-sans tracking-tight;
+    @apply bg-[#F8F9FA] dark:bg-[#0a0c10] text-neutral-900 dark:text-neutral-100 font-sans tracking-tight antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
@@ -24,9 +24,15 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #262626;
+  background: #E5E7EB;
   border-radius: 3px;
 }
+.dark ::-webkit-scrollbar-thumb {
+  background: #232f42;
+}
 ::-webkit-scrollbar-thumb:hover {
-  background: #404040;
+  background: #D1D5DB;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #334155;
 }
