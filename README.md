@@ -1,15 +1,8 @@
 # FinSight — Behavioral Spending Analysis & Financial Archetype Intelligence
 
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg)](https://fastapi.tiangolo.com)
-[![React 19](https://img.shields.io/badge/React-19.0-61dafb.svg)](https://react.dev)
-[![Vite](https://img.shields.io/badge/Vite-6.0-646CFF.svg)](https://vitejs.dev)
-[![scikit-learn](https://img.shields.io/badge/scikit--learn-1.4+-F7931E.svg)](https://scikit-learn.org)
-
 FinSight is a machine learning system designed to parse raw Indian bank statements, extract high-dimensional behavioral features, classify lifestyle spending archetypes, and provide actionable financial health diagnostics.
 
-Developed as a term project for an Intro to Machine Learning course, FinSight demonstrates an end-to-end applied ML pipeline—from domain-specific feature engineering to supervised classification, regression, unsupervised clustering, and counterfactual simulation.
+Developed as a term project for an Intro to Machine Learning course, FinSight demonstrates an end-to-end applied ML pipeline—from domain-specific feature engineering to supervised classification, regression, unsupervised clustering, and counterfactual simulation. Trained models and datasets are hosted on the Hugging Face [Model Hub](https://huggingface.co/sanjeevafk/finsight-indian-tax-models) and [Dataset Hub](https://huggingface.co/datasets/sanjeevafk/indian-banking-tax-profiles-2025).
 
 ---
 
