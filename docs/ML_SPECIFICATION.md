@@ -120,7 +120,7 @@ $$Z_{\text{cat}} = \frac{x_{\text{cat}} - \mu_{\text{cat}}}{\sigma_{\text{cat}} 
 A spending anomaly is triggered when $Z_{\text{cat}} \ge 2.0$, damped by the historical statement duration (number of active calendar months).
 
 ### Counterfactual Sandbox Identity Preservation
-During interactive 16-slider exploration in the What-If Simulator, slider updates strictly preserve identity constraints across interconnected features:
-$$\text{net\_savings\_ratio} + \text{monthly\_burn\_rate} = 1.0$$
-$$\sum (\text{investment\_ratio} + \text{fixed\_obligation\_ratio} + \text{discretionary\_ratio}) \le 1.0$$
+During interactive 16-slider exploration in the What-If Simulator, slider updates strictly preserve identity constraints across interconnected features (`net_savings_ratio + monthly_burn_rate = 1.0`):
+$$\text{Savings Ratio} + \text{Burn Rate} = 1.0$$
+$$\sum (\text{Investment Ratio} + \text{Fixed Obligation Ratio} + \text{Discretionary Ratio}) \le 1.0$$
 This prevents out-of-manifold synthetic vectors from distorting model inference.
